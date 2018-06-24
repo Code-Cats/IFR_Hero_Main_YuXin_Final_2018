@@ -1,0 +1,13 @@
+*.o
+*.crf
+*.d
+*.iex
+*.map
+*.lst
+*.htm
+*.lnp
+*.sct
+*.dep
+DebugConfig/*
+Listings/*
+Objects/*
