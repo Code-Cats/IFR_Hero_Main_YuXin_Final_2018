@@ -1,4 +1,5 @@
 #include "uart4.h"
+#include "protect.h"
  /**
  * @brief  UART4 INIT
  * @note   UART4 INIT
@@ -209,7 +210,7 @@ void data_decode(uint16_t ch)
 						Gyro_Data.angle[ROLL]=Data_Boundary_Transform(Gyro_Data.angle[ROLL]);
 						Gyro_Data.angle[YAW]=-Data_Boundary_Transform(Gyro_Data.angle[YAW]);
 						
-						t_gyro_count++;
+						LostCountFeed(&Error_Check.count[LOST_IMU]);
 						////////////////////////////////////////////////////
 						STATUS = IDLE;
 					}else STATUS = IDLE;

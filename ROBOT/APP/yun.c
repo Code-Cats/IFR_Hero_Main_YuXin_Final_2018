@@ -67,7 +67,7 @@ void Yun_Control_External_Solution(void)	//外置反馈方案
 		}
 	}
 	
-	Yun_WorkState_Turn_Task();	//取弹时云台转向标志位
+//	Yun_WorkState_Turn_Task();	//新版无需取弹//取弹时云台转向标志位
 	
 	if(GetWorkState()==NORMAL_STATE||GetWorkState()==WAIST_STATE)	//仅在正常模式下受控	//取弹受控为暂时加入，之后以传感器自动进行	//取弹受控已取消，云台跟随底盘
 	{
@@ -83,13 +83,13 @@ void Yun_Control_External_Solution(void)	//外置反馈方案
 	
 	yun_control_pcorrc_last=Yun_Control_RCorPC;
 	
-	if(GetWorkState()==TAKEBULLET_STATE&&Yun_WorkState_Turn180_statu==1)	//取弹模式且已经转了180°一直校准		//后续取消180°
+	if(GetWorkState()==TAKEBULLET_STATE)	//新版取消了旋转180//取弹模式且已经转了180°一直校准		//后续取消180°
 	{
-		yunMotorData.yaw_tarP=(Gyro_Data.angle[2]*10+(YAW_INIT-yunMotorData.yaw_fdbP)*3600/8192);	//反馈放大10倍并将目标位置置为中点
+		yunMotorData.yaw_tarP=(Gyro_Data.angle[YAW]*10+(YAW_INIT-yunMotorData.yaw_fdbP)*3600/8192);	//反馈放大10倍并将目标位置置为中点
 	}
 	else if(GetWorkState()==NORMAL_STATE&&Replenish_Bullet_Statu==1)
 	{
-		yunMotorData.yaw_tarP=(Gyro_Data.angle[2]*10+(YAW_INIT-yunMotorData.yaw_fdbP)*3600/8192);	//反馈放大10倍并将目标位置置为中点
+		yunMotorData.yaw_tarP=(Gyro_Data.angle[YAW]*10+(YAW_INIT-yunMotorData.yaw_fdbP)*3600/8192);	//反馈放大10倍并将目标位置置为中点
 	}
 
 	/////////////////////
@@ -100,19 +100,19 @@ void Yun_Control_External_Solution(void)	//外置反馈方案
 	
 	////////////////////////////
 	
-	yunMotorData.pitch_tarV=-PID_General(yunMotorData.pitch_tarP,(yunMotorData.pitch_fdbP),&PID_PITCH_POSITION);
+	yunMotorData.pitch_tarV=PID_General(yunMotorData.pitch_tarP,(yunMotorData.pitch_fdbP),&PID_PITCH_POSITION);
 		
-	if(yunMotorData.yaw_tarP-Gyro_Data.angle[2]*10>1800)	//过零点
+	if(yunMotorData.yaw_tarP-Gyro_Data.angle[YAW]*10>1800)	//过零点
 	{
-		yunMotorData.yaw_tarV=-PID_General(yunMotorData.yaw_tarP,Gyro_Data.angle[2]*10+3600,&PID_YAW_POSITION);
+		yunMotorData.yaw_tarV=PID_General(yunMotorData.yaw_tarP,Gyro_Data.angle[YAW]*10+3600,&PID_YAW_POSITION);
 	}
-	else if(yunMotorData.yaw_tarP-Gyro_Data.angle[2]*10<-1800)
+	else if(yunMotorData.yaw_tarP-Gyro_Data.angle[YAW]*10<-1800)
 	{
-		yunMotorData.yaw_tarV=-PID_General(yunMotorData.yaw_tarP,Gyro_Data.angle[2]*10-3600,&PID_YAW_POSITION);
+		yunMotorData.yaw_tarV=PID_General(yunMotorData.yaw_tarP,Gyro_Data.angle[YAW]*10-3600,&PID_YAW_POSITION);
 	}
 	else
 	{
-		yunMotorData.yaw_tarV=-PID_General(yunMotorData.yaw_tarP,Gyro_Data.angle[2]*10,&PID_YAW_POSITION);
+		yunMotorData.yaw_tarV=PID_General(yunMotorData.yaw_tarP,Gyro_Data.angle[YAW]*10,&PID_YAW_POSITION);
 	}
 	
 //	if(KeyBoardData[KEY_SHIFT].value==1)	//分区赛版本扩展云台范围
@@ -121,8 +121,8 @@ void Yun_Control_External_Solution(void)	//外置反馈方案
 //	}
 	
 	
-	yunMotorData.pitch_output=PID_General(yunMotorData.pitch_tarV,(-Gyro_Data.angvel[1]/10.0),&PID_PITCH_SPEED);
-	yunMotorData.yaw_output=PID_General(yunMotorData.yaw_tarV,(-Gyro_Data.angvel[2]/10.0),&PID_YAW_SPEED);	//采用外界陀螺仪做反馈
+	yunMotorData.pitch_output=-PID_General(yunMotorData.pitch_tarV,(Gyro_Data.angvel[PITCH]),&PID_PITCH_SPEED);
+	yunMotorData.yaw_output=-PID_General(yunMotorData.yaw_tarV,(Gyro_Data.angvel[YAW]),&PID_YAW_SPEED);	//采用外界陀螺仪做反馈
 }
 
 
@@ -256,21 +256,21 @@ void Yun_Control_Inscribe_Solution(void)	//当陀螺仪崩了时单速度反馈方案
 			yunMotorData.yaw_tarV=((RC_Ctl.rc.ch2-1024)*300.0/660.0);
 		}
 		
-		yunMotorData.pitch_tarP=(-(RC_Ctl.rc.ch3-1024)*460.0/660.0)+PITCH_INIT;	//-50是因为陀螺仪水平时云台上扬
+		yunMotorData.pitch_tarP=((RC_Ctl.rc.ch3-1024)*460.0/660.0)+PITCH_INIT;	//-50是因为陀螺仪水平时云台上扬
 	}
 	
 	
 	Yun_WorkState_Turn_Task();	//取弹时云台转向标志位	//内部有对于陀螺仪状态的区别
 	
-	yunMotorData.pitch_tarV=-PID_General(yunMotorData.pitch_tarP,(yunMotorData.pitch_fdbP),&PID_PITCH_POSITION);	//pitch位置环
+	yunMotorData.pitch_tarV=PID_General(yunMotorData.pitch_tarP,(yunMotorData.pitch_fdbP),&PID_PITCH_POSITION);	//pitch位置环
 	
 //	if(KeyBoardData[KEY_SHIFT].value==1)	//分区赛版本扩展云台范围
 //	{
 //		Yun_Pitch_Extension(yunMotorData.pitch_tarP);	//pitch扩展
 //	}
 	
-	yunMotorData.pitch_output=PID_General(yunMotorData.pitch_tarV,(-Gyro_Data.angvel[1]/10.0),&PID_PITCH_SPEED);
-	yunMotorData.yaw_output=PID_General(yunMotorData.yaw_tarV,(-Gyro_Data.angvel[2]/10.0),&PID_YAW_SPEED);	//采用外界陀螺仪做反馈
+	yunMotorData.pitch_output=-PID_General(yunMotorData.pitch_tarV,(Gyro_Data.angvel[PITCH]),&PID_PITCH_SPEED);
+	yunMotorData.yaw_output=-PID_General(yunMotorData.yaw_tarV,(Gyro_Data.angvel[YAW]),&PID_YAW_SPEED);	//采用外界陀螺仪做反馈
 }
 
 

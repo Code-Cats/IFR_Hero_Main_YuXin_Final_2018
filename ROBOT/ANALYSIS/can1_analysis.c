@@ -29,21 +29,18 @@ void CAN1_Feedback_Analysis(CanRxMsg *rx_message)
 			 }
 			 case 0x202:
 			 {
-//				 LostCountFeed(&Error_Check.count[LOST_LIFT2]);
 				 break;
 			 }
 			 case 0x203:	//shoot 下
 			 {
 				 Shoot_Feedback_Deal(&shoot_Data_Down,&shoot_Motor_Data_Down,rx_message);	//临时用
 					LostCountFeed(&Error_Check.count[LOST_SM_DOWN]);
-//				 LostCountFeed(&Error_Check.count[LOST_LIFT3]);
 				 break;
 			 }
 			 case 0x204:	//shoot 上
 			 {
 				 Shoot_Feedback_Deal(&shoot_Data_Up,&shoot_Motor_Data_Up,rx_message);	//临时用
 					LostCountFeed(&Error_Check.count[LOST_SM_UP]);
-//				 LostCountFeed(&Error_Check.count[LOST_LIFT4]);
 				 break;
 			 }
 			 case 0x205:	//yaw

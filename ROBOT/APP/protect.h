@@ -33,7 +33,7 @@ extern Error_check_t Error_Check;
 
 #define LOST_CYCLE \
 {\
-	17,\
+	6,\
 	17,\
 	4,\
 	10,\

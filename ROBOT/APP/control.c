@@ -248,7 +248,6 @@ void Work_State_Change_BackProtect(void)	//µ±´ÓÄ³Ò»×´Ì¬ÍË³öÊ±£¬È·±£¸Ã×´Ì¬µÄÒ»ÇĞÒ
 }
 
 
-s32 per_state_count=0;
 void Work_Execute(void)	//¹¤×÷Ö´ĞĞ2018.7.1
 {
 	switch (GetWorkState())	//2018.3.15	Ö´ĞĞÈÎÎñ¿é
@@ -263,7 +262,7 @@ void Work_Execute(void)	//¹¤×÷Ö´ĞĞ2018.7.1
 					SetWorkState(PREPARE_STATE);	//´Ë²½ÒâÎ¶×Ô¼ìÍ¨¹ı£¬Ò»ÇĞÓ²¼şÄ£¿éÕı³£
 					//Êı¾İ³õÊ¼»¯¡ı
 					yunMotorData.pitch_tarP=PITCH_INIT;	//-50ÊÇÒòÎªÍÓÂİÒÇË®Æ½Ê±ÔÆÌ¨ÉÏÑï	//ÍÓÂİÒÇÕı·½ÏòÔÆÌ¨ÏòÏÂ
-					yunMotorData.yaw_tarP=(Gyro_Data.angle[2]*10+(YAW_INIT-yunMotorData.yaw_fdbP)*3600/8192);	//·´À¡·Å´ó10±¶²¢½«Ä¿±êÎ»ÖÃÖÃÎªÖĞµã
+					yunMotorData.yaw_tarP=(Gyro_Data.angle[YAW]*10+(YAW_INIT-yunMotorData.yaw_fdbP)*3600/8192);	//·´À¡·Å´ó10±¶²¢½«Ä¿±êÎ»ÖÃÖÃÎªÖĞµã
 				}
 			}
 			break;
@@ -271,12 +270,11 @@ void Work_Execute(void)	//¹¤×÷Ö´ĞĞ2018.7.1
 		case PREPARE_STATE:	//Ô¤±¸Ä£Ê½
 		{	//µÈ´ı³µÉí×´Ì¬ÎÈ¶¨£¬²¢ÉèÖÃ³õÖµ
 			Yun_Task();	//¿ªÆôµ×ÅÌ
-			per_state_count++;
 //			if(abs(Gyro_Data.angvel[0])<20&&abs(Gyro_Data.angvel[2])<20&&abs(yunMotorData.pitch_tarP-(Gyro_Data.angle[0]*8192/360.0f+PITCH_INIT))<50)	//ÔÆÌ¨ÒÑ¾ÍÎ»	//Î»ÖÃ»·Çé¿öÏÂ
-////////////			if(abs(Gyro_Data.angvel[0])<20)	//ÔÆÌ¨ÒÑ¾ÍÎ»£¬µ¥ËÙ¶È»·Çé¿ö
-////////////			{
-				SetWorkState(CALI_STATE);
-//////////////			}
+			if(abs(Gyro_Data.angvel[YAW])<3&&Error_Check.statu[LOST_IMU]!=1)	//ÔÆÌ¨ÒÑ¾ÍÎ»£¬ÇÒÓĞ·´À¡
+			{
+////////////				SetWorkState(CALI_STATE);
+			}
 			Shoot_Task();	//ÁÙÊ±µ÷ÊÔ
 			break;
 		}
@@ -441,6 +439,8 @@ LED_Blink_Run();
 
 //extern YUN_MOTOR_DATA 			yunMotorData;
 
+s16 t_yaw_send,t_pitch_send=0;
+
 void Motor_Send(void)
 {
 	switch (GetWorkState())	//2018.3.15
@@ -455,8 +455,8 @@ void Motor_Send(void)
 		}
 		case PREPARE_STATE:	//Ô¤±¸Ä£Ê½
 		{	//µÈ´ı³µÉí×´Ì¬ÎÈ¶¨£¬²¢ÉèÖÃ³õÖµ
-			CAN1_Yun_SendMsg(yunMotorData.yaw_output,yunMotorData.pitch_output);	//CAN2-1000	//È¡Ïû·´À¡²¹³¥
-	//		CAN1_Yun_SendMsg(t_yaw_16t,t_pitch_16t);	//µ÷ÊÔÓÃÄ£Ê½
+			CAN1_Yun_SendMsg(0,yunMotorData.pitch_output);	//CAN2-1000	//È¡Ïû·´À¡²¹³¥
+//			CAN1_Yun_SendMsg(t_yaw_send,t_pitch_send);	//µ÷ÊÔÓÃÄ£Ê½
 //			CAN_Motor6623_calibration();
 			//CAN1_Yun_SendMsg(yunMotorData.yaw_output+Yaw_output_offset(yunMotorData.yaw_fdbP),yunMotorData.pitch_output+Pitch_output_offset(yunMotorData.pitch_tarP));	//CAN2-1000
 			CAN2_Chassis_SendMsg(0,0,0,0);

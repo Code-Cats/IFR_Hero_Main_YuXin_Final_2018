@@ -92,7 +92,7 @@ void Check_Task(void)
 
 }
 
-u8 IMU_Check_Useless_State=1;	//陀螺仪失效检测位	//临时设置成1
+u8 IMU_Check_Useless_State=0;	//陀螺仪失效检测位	//临时设置成1
 void IMU_Check_Useless(void)	//陀螺仪检测失效
 {
 	static u16 IMU_check_useless_count=0;
