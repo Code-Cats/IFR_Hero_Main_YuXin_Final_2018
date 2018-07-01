@@ -3,13 +3,7 @@
 LIFT_POSITION_ENCODER chassis_position_encoder[4]={0};
 
 extern CHASSIS_DATA chassis_Data;
-extern SHOOT_DATA shoot_Data_Down;
-extern SHOOT_MOTOR_DATA shoot_Motor_Data_Down;
 
-extern SHOOT_DATA shoot_Data_Up;
-extern SHOOT_MOTOR_DATA shoot_Motor_Data_Up;
-
-extern u16 t_up_sm_count_1s;
 /******************************************
 函数名：CAN2_Feedback_Analysis
 函数功能：对底盘电机以及云台电机进行数据解析
@@ -52,16 +46,14 @@ void CAN2_Feedback_Analysis(CanRxMsg *rx_message)
 				LostCountFeed(&Error_Check.count[LOST_CM4]);
 				break;
 			}
-			case 0x205:	//shoot 下
+			case 0x205:	//新英雄改
 			{
-			  Shoot_Feedback_Deal(&shoot_Data_Down,&shoot_Motor_Data_Down,rx_message);	//临时用
-				LostCountFeed(&Error_Check.count[LOST_SM_DOWN]);
+			  
 			  break;
 			}
-			case 0x206:	//shoot 上
+			case 0x206:	//新英雄改
 			{
-			  Shoot_Feedback_Deal(&shoot_Data_Up,&shoot_Motor_Data_Up,rx_message);	//临时用
-				LostCountFeed(&Error_Check.count[LOST_SM_UP]);
+			  
 			  break;
 			}
 			 default:
@@ -98,36 +90,6 @@ void CAN2_Chassis_SendMsg(int motor_201,int motor_202,int motor_203,int motor_20
     TxMessage.Data[7] = (unsigned char)(motor_204&0xff);
 		 
     CAN_Transmit(CAN2,&TxMessage);
-}
-
-
-/****************************************************
-函数名称：CAN2_Shoot_SendMsg
-函数功能：将拨弹电机数据解析后发出
-函数参数：motor_205*******下拨弹电机转速
-          motor_206*******上拨弹电机转速
-
-函数返回值： 无
-描述：将数据存入tx_message结构体再由CAN_Transmit发送
-****************************************************/
-void CAN2_Shoot_SendMsg(int16_t motor_205,int16_t motor_206)
-{	  
-    CanTxMsg tx_message;
-    tx_message.StdId = 0x1ff;
-    tx_message.IDE = CAN_Id_Standard;//标准帧
-    tx_message.RTR = CAN_RTR_Data;   //数据帧
-    tx_message.DLC = 0x08;           //帧长度为8
-    
-    tx_message.Data[0] = (unsigned char)(motor_205>>8);
-    tx_message.Data[1] = (unsigned char)motor_205;
-    tx_message.Data[2] = (unsigned char)(motor_206>>8);
-    tx_message.Data[3] = (unsigned char)motor_206;
-    tx_message.Data[4] = 0x00;
-    tx_message.Data[5] = 0x00;
-    tx_message.Data[6] = 0x00;
-    tx_message.Data[7] = 0x00;
-    
-    CAN_Transmit(CAN2,&tx_message);
 }
 
 

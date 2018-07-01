@@ -5,8 +5,8 @@
 #define ROLL 1
 #define YAW 2
 
-extern float tar_attitude;
-extern float Attitude_error;
+//extern float tar_attitude;
+//extern float Attitude_error;
 extern s16 t_Vw_correct;
 extern s16 Chassis_Vw;
 extern WorkState_e workState;
@@ -19,8 +19,8 @@ s16 tar_att_tem=0;
 s16 att_err=0;
 void Debug_Send_OSC(void)
 {
-	tar_att_tem=(s16)tar_attitude;
-	att_err=(s16)Attitude_error;
+	tar_att_tem=0xCC;
+	att_err=0xCC;
 	OSC_Data[0]=(s16)Gyro_Data.angle[YAW]>8;//tar_att_tem>>8;
 	OSC_Data[1]=(s16)Gyro_Data.angle[YAW];//tar_att_tem;
 	OSC_Data[2]=0;//att_err>>8;

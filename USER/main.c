@@ -10,7 +10,11 @@ u8 Judge_Send_Statu=0;	//Ë¢ÐÂ±êÖ¾
 
 int main(void)
 {
-	delay_ms(1500);
+	SetWorkState(CHECK_STATE);
+	Data_Init();
+	delay_ms(500);
+	BSP_Init();
+	delay_ms(500);
 	while(1)
 	 {
 	 }

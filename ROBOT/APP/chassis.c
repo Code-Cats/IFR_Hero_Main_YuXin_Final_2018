@@ -19,7 +19,6 @@ extern GYRO_DATA Gyro_Data;
 extern YUN_MOTOR_DATA 	yunMotorData;
 extern tPowerHeatData 	testPowerHeatData;      //实时功率热量数据
 extern u32 time_1ms_count;
-extern IslandAttitudeCorrectState_e IslandAttitude_Correct_State;	//登岛姿态自校正
 extern ViceControlDataTypeDef ViceControlData;
 
 extern u8 Yun_WorkState_Turn180_statu;	//180旋转到位标志位，放在了上面
@@ -64,11 +63,6 @@ void Remote_Task(void)
 void Chassis_Control_External_Solution(void)	//陀螺仪正常的底盘解决方案
 {
 	static u8 chassis_follow_statu_last=0;	//记录上一次状态、目的是消除按下键盘触发不跟随模式和键盘控制模式有Vw残留的问题
-	
-	if(GetWorkState()!=ASCEND_STATE&&GetWorkState()!=DESCEND_STATE)	//其他状态下均收起导轮	//需要改进，在切换到手动模式时不收导轮
-	{
-		ViceControlData.valve[VALVE_ISLAND]=0;
-	}
 	
 	if(GetWorkState()==NORMAL_STATE)	//底盘PID复位
 	{
@@ -156,10 +150,6 @@ void Chassis_Control_External_Solution(void)	//陀螺仪正常的底盘解决方案
 	
 	
 	if((GetWorkState()==NORMAL_STATE||GetWorkState()==WAIST_STATE)&&Replenish_Bullet_Statu==0)	//底盘跟随标志位定义块	//取弹、补弹不受云台控
-	{
-		Chassis_Follow_Statu=1;
-	}
-	else if((GetWorkState()==ASCEND_STATE||GetWorkState()==DESCEND_STATE)&&IslandAttitude_Correct_State==CORRECT_CHASSIS_STATE)	//上下岛模式
 	{
 		Chassis_Follow_Statu=1;
 	}
@@ -298,7 +288,7 @@ void Chassis_Control_External_Solution(void)	//陀螺仪正常的底盘解决方案
 	chassis_Data.rb_wheel_output=PID_General(chassis_Data.rb_wheel_tarV,chassis_Data.rb_wheel_fdbV,&PID_Chassis_Speed[RB]);
 
 	
-	if((GetWorkState()==NORMAL_STATE||GetWorkState()==ASCEND_STATE)&&RC_Ctl.rc.switch_left==RC_SWITCH_UP)	//扩展性整体比例PID补偿块
+	if(GetWorkState()==NORMAL_STATE&&RC_Ctl.rc.switch_left==RC_SWITCH_UP)	//扩展性整体比例PID补偿块
 	{
 		Extended_Integral_PID(&chassis_Data);
 	}
@@ -324,11 +314,6 @@ void Chassis_Control_External_Solution(void)	//陀螺仪正常的底盘解决方案
 void Chassis_Control_Inscribe_Solution(void)	//陀螺仪正常的底盘解决方案	/////////////////////////////////////////仅跟随，扭腰可能不同
 {
 	static u8 chassis_follow_statu_last=0;	//记录上一次状态、目的是消除按下键盘触发不跟随模式和键盘控制模式有Vw残留的问题
-	
-	if(GetWorkState()!=ASCEND_STATE&&GetWorkState()!=DESCEND_STATE)	//其他状态下均收起导轮	//需要改进，在切换到手动模式时不收导轮
-	{
-		ViceControlData.valve[VALVE_ISLAND]=0;
-	}
 	
 	if(GetWorkState()==NORMAL_STATE)	//底盘PID复位
 	{
@@ -416,10 +401,6 @@ void Chassis_Control_Inscribe_Solution(void)	//陀螺仪正常的底盘解决方案	////////
 	
 	
 	if((GetWorkState()==NORMAL_STATE||GetWorkState()==WAIST_STATE)&&Replenish_Bullet_Statu==0)	//底盘跟随标志位定义块	//取弹、补弹不受云台控
-	{
-		Chassis_Follow_Statu=1;
-	}
-	else if((GetWorkState()==ASCEND_STATE||GetWorkState()==DESCEND_STATE)&&IslandAttitude_Correct_State==CORRECT_CHASSIS_STATE)	//上下岛模式
 	{
 		Chassis_Follow_Statu=1;
 	}
@@ -558,7 +539,7 @@ void Chassis_Control_Inscribe_Solution(void)	//陀螺仪正常的底盘解决方案	////////
 	chassis_Data.rb_wheel_output=PID_General(chassis_Data.rb_wheel_tarV,chassis_Data.rb_wheel_fdbV,&PID_Chassis_Speed[RB]);
 
 	
-	if((GetWorkState()==NORMAL_STATE||GetWorkState()==ASCEND_STATE)&&RC_Ctl.rc.switch_left==RC_SWITCH_UP)	//扩展性整体比例PID补偿块
+	if(GetWorkState()==NORMAL_STATE&&RC_Ctl.rc.switch_left==RC_SWITCH_UP)	//扩展性整体比例PID补偿块
 	{
 		Extended_Integral_PID(&chassis_Data);
 	}

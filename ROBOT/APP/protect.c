@@ -72,18 +72,18 @@ void Check_Task(void)
 	}
 	
 	
-	if(Error_Check.statu[LOST_DBUS]==1)
-	{
-		if(GetWorkState()==CHECK_STATE)
-		{
-			SetWorkState(LOST_STATE);	//启动时没有遥控信号的选择
-		}
-		else
-		{
-			SetWorkState(PROTECT_STATE);
-		}
-		
-	}
+////////////////////	if(Error_Check.statu[LOST_DBUS]==1)
+////////////////////	{
+////////////////////		if(GetWorkState()==CHECK_STATE)
+////////////////////		{
+////////////////////			SetWorkState(LOST_STATE);	//启动时没有遥控信号的选择
+////////////////////		}
+////////////////////		else
+////////////////////		{
+////////////////////			SetWorkState(PROTECT_STATE);
+////////////////////		}
+////////////////////		
+////////////////////	}
 	
 	if(RC_Ctl.key.v_h!=0||RC_Ctl.key.v_l!=0||abs(RC_Ctl.mouse.x)>3)
 	{

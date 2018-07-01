@@ -484,11 +484,6 @@
           <GroupName>APP</GroupName>
           <Files>
             <File>
-              <FileName>auto_lift.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\ROBOT\APP\auto_lift.c</FilePath>
-            </File>
-            <File>
               <FileName>auto_takebullet.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\ROBOT\APP\auto_takebullet.c</FilePath>
@@ -517,11 +512,6 @@
               <FileName>imu_deal.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\ROBOT\APP\imu_deal.c</FilePath>
-            </File>
-            <File>
-              <FileName>lift.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\ROBOT\APP\lift.c</FilePath>
             </File>
             <File>
               <FileName>protect.c</FileName>

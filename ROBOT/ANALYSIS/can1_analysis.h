@@ -16,8 +16,9 @@ typedef struct
 
 
 void CAN1_Feedback_Analysis(CanRxMsg *rx_message);
-void CAN1_Lift_SendMsg(int motor_201,int motor_202,int motor_203,int motor_204);
+//void CAN1_Lift_SendMsg(int motor_201,int motor_202,int motor_203,int motor_204);
 void CAN1_Yun_SendMsg(int16_t motor_205,int16_t motor_206);	//yaw  pitch
+void CAN2_Shoot_Bullet_SendMsg(int16_t motor_201,int16_t motor_202,int16_t motor_203,int16_t motor_204);
 void CAN_Motor6623_calibration(void);
 
 void Position_Data_deal_DIV8(s32 * value,LIFT_POSITION_ENCODER *Receive,CanRxMsg * msg);	//分辨率转子1/8圈

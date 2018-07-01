@@ -35,14 +35,9 @@ const u32 servo_POORdelay[2]={500,500};	//延时参数
 //#define VALVE_BULLET_PROTRACT 1	//前伸
 //#define VALVE_BULLET_CLAMP 2	//夹紧
 
-u8 auto_takebullet_statu=0;	//不能在切出时置0，因为要等待一个流程完整结束
 void TakeBullet_Control_Center(void)
 {
 	static u8 swicth_Last_state=0;	//右拨杆
-//	static u8 pwm_state=0;
-//	static u8 valve_state=0;
-//	static u8 valve_delay_statu=0;
-//	static u32 valve_time_record=0;
 	
 	static u8 valve_last[6]={0};	//记录上一次数值	//保持与工程车兼容性
 	static u8 servo_last[2]={0};	//记录上一次数值	//保持与工程车兼容性
@@ -52,136 +47,9 @@ void TakeBullet_Control_Center(void)
 	static u32 valve_startPOOR_time[6]={0};	//记录逆向触发时间	//保持与工程车兼容性
 	static u32 servo_startPOOR_time[2]={0};	//记录逆向触发时间	//保持与工程车兼容性
 	
-
-	if(1)	//GetWorkState()==TAKEBULLET_STATE&&RC_Ctl.rc.switch_left==RC_SWITCH_DOWN	//将条件注释移到标志位受控处，根据标志位执行处不受影响
-	{
-//		for(int i=0;i<4;i++)
-//		{
-//		PID_Chassis_Speed[i].k_i=CHASSIS_SPEED_PID_I*3;
-//		PID_Chassis_Speed[i].i_sum_max=CHASSIS_SPEED_I_MAX*1.5f;
-//		}
-////		if(swicth_Last_state==RC_SWITCH_MIDDLE&&RC_Ctl.rc.switch_right==RC_SWITCH_DOWN)	//shoot_Motor_Data.tarP-shoot_Motor_Data.fdbP	//待加入
-////		{
-////			auto_takebullet_statu=!auto_takebullet_statu;
-////			TakeBulletState=BULLET_ACQUIRE;
-////		}	
-////		else if(swicth_Last_state==RC_SWITCH_MIDDLE&&RC_Ctl.rc.switch_right==RC_SWITCH_DOWN)	//暂时无用
-////		{
-////		}
-		if(GetWorkState()==TAKEBULLET_STATE&&RC_Ctl.rc.switch_left==RC_SWITCH_DOWN)
-		{
-			if(RC_Ctl.rc.ch3-1024>40&&auto_takebullet_statu==0)
-			{
-				auto_takebullet_statu=1;
-				TakeBulletState=BULLET_ACQUIRE;
-			}
-			else if(RC_Ctl.rc.ch3-1024<-40&&auto_takebullet_statu==0)
-			{
-				auto_takebullet_statu=0;
-				TakeBulletState=BULLET_ACQUIRE;
-			}
-		}
-		
-		
-		
-		{	//自动取弹块
-			if(auto_takebullet_statu==1)	//自动取弹
-			{
-				switch(TakeBulletState)
-				{
-					case BULLET_ACQUIRE:	//前伸、夹紧、抬起动作	称之为获得过程
-					{
-						if(valve_fdbstate[VALVE_BULLET_PROTRACT]==0)//如果前伸没到位 ，腿执行到取弹合适位置函数	//这条语句可以让多次取弹与第一次取弹兼容
-						{
-							if(SetCheck_GripLift(1)==1)	//下降到抓取高度
-							{
-								ViceControlData.valve[VALVE_BULLET_PROTRACT]=1;	//前伸函数
-							}
-						}
-						
-						if(valve_fdbstate[VALVE_BULLET_PROTRACT]==1&&SetCheck_GripLift(1)==1)	//如果前伸到位且升降到位
-						{
-							ViceControlData.valve[VALVE_BULLET_CLAMP]=1;
-						}
-						if(valve_fdbstate[VALVE_BULLET_CLAMP]==1)//如果前伸到位腿升起函数
-						{
-							if(SetCheck_GripLift(0)==1)	//上升至可旋转高度,覆盖前面的SetCheck_GripLift(1)==1
-							TakeBulletState=BULLET_POUROUT;//直接切换到下一状态
-						}
-						break;
-					}
-					case BULLET_POUROUT:	//车身倾斜、舵机旋转	称之为倒弹过程
-					{
-						ViceControlData.servo[0]=1;
-						if(SetCheck_SlopeLift(1)==1)//腿倾斜函数
-						{//略作延时，切换到下一状态	//此处缺少延时
-							if(servo_fdbstate[0]==1)
-							TakeBulletState=BULLET_THROWOUT;
-						}
-						break;
-					}
-					case BULLET_THROWOUT:	//舵机旋回、车身抬起、夹紧松开	称之为抛落过程
-					{
-						SetCheck_GripLift(0);
-						ViceControlData.servo[0]=0;
-						if(SetCheck_GripLift(0)==1)	//先让舵机归位的原因是以便让弹药箱能够顺利回位，后来发现同时进行
-						{
-							ViceControlData.servo[0]=0;
-							if(servo_fdbstate[0]==0)//车身抬起函数	/
-							{
-								ViceControlData.valve[VALVE_BULLET_CLAMP]=0;
-								auto_takebullet_statu=0;
-							//	ViceControlData.valve[VALVE_BULLET_PROTRACT]=0;	//注释以便平移取下一颗弹
-							}//如果车身抬起且舵机到位，则松开夹紧，至此一个完整取弹结束
-						}
-						break;
-					}
-				}
-			}
-			else if(GetWorkState()==TAKEBULLET_STATE)	//因为改变了结构，该函数一直执行，所以在完成了完整取弹流程且不在取弹模式后，不应该执行这里,因为fi else的逻辑，这里仅会在auto=0时执行
-			{
-				ViceControlData.servo[0]=0;
-				if(servo_fdbstate[0]==0)
-				{
-					ViceControlData.valve[VALVE_BULLET_CLAMP]=0;
-				//	ViceControlData.valve[VALVE_BULLET_PROTRACT]=0;	//注释以便平移取下一颗弹
-				}
-				
-				if(valve_fdbstate[VALVE_BULLET_PROTRACT]==0)
-				{
-					SetCheck_GripLift(1);
-				}
-			}
-		}
-		
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
-//		if(valve_state==0)	//测试分立操作
-//		{
-//			ViceControlData.valve[VALVE_BULLET_PROTRACT]=0;
-//			ViceControlData.valve[VALVE_BULLET_CLAMP]=0;
-//			valve_delay_statu=0;
-//		}
-//		else
-//		{
-//			if(valve_delay_statu==0)
-//			{
-//				valve_time_record=time_1ms_count;
-//				valve_delay_statu=1;
-//			}
-//			ViceControlData.valve[VALVE_BULLET_PROTRACT]=1;
-//			if(valve_delay_statu==1&&time_1ms_count-valve_time_record>1500)
-//			{
-//				ViceControlData.valve[VALVE_BULLET_CLAMP]=1;
-//			}
-//			
-//		}
-		
-	}
-	else
-	{
-		ViceControlData.valve[VALVE_BULLET_CLAMP]=0;
-		ViceControlData.valve[VALVE_BULLET_PROTRACT]=0;
-	}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	/******************************************************************
 以下三个for为反馈假设检测方案	//在任意时刻都进行检测
@@ -305,7 +173,7 @@ void TakeBullet_Control_Center(void)
   PWM3_2=(u16)pwm_r_t;
 }
 
-
+/********************************************************************
 u8 SetCheck_TakeBullet_TakeBack_statu=0;	//切出取弹保护执行标志位
 void SetCheck_TakeBullet_TakeBack(void)	//切出取弹机构回位保护
 {
@@ -356,7 +224,7 @@ u8 SetCheck_SlopeLift(u8 slope_state)	//暂时只升后腿	slope倾斜的意思	//0表示不倾
 }
 
 
-
+*****************************************************************/
 
 
 

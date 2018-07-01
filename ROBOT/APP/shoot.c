@@ -15,8 +15,6 @@ PID_GENERAL   PID_Shoot_Up_Speed=PID_SHOOT_SPEED_DEFAULT;
 
 extern u32 time_1ms_count;
 
-extern u8 auto_takebullet_statu;	//自动取弹标志位，此处用来自动拨弹
-
 extern KeyBoardTypeDef KeyBoardData[KEY_NUMS];
 
 extern tGameRobotState         testGameRobotState;      //比赛机器人状态
@@ -105,23 +103,11 @@ void Shoot_Instruction(void)	//发弹指令模块
 	static WorkState_e State_Record=CHECK_STATE;
 	PC_Control_Shoot(&Friction_State);
 	RC_Control_Shoot(&Friction_State);
-
 	
-	if(GetWorkState()!=TAKEBULLET_STATE&&auto_takebullet_statu_last==1&&auto_takebullet_statu==0)	//取完弹自动拨下3颗	//提前退出取弹模式
-	{
-		shoot_Data_Up.count+=3;
-		shoot_Data_Up.last_time=time_1ms_count;	//记录
-	}
-	if(State_Record==TAKEBULLET_STATE&&GetWorkState()!=TAKEBULLET_STATE&&auto_takebullet_statu==0)	//正常退出取弹模式
-	{
-		shoot_Data_Up.count+=3;
-		shoot_Data_Up.last_time=time_1ms_count;	//记录
-	}
-	
-	if((auto_takebullet_statu_last==0&&auto_takebullet_statu==1)||KeyBoardData[KEY_R].value==1)	//开摩擦轮
-	{
-		Friction_State=1;	//自动开摩擦轮
-	}
+//	if((auto_takebullet_statu_last==0&&auto_takebullet_statu==1)||KeyBoardData[KEY_R].value==1)	//开摩擦轮
+//	{
+//		Friction_State=1;	//自动开摩擦轮
+//	}
 //	shoot_time_record=shoot_time_measure(shoot_Data_Down.count,shoot_Data_Down.count_fdb,last_mouse_press_l);////////////////////////////////
 	
 	shoot_Data_Down.motor_tarP=((float)shoot_Data_Down.count*SINGLE_INCREMENT);	//新2006
@@ -129,7 +115,6 @@ void Shoot_Instruction(void)	//发弹指令模块
 	Prevent_Jam_Down(&shoot_Data_Down,&shoot_Motor_Data_Down);
 	Prevent_Jam_Up(&shoot_Data_Up,&shoot_Motor_Data_Up);
 	
-	auto_takebullet_statu_last=auto_takebullet_statu;
 	State_Record=GetWorkState();
 }
 

@@ -25,7 +25,6 @@ extern  MPU6050_REAL_DATA    MPU6050_Real_Data;
 extern	RC_Ctl_t RC_Ctl;
 extern KeyBoardTypeDef KeyBoardData[KEY_NUMS];
 extern GYRO_DATA Gyro_Data;
-extern IslandAttitudeCorrectState_e IslandAttitude_Correct_State;	//登岛姿态自校正
 extern u8 Chassis_Follow_Statu;	//底盘跟随标志位
 extern volatile float yaw_follow_real_error;	//扭腰时的底盘跟随偏差
 extern float yaw_follow_error;	//普通时的底盘跟随误差
@@ -84,23 +83,7 @@ void Yun_Control_External_Solution(void)	//外置反馈方案
 	
 	yun_control_pcorrc_last=Yun_Control_RCorPC;
 	
-	if(GetWorkState()==ASCEND_STATE||GetWorkState()==DESCEND_STATE)	//登岛姿态调整 当自校正状态时利用底盘跟随，其他主动矫正状态进行云台归位
-	{
-		switch(IslandAttitude_Correct_State)
-		{
-			case CALI_SELF_STATE:
-			{
-				yunMotorData.yaw_tarP=(Gyro_Data.angle[2]*10+(YAW_INIT-yunMotorData.yaw_fdbP)*3600/8192);	//反馈放大10倍并将目标位置置为中点
-				break;
-			}
-			case CORRECT_CHASSIS_STATE:
-			{
-				
-				break;
-			}
-		}
-	}
-	else if(GetWorkState()==TAKEBULLET_STATE&&Yun_WorkState_Turn180_statu==1)	//取弹模式且已经转了180°一直校准
+	if(GetWorkState()==TAKEBULLET_STATE&&Yun_WorkState_Turn180_statu==1)	//取弹模式且已经转了180°一直校准		//后续取消180°
 	{
 		yunMotorData.yaw_tarP=(Gyro_Data.angle[2]*10+(YAW_INIT-yunMotorData.yaw_fdbP)*3600/8192);	//反馈放大10倍并将目标位置置为中点
 	}
@@ -132,10 +115,10 @@ void Yun_Control_External_Solution(void)	//外置反馈方案
 		yunMotorData.yaw_tarV=-PID_General(yunMotorData.yaw_tarP,Gyro_Data.angle[2]*10,&PID_YAW_POSITION);
 	}
 	
-	if(KeyBoardData[KEY_SHIFT].value==1)
-	{
-		Yun_Pitch_Extension(yunMotorData.pitch_tarP);
-	}
+//	if(KeyBoardData[KEY_SHIFT].value==1)	//分区赛版本扩展云台范围
+//	{
+//		Yun_Pitch_Extension(yunMotorData.pitch_tarP);
+//	}
 	
 	
 	yunMotorData.pitch_output=PID_General(yunMotorData.pitch_tarV,(-Gyro_Data.angvel[1]/10.0),&PID_PITCH_SPEED);
@@ -281,10 +264,10 @@ void Yun_Control_Inscribe_Solution(void)	//当陀螺仪崩了时单速度反馈方案
 	
 	yunMotorData.pitch_tarV=-PID_General(yunMotorData.pitch_tarP,(yunMotorData.pitch_fdbP),&PID_PITCH_POSITION);	//pitch位置环
 	
-	if(KeyBoardData[KEY_SHIFT].value==1)
-	{
-		Yun_Pitch_Extension(yunMotorData.pitch_tarP);	//pitch扩展
-	}
+//	if(KeyBoardData[KEY_SHIFT].value==1)	//分区赛版本扩展云台范围
+//	{
+//		Yun_Pitch_Extension(yunMotorData.pitch_tarP);	//pitch扩展
+//	}
 	
 	yunMotorData.pitch_output=PID_General(yunMotorData.pitch_tarV,(-Gyro_Data.angvel[1]/10.0),&PID_PITCH_SPEED);
 	yunMotorData.yaw_output=PID_General(yunMotorData.yaw_tarV,(-Gyro_Data.angvel[2]/10.0),&PID_YAW_SPEED);	//采用外界陀螺仪做反馈
@@ -292,11 +275,11 @@ void Yun_Control_Inscribe_Solution(void)	//当陀螺仪崩了时单速度反馈方案
 
 
 
-
+/********************************老板英雄*******************************
 extern LIFT_DATA lift_Data;
-/*******************************
+*******************************
 云台电机反馈同陀螺仪：下为正，上为负
-********************************/
+********************************
 #define PITCH_EXTENSION_UP 550
 #define PITCH_EXTENSION_DOWN	550
 #define PITCH_EXTENSION_TRIGGER_UP	620	//实际活动范围：860
@@ -318,6 +301,7 @@ void Yun_Pitch_Extension(float pitch_tar)	//pitch轴扩展范围
 		lift_Data.rb_lift_tarP=LIFT_DISTANCE_FALL;
 	}
 }
+**********************************************************************/
 
 //u8 Yun_WorkState_Turn180_statu=0;	//180旋转到位标志位，放在了上面
 void Yun_WorkState_Turn_Task(void)	//模式切换时云台转向任务	//当转向完成标志位为1时切换到云台跟随底盘

@@ -87,16 +87,16 @@ void Image_Cut_Task(void)	//摄像头切换、舵机
 		Steer_Image_state=0;
 	}
 	
-	if((State_Record!=ASCEND_STATE&&GetWorkState()==ASCEND_STATE)||(State_Record!=DESCEND_STATE&&GetWorkState()==DESCEND_STATE))	//自动上下岛模式
-	{
-		Image_Cut_Screen(IMAGE_CUTLIST_CHASSIS);	//低电平
-		Steer_Image_state=1;
-	}
-	else if((State_Record==ASCEND_STATE&&GetWorkState()!=ASCEND_STATE)||(State_Record==DESCEND_STATE&&GetWorkState()!=DESCEND_STATE))
-	{
-		Image_Cut_Screen(IMAGE_CUTLIST_CHASSIS);	//低电平
-		Steer_Image_state=0;
-	}
+////////	if((State_Record!=ASCEND_STATE&&GetWorkState()==ASCEND_STATE)||(State_Record!=DESCEND_STATE&&GetWorkState()==DESCEND_STATE))	//自动上下岛模式
+////////	{
+////////		Image_Cut_Screen(IMAGE_CUTLIST_CHASSIS);	//低电平
+////////		Steer_Image_state=1;
+////////	}
+////////	else if((State_Record==ASCEND_STATE&&GetWorkState()!=ASCEND_STATE)||(State_Record==DESCEND_STATE&&GetWorkState()!=DESCEND_STATE))
+////////	{
+////////		Image_Cut_Screen(IMAGE_CUTLIST_CHASSIS);	//低电平
+////////		Steer_Image_state=0;
+////////	}
 	
 //	if(key_r_last==0&&KeyBoardData[KEY_R].value==1)
 //	{

@@ -17,8 +17,8 @@ typedef enum
 }TakeBulletState_e;
 
 
-u8 SetCheck_GripLift(u8 grip_state);	//是否与弹药箱平齐,grip抓住的意思	//0表示不抓住，即需要丢弹药箱或拔起弹药箱高度，1表示抓住，即需要夹紧弹药箱时的高度
-u8 SetCheck_SlopeLift(u8 slope_state);	//暂时只升后腿	slope倾斜的意思	//0表示不倾斜，即恢复到拔起弹药箱高度，1表示倾斜，即倾斜倒子弹状态
-void SetCheck_TakeBullet_TakeBack(void);	//切出取弹机构回位保护
+//u8 SetCheck_GripLift(u8 grip_state);	//是否与弹药箱平齐,grip抓住的意思	//0表示不抓住，即需要丢弹药箱或拔起弹药箱高度，1表示抓住，即需要夹紧弹药箱时的高度
+//u8 SetCheck_SlopeLift(u8 slope_state);	//暂时只升后腿	slope倾斜的意思	//0表示不倾斜，即恢复到拔起弹药箱高度，1表示倾斜，即倾斜倒子弹状态
+//void SetCheck_TakeBullet_TakeBack(void);	//切出取弹机构回位保护
 
 #endif

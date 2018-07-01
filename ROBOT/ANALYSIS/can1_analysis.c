@@ -1,7 +1,12 @@
 #include "can1_analysis.h"
 
-extern LIFT_DATA lift_Data;
+
 extern YUN_MOTOR_DATA	yunMotorData;	//云台挂载在CAN1上，因为CAN2预留了6pin接口，云台不需要该接口，为不浪费，故接CAN1
+
+extern SHOOT_DATA shoot_Data_Down;
+extern SHOOT_MOTOR_DATA shoot_Motor_Data_Down;
+extern SHOOT_DATA shoot_Data_Up;
+extern SHOOT_MOTOR_DATA shoot_Motor_Data_Up;
 
 LIFT_POSITION_ENCODER lift_position_encoder[4]={0};
 /**************** **************************
@@ -19,7 +24,7 @@ void CAN1_Feedback_Analysis(CanRxMsg *rx_message)
 		{
 			case 0x201:
 			 {
-				 LostCountFeed(&Error_Check.count[LOST_TBM1]);
+				 LostCountFeed(&Error_Check.count[LOST_BULLETROTATE1]);
 				 break;
 			 }
 			 case 0x202:
@@ -27,13 +32,17 @@ void CAN1_Feedback_Analysis(CanRxMsg *rx_message)
 //				 LostCountFeed(&Error_Check.count[LOST_LIFT2]);
 				 break;
 			 }
-			 case 0x203:
+			 case 0x203:	//shoot 下
 			 {
+				 Shoot_Feedback_Deal(&shoot_Data_Down,&shoot_Motor_Data_Down,rx_message);	//临时用
+					LostCountFeed(&Error_Check.count[LOST_SM_DOWN]);
 //				 LostCountFeed(&Error_Check.count[LOST_LIFT3]);
 				 break;
 			 }
-			 case 0x204:
+			 case 0x204:	//shoot 上
 			 {
+				 Shoot_Feedback_Deal(&shoot_Data_Up,&shoot_Motor_Data_Up,rx_message);	//临时用
+					LostCountFeed(&Error_Check.count[LOST_SM_UP]);
 //				 LostCountFeed(&Error_Check.count[LOST_LIFT4]);
 				 break;
 			 }
@@ -53,6 +62,38 @@ void CAN1_Feedback_Analysis(CanRxMsg *rx_message)
 			default:
 			break;
 		}
+}
+
+
+/****************************************************
+函数名称：CAN2_Shoot_Bullet_SendMsg
+函数功能：将拨弹电机及取弹电机数据解析后发出
+函数参数： motor_201				取弹电机
+					motor_203*******下拨弹电机转速
+          motor_204*******上拨弹电机转速
+
+2017.7.1
+函数返回值： 无
+描述：将数据存入tx_message结构体再由CAN_Transmit发送
+****************************************************/
+void CAN2_Shoot_Bullet_SendMsg(int16_t motor_201,int16_t motor_202,int16_t motor_203,int16_t motor_204)
+{	  
+    CanTxMsg tx_message;
+    tx_message.StdId = 0x200;
+    tx_message.IDE = CAN_Id_Standard;//标准帧
+    tx_message.RTR = CAN_RTR_Data;   //数据帧
+    tx_message.DLC = 0x08;           //帧长度为8
+    
+    tx_message.Data[0] = (char)(motor_201>>8);
+    tx_message.Data[1] = (char)motor_201;
+    tx_message.Data[2] = (char)(motor_202>>8);
+    tx_message.Data[3] = (char)motor_202;
+    tx_message.Data[4] = (char)(motor_203>>8);
+    tx_message.Data[5] = (char)motor_203;
+    tx_message.Data[6] = (char)(motor_204>>8);
+    tx_message.Data[7] = (char)motor_204;
+    
+    CAN_Transmit(CAN2,&tx_message);
 }
 
 
@@ -137,12 +178,12 @@ void CAN_Motor6623_calibration(void)	//6623标定
 	
 
 
+
 void Speed_Data_deal(s32 * fdbV,CanRxMsg * msg)
 {
 	s16 v_tem=(msg->Data[2]<<8)|msg->Data[3];
 	*fdbV=v_tem;//接收到的真实数据值  处理频率1KHz
 }
-
 
 
 void Position_Data_deal_DIV8(s32 * value,LIFT_POSITION_ENCODER *Receive,CanRxMsg * msg)	//分辨率转子1/8圈

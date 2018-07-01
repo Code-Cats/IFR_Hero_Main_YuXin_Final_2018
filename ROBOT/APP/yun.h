@@ -217,7 +217,6 @@ void __yun_yaw_offset(void);
 void RC_Control_Yun(float * yaw_tarp,float * pitch_tarp);	//1000Hz
 void PC_Control_Yun(float * yaw_tarp,float * pitch_tarp);	//1000Hz
 
-void Yun_Pitch_Extension(float pitch_tar);	//pitch÷·¿©’π∑∂Œß
 
 #endif
 
