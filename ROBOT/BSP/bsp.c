@@ -22,7 +22,6 @@ void BSP_Init(void)
 //////   MPU6050_Gyro_calibration();//
 //////	 MPU6050_IntConfiguration(); //
 	 uart4_init();              										  //UART4 INIT UART4->GYRO PORT
-	 imu_data_decode_init();
 	 delay_ms(1000);
 	 TIM6_Configuration();
 	 CAN1_Motors_Config();

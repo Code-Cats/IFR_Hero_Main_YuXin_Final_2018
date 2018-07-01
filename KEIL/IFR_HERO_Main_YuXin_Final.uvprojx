@@ -702,16 +702,6 @@
           <GroupName>IMU_URANUS</GroupName>
           <Files>
             <File>
-              <FileName>imu_data_decode.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\ROBOT\MODULE\IMU_Uranus\imu_data_decode.c</FilePath>
-            </File>
-            <File>
-              <FileName>packet.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\ROBOT\MODULE\IMU_Uranus\packet.c</FilePath>
-            </File>
-            <File>
               <FileName>uart4.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\ROBOT\MODULE\IMU_Uranus\uart4.c</FilePath>
