@@ -15,7 +15,7 @@ typedef struct  __MOTOR_FEEDBACK_DATA__
 }MOTOR_FEEDBACK_DATA;  //底盘电机反馈数据
 
 void CAN2_Feedback_Analysis(CanRxMsg *rx_message);
-void CAN2_Chassis_SendMsg(int motor_201,int motor_202,int motor_203,int motor_204);
+void CAN2_Chassis_SendMsg(int16_t motor_201,int16_t motor_202,int16_t motor_203,int16_t motor_204);
 	
 void Pitch_Board_Remove(void);
 void Yaw_Board_Remove(void);

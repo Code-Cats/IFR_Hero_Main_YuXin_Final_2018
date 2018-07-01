@@ -90,7 +90,7 @@ void CAN2_Shoot_Bullet_SendMsg(int16_t motor_201,int16_t motor_202,int16_t motor
     tx_message.Data[6] = (char)(motor_204>>8);
     tx_message.Data[7] = (char)motor_204;
     
-    CAN_Transmit(CAN2,&tx_message);
+    CAN_Transmit(CAN1,&tx_message);
 }
 
 

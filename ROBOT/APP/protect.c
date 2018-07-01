@@ -51,12 +51,12 @@ void Check_Task(void)
 	
 	if(Error_check_workstate==1)	//工作状态
 	{
-//		if(Error_Check.statu[LOST_IMU]==1)
-//		{
-//			test_error_Satrt=1;
-//			t_error_record=LOST_IMU;
-//			SetWorkState(ERROR_STATE);
-//		}
+		if(Error_Check.statu[LOST_IMU]==1)
+		{
+			test_error_Satrt=1;
+			t_error_record=LOST_IMU;
+			SetWorkState(ERROR_STATE);
+		}
 //		
 //		for(int i=5;i<LOST_TYPE_NUM-2;i++)	//电机比控更重要
 //		{
@@ -72,18 +72,18 @@ void Check_Task(void)
 	}
 	
 	
-////////////////////	if(Error_Check.statu[LOST_DBUS]==1)
-////////////////////	{
-////////////////////		if(GetWorkState()==CHECK_STATE)
-////////////////////		{
-////////////////////			SetWorkState(LOST_STATE);	//启动时没有遥控信号的选择
-////////////////////		}
-////////////////////		else
-////////////////////		{
-////////////////////			SetWorkState(PROTECT_STATE);
-////////////////////		}
-////////////////////		
-////////////////////	}
+	if(Error_Check.statu[LOST_DBUS]==1)
+	{
+		if(GetWorkState()==CHECK_STATE)
+		{
+			SetWorkState(LOST_STATE);	//启动时没有遥控信号的选择
+		}
+		else
+		{
+			SetWorkState(PROTECT_STATE);
+		}
+		
+	}
 	
 	if(RC_Ctl.key.v_h!=0||RC_Ctl.key.v_l!=0||abs(RC_Ctl.mouse.x)>3)
 	{

@@ -38,7 +38,7 @@ void uart4_init(void)
 	USART_Cmd(UART4,ENABLE);
 	
 	uart4_nvic.NVIC_IRQChannel = UART4_IRQn;
-  uart4_nvic.NVIC_IRQChannelPreemptionPriority = 2;
+  uart4_nvic.NVIC_IRQChannelPreemptionPriority = 0;
   uart4_nvic.NVIC_IRQChannelSubPriority = 0;
   uart4_nvic.NVIC_IRQChannelCmd = ENABLE;
   NVIC_Init(&uart4_nvic);

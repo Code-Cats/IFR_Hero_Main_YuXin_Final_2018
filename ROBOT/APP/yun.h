@@ -38,7 +38,7 @@ extern s32 YAW_INIT;
 
 
 /*PID参数-外接陀螺仪*/
-#define PITCH_POSITION_PID_P 0.83//0.83
+#define PITCH_POSITION_PID_P 0.80//0.83
 #define PITCH_POSITION_PID_I 0.005f
 #define PITCH_POSITION_PID_D 1.1f	//1.2
 #define PITCH_POSITION_PID_MER 400	//最大偏差输入
@@ -47,9 +47,9 @@ extern s32 YAW_INIT;
 #define PITCH_POSITION_PID_I_MAX 3000	//I累加限制
 #define PITCH_POSITION_PID_DEAD 0	//计算死区3
 //参数记录：
-#define PITCH_SPEED_PID_P 28
+#define PITCH_SPEED_PID_P 25
 #define PITCH_SPEED_PID_I 0.01f//0.014	//0.026
-#define PITCH_SPEED_PID_D 8	//0.08
+#define PITCH_SPEED_PID_D 1	//0.08
 #define PITCH_SPEED_PID_MER 260	//最大偏差输入240
 #define PITCH_SPEED_PID_MAXINPUT 320	//最大期望输入
 #define PITCH_SPEED_PID_MAXOUTPUT 6000	//超过7000电机反转

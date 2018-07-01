@@ -273,7 +273,7 @@ void Work_Execute(void)	//工作执行2018.7.1
 //			if(abs(Gyro_Data.angvel[0])<20&&abs(Gyro_Data.angvel[2])<20&&abs(yunMotorData.pitch_tarP-(Gyro_Data.angle[0]*8192/360.0f+PITCH_INIT))<50)	//云台已就位	//位置环情况下
 			if(abs(Gyro_Data.angvel[YAW])<3&&Error_Check.statu[LOST_IMU]!=1)	//云台已就位，且有反馈
 			{
-////////////				SetWorkState(CALI_STATE);
+				SetWorkState(CALI_STATE);
 			}
 			Shoot_Task();	//临时调试
 			break;
@@ -291,11 +291,11 @@ void Work_Execute(void)	//工作执行2018.7.1
 		}
 		case NORMAL_STATE:	//正常操作模式
 		{
-			Replenish_Bullet_Task(KeyBoardData[KEY_R].value);
+	//		Replenish_Bullet_Task(KeyBoardData[KEY_R].value);
 			Teleconltroller_Data_protect();	//遥控器数据保护
 			Yun_Task();	//开启云台处理
 			Remote_Task();	//执行移动
-			TakeBullet_Control_Center();	//取弹控制中心
+	//		TakeBullet_Control_Center();	//取弹控制中心
 			Shoot_Task();
 			
 			break;
@@ -455,7 +455,7 @@ void Motor_Send(void)
 		}
 		case PREPARE_STATE:	//预备模式
 		{	//等待车身状态稳定，并设置初值
-			CAN1_Yun_SendMsg(0,yunMotorData.pitch_output);	//CAN2-1000	//取消反馈补偿
+			CAN1_Yun_SendMsg(yunMotorData.yaw_output,yunMotorData.pitch_output);	//CAN2-1000	//取消反馈补偿
 //			CAN1_Yun_SendMsg(t_yaw_send,t_pitch_send);	//调试用模式
 //			CAN_Motor6623_calibration();
 			//CAN1_Yun_SendMsg(yunMotorData.yaw_output+Yaw_output_offset(yunMotorData.yaw_fdbP),yunMotorData.pitch_output+Pitch_output_offset(yunMotorData.pitch_tarP));	//CAN2-1000
@@ -484,8 +484,8 @@ void Motor_Send(void)
 //			CAN1_Yun_SendMsg(t_yaw_16t,t_pitch_16t);	//调试用模式
 			
 //		CAN_Chassis_SendMsg((s16)remote_tem,(s16)remote_tem,(s16)remote_tem,(s16)remote_tem);
-//			CAN2_Chassis_SendMsg(chassis_Data.lf_wheel_output,chassis_Data.rf_wheel_output,chassis_Data.lb_wheel_output,chassis_Data.rb_wheel_output);
-			CAN2_Chassis_SendMsg(0,0,0,0);
+			CAN2_Chassis_SendMsg(chassis_Data.lf_wheel_output,chassis_Data.rf_wheel_output,chassis_Data.lb_wheel_output,chassis_Data.rb_wheel_output);
+//			CAN2_Chassis_SendMsg(0,0,0,0);
 			CAN2_Shoot_Bullet_SendMsg(0,0,(s16)shoot_Motor_Data_Down.output,(s16)shoot_Motor_Data_Up.output);//取弹旋转、0、下拨弹、上拨弹
 			break;
 		}

@@ -132,12 +132,12 @@ void RC_Control_Yun(float * yaw_tarp,float * pitch_tarp)	//1000Hz
 {
 	if(time_1ms_count%15==0)	//66.67hz
 	{
-		yunMotorData.yaw_tarP-=((RC_Ctl.rc.ch2-1024)*20.0/660.0);
+		yunMotorData.yaw_tarP+=((RC_Ctl.rc.ch2-1024)*35.0/660.0);
 		yunMotorData.yaw_tarP=yunMotorData.yaw_tarP>1800?yunMotorData.yaw_tarP-3600:yunMotorData.yaw_tarP;	//过零点
 		yunMotorData.yaw_tarP=yunMotorData.yaw_tarP<-1800?yunMotorData.yaw_tarP+3600:yunMotorData.yaw_tarP;	//过零点
 	}
 	
-	yunMotorData.pitch_tarP=(-(RC_Ctl.rc.ch3-1024)*460.0/660.0)+PITCH_INIT;	//-50是因为陀螺仪水平时云台上扬
+	yunMotorData.pitch_tarP=((RC_Ctl.rc.ch3-1024)*460.0/660.0)+PITCH_INIT;	//-50是因为陀螺仪水平时云台上扬
 }
 
 
@@ -182,8 +182,8 @@ void PC_Control_Yun(float * yaw_tarp,float * pitch_tarp)	//1000Hz
 	
 	if(time_1ms_count%10==0)
 	{
-		yaw_tarp_float-=RC_Ctl.mouse.x*15.0f/40.0f;
-		pitch_tarp_float+=RC_Ctl.mouse.y*2.0f/3.0f;	//2/4
+		yaw_tarp_float+=RC_Ctl.mouse.x*15.0f/40.0f;
+		pitch_tarp_float-=RC_Ctl.mouse.y*2.0f/3.0f;	//2/4
 		
 		yaw_tarp_float=yaw_tarp_float>1800?yaw_tarp_float-3600:yaw_tarp_float;	//过零点
 		yaw_tarp_float=yaw_tarp_float<-1800?yaw_tarp_float+3600:yaw_tarp_float;	//过零点

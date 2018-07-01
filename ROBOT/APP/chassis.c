@@ -181,17 +181,17 @@ void Chassis_Control_External_Solution(void)	//陀螺仪正常的底盘解决方案
 		{
 			if(YAW_INIT-yunMotorData.yaw_fdbP>8192/2)	//普通跟随块	
 			{
-				Chassis_Vw=PID_ChassisFollow(YAW_INIT,yunMotorData.yaw_fdbP+8192,&PID_Chassis_Follow);	//负过界状况下
+				Chassis_Vw=-PID_ChassisFollow(YAW_INIT,yunMotorData.yaw_fdbP+8192,&PID_Chassis_Follow);	//负过界状况下
 				yaw_follow_error=YAW_INIT-(yunMotorData.yaw_fdbP+8192);
 			}
 			else if(YAW_INIT-yunMotorData.yaw_fdbP<-8192/2)
 			{
-				Chassis_Vw=PID_ChassisFollow(YAW_INIT,yunMotorData.yaw_fdbP-8192,&PID_Chassis_Follow);	//正过界状况下
+				Chassis_Vw=-PID_ChassisFollow(YAW_INIT,yunMotorData.yaw_fdbP-8192,&PID_Chassis_Follow);	//正过界状况下
 				yaw_follow_error=YAW_INIT-(yunMotorData.yaw_fdbP-8192);
 			}
 			else
 			{
-				Chassis_Vw=PID_ChassisFollow(YAW_INIT,yunMotorData.yaw_fdbP,&PID_Chassis_Follow);	//正常状况下
+				Chassis_Vw=-PID_ChassisFollow(YAW_INIT,yunMotorData.yaw_fdbP,&PID_Chassis_Follow);	//正常状况下
 				yaw_follow_error=YAW_INIT-yunMotorData.yaw_fdbP;
 			}
 		}
@@ -199,17 +199,17 @@ void Chassis_Control_External_Solution(void)	//陀螺仪正常的底盘解决方案
 		{
 			if(YAW_INIT-yaw_follow_tarP>8192/2)	//智能跟随块	
 			{
-				Chassis_Vw=PID_ChassisFollow(YAW_INIT,yaw_follow_tarP+8192,&PID_Chassis_Follow);	//负过界状况下
+				Chassis_Vw=-PID_ChassisFollow(YAW_INIT,yaw_follow_tarP+8192,&PID_Chassis_Follow);	//负过界状况下
 				yaw_follow_error=YAW_INIT-(yaw_follow_tarP+8192);
 			}
 			else if(YAW_INIT-yaw_follow_tarP<-8192/2)
 			{
-				Chassis_Vw=PID_ChassisFollow(YAW_INIT,yaw_follow_tarP-8192,&PID_Chassis_Follow);	//正过界状况下
+				Chassis_Vw=-PID_ChassisFollow(YAW_INIT,yaw_follow_tarP-8192,&PID_Chassis_Follow);	//正过界状况下
 				yaw_follow_error=YAW_INIT-(yaw_follow_tarP-8192);
 			}
 			else
 			{
-				Chassis_Vw=PID_ChassisFollow(YAW_INIT,yaw_follow_tarP,&PID_Chassis_Follow);	//正常状况下
+				Chassis_Vw=-PID_ChassisFollow(YAW_INIT,yaw_follow_tarP,&PID_Chassis_Follow);	//正常状况下
 				yaw_follow_error=YAW_INIT-yaw_follow_tarP;
 			}
 		}
@@ -271,6 +271,7 @@ void Chassis_Control_External_Solution(void)	//陀螺仪正常的底盘解决方案
 		Chassis_Vx+=21;	//对后退的补偿	//每次调节轮压需要重新调节		//思考？加在这里还是上面扭腰前进补偿之前合适
 	}
 
+//	Chassis_Vw=0;	//////////////////////////////临时测试
 				
 	chassis_Data.lf_wheel_tarV=(Chassis_Vx+Chassis_Vy+Chassis_Vw)*K_SPEED;
 	chassis_Data.rf_wheel_tarV=(-Chassis_Vx+Chassis_Vy+Chassis_Vw)*K_SPEED;
@@ -432,17 +433,17 @@ void Chassis_Control_Inscribe_Solution(void)	//陀螺仪正常的底盘解决方案	////////
 		{
 			if(YAW_INIT-yunMotorData.yaw_fdbP>8192/2)	//普通跟随块	
 			{
-				Chassis_Vw=PID_ChassisFollow(YAW_INIT,yunMotorData.yaw_fdbP+8192,&PID_Chassis_Follow);	//负过界状况下
+				Chassis_Vw=-PID_ChassisFollow(YAW_INIT,yunMotorData.yaw_fdbP+8192,&PID_Chassis_Follow);	//负过界状况下
 				yaw_follow_error=YAW_INIT-(yunMotorData.yaw_fdbP+8192);
 			}
 			else if(YAW_INIT-yunMotorData.yaw_fdbP<-8192/2)
 			{
-				Chassis_Vw=PID_ChassisFollow(YAW_INIT,yunMotorData.yaw_fdbP-8192,&PID_Chassis_Follow);	//正过界状况下
+				Chassis_Vw=-PID_ChassisFollow(YAW_INIT,yunMotorData.yaw_fdbP-8192,&PID_Chassis_Follow);	//正过界状况下
 				yaw_follow_error=YAW_INIT-(yunMotorData.yaw_fdbP-8192);
 			}
 			else
 			{
-				Chassis_Vw=PID_ChassisFollow(YAW_INIT,yunMotorData.yaw_fdbP,&PID_Chassis_Follow);	//正常状况下
+				Chassis_Vw=-PID_ChassisFollow(YAW_INIT,yunMotorData.yaw_fdbP,&PID_Chassis_Follow);	//正常状况下
 				yaw_follow_error=YAW_INIT-yunMotorData.yaw_fdbP;
 			}
 		}
