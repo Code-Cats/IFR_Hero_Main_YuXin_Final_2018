@@ -1,4 +1,4 @@
-#include "viceboard_analysis.h"
+#include "usart6_viceboard_analysis.h"
 
 SensorDataTypeDef SensorData={0};
 ViceControlDataTypeDef ViceControlData={0};

@@ -4,7 +4,7 @@
 
 #include "main.h"
 
-#define  YAW_INIT_DEFINE 2410
+#define  YAW_INIT_DEFINE 3160
 //s32 YAW_INIT=YAW_INIT_DEFINE;
 extern s32 YAW_INIT;
 #define PITCH_INIT         3098
@@ -44,7 +44,7 @@ extern s32 YAW_INIT;
 #define PITCH_POSITION_PID_MER 400	//最大偏差输入
 #define PITCH_POSITION_PID_MAXINPUT 8190	//最大期望输入
 #define PITCH_POSITION_PID_MAXOUTPUT 320	//最大输出
-#define PITCH_POSITION_PID_I_MAX 3000	//I累加限制
+#define PITCH_POSITION_PID_I_MAX 15/PITCH_POSITION_PID_I	//I累加限制
 #define PITCH_POSITION_PID_DEAD 0	//计算死区3
 //参数记录：
 #define PITCH_SPEED_PID_P 25
@@ -76,7 +76,7 @@ extern s32 YAW_INIT;
 //#define PITCH_SPEED_PID_DEAD 1	//计算死区3
 
 
-#define YAW_SPEED_PID_P 44//45	//30  
+#define YAW_SPEED_PID_P 45//44//45	//30  
 #define YAW_SPEED_PID_I 0.03	//0.02
 #define YAW_SPEED_PID_D 1
 #define YAW_SPEED_PID_MER 260	//最大偏差输入
@@ -85,13 +85,13 @@ extern s32 YAW_INIT;
 #define YAW_SPEED_PID_I_MAX 1500/YAW_SPEED_PID_I	//I累加限制
 #define YAW_SPEED_PID_DEAD 0	//计算死区
 
-#define YAW_POSITION_PID_P 1.4//1.2  
-#define YAW_POSITION_PID_I 0
+#define YAW_POSITION_PID_P 1.3f//1.4//1.2  
+#define YAW_POSITION_PID_I 0.004f
 #define YAW_POSITION_PID_D 1	//经过实验观察数据发现D过大引起tarV波动过大，但D对于减弱波形超调猜测有效用，采用非线性D	//原值6
 #define YAW_POSITION_PID_MER 280	//最大偏差输入
 #define YAW_POSITION_PID_MAXINPUT 5350	//最大期望输入
 #define YAW_POSITION_PID_MAXOUTPUT 300	//最大输出
-#define YAW_POSITION_PID_I_MAX 0///YAW_SPEED_PID_I	//I累加限制
+#define YAW_POSITION_PID_I_MAX 10/YAW_POSITION_PID_I	//I累加限制
 #define YAW_POSITION_PID_DEAD 0	//计算死区
 
 //PITCH电机位置环参数
@@ -208,7 +208,7 @@ s16 Pitch_output_offset(s32 pitch_tarP);	//克服云台pitch轴非线性力及非对称性的补
 void Yun_Task(void);	//云台控制任务 
 void Yun_Control_External_Solution(void);	//外置反馈方案
 void Yun_Control_Inscribe_Solution(void);	//内接反馈方案
-void Yun_WorkState_Turn_Task(void);	//模式切换时云台转向任务
+//void Yun_WorkState_Turn_Task(void);	//模式切换时云台转向任务
 
 s32 t_yun_yaw_tarV(s32 now_V);	//对速度的一阶滞后滤波
 

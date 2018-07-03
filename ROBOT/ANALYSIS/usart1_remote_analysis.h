@@ -1,5 +1,5 @@
-#ifndef __REMOTE_ANALYSIS_H__
-#define __REMOTE_ANALYSIS_H__
+#ifndef __USART1_REMOTE_ANALYSIS_H__
+#define __USART1_REMOTE_ANALYSIS_H__
 
 #include "main.h"
 

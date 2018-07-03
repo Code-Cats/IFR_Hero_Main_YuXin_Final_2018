@@ -1,5 +1,5 @@
 #include "yun.h"
-#include "remote_analysis.h"
+#include "usart1_remote_analysis.h"
 s32 YAW_INIT=YAW_INIT_DEFINE;
 /*
 整体结构：yaw轴暂定单独速度环//后期计划增加外接陀螺仪位置环进行选择
@@ -260,7 +260,7 @@ void Yun_Control_Inscribe_Solution(void)	//当陀螺仪崩了时单速度反馈方案
 	}
 	
 	
-	Yun_WorkState_Turn_Task();	//取弹时云台转向标志位	//内部有对于陀螺仪状态的区别
+//	Yun_WorkState_Turn_Task();	//取弹时云台转向标志位	//内部有对于陀螺仪状态的区别
 	
 	yunMotorData.pitch_tarV=PID_General(yunMotorData.pitch_tarP,(yunMotorData.pitch_fdbP),&PID_PITCH_POSITION);	//pitch位置环
 	

@@ -1,7 +1,7 @@
-#include "usart5_wifi_Debug.h"
+#include "uart5_vision.h"
 
 
-void USART5_WIFIDEBUG_Init(uint32_t baud_rate)	//´ýÐÞ¸Ä
+void UART5_Vision_Init(uint32_t baud_rate)	//´ýÐÞ¸Ä
 {
 
     GPIO_InitTypeDef gpio;
@@ -9,21 +9,29 @@ void USART5_WIFIDEBUG_Init(uint32_t baud_rate)	//´ýÐÞ¸Ä
 	  NVIC_InitTypeDef nvic;
 //    DMA_InitTypeDef dma;
     
-    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, ENABLE); 
+    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, ENABLE); 	//PC12 TX
+		RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE); 	//PD2 RX
 //     RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_DMA1, ENABLE);
-		RCC_APB2PeriphClockCmd(RCC_APB2Periph_USART6, ENABLE); 
+		RCC_APB1PeriphClockCmd(RCC_APB1Periph_UART5, ENABLE); 
     
-    GPIO_PinAFConfig(GPIOC,GPIO_PinSource6,GPIO_AF_USART6);
-    GPIO_PinAFConfig(GPIOC,GPIO_PinSource7,GPIO_AF_USART6); 
+    GPIO_PinAFConfig(GPIOC,GPIO_PinSource12,GPIO_AF_UART5);
+    GPIO_PinAFConfig(GPIOD,GPIO_PinSource2,GPIO_AF_UART5); 
 
-    gpio.GPIO_Pin = GPIO_Pin_6 | GPIO_Pin_7;
+    gpio.GPIO_Pin = GPIO_Pin_12;
     gpio.GPIO_Mode = GPIO_Mode_AF;
     gpio.GPIO_OType = GPIO_OType_PP;
     gpio.GPIO_Speed = GPIO_Speed_100MHz;
     gpio.GPIO_PuPd = GPIO_PuPd_NOPULL;
     GPIO_Init(GPIOC,&gpio);
     
-    USART_DeInit(USART6);
+		gpio.GPIO_Pin = GPIO_Pin_2;
+    gpio.GPIO_Mode = GPIO_Mode_AF;
+    gpio.GPIO_OType = GPIO_OType_PP;
+    gpio.GPIO_Speed = GPIO_Speed_100MHz;
+    gpio.GPIO_PuPd = GPIO_PuPd_NOPULL;
+    GPIO_Init(GPIOD,&gpio);
+		
+    USART_DeInit(UART5);
     USART_StructInit(&usart);
     usart.USART_BaudRate = baud_rate;
     usart.USART_WordLength = USART_WordLength_8b;
@@ -32,7 +40,7 @@ void USART5_WIFIDEBUG_Init(uint32_t baud_rate)	//´ýÐÞ¸Ä
    // usart.USART_Parity = USART_Parity_Even;
     usart.USART_Mode = USART_Mode_Rx|USART_Mode_Tx;
     usart.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
-    USART_Init(USART6, &usart);
+    USART_Init(UART5, &usart);
 //		
 //		USART_DMACmd(USART3, USART_DMAReq_Rx, ENABLE);
 //		
@@ -62,31 +70,29 @@ void USART5_WIFIDEBUG_Init(uint32_t baud_rate)	//´ýÐÞ¸Ä
 //    
 //    DMA_Cmd(DMA1_Stream1, ENABLE);
 		
-    nvic.NVIC_IRQChannel = USART6_IRQn;
-    nvic.NVIC_IRQChannelPreemptionPriority = 2;
+    nvic.NVIC_IRQChannel = UART5_IRQn;
+    nvic.NVIC_IRQChannelPreemptionPriority = 1;
     nvic.NVIC_IRQChannelSubPriority = 1;
     nvic.NVIC_IRQChannelCmd = ENABLE; 
     NVIC_Init(&nvic);
 		
-		USART_ITConfig(USART6, USART_IT_RXNE, ENABLE);        //usart rx idle interrupt  enabled
-    USART_Cmd(USART6, ENABLE);
+		USART_ITConfig(UART5, USART_IT_RXNE, ENABLE);        //usart rx idle interrupt  enabled
+    USART_Cmd(UART5, ENABLE);
 }
 
-
-u8 USART5_Res=0;
-void USART5_IRQHandler(void)
+s32 UART_count=0;
+u8 UART5_Res=0;
+void UART5_IRQHandler(void)
 {
-////		if(Vision_Flag==0)
-////		{
-//	static uint32_t this_time_rx_len = 0;
 
 
 	if(USART_GetITStatus(UART5, USART_IT_RXNE) != RESET)
 	{
+		UART_count++;
+		UART5_Res=USART_ReceiveData(UART5);
+
+		VisionData_Receive(UART5_Res);
 		
-		USART5_Res=USART_ReceiveData(UART5);
-		//Data_Receive(USART6_Res);
-		//clear the idle pending flag 
 		(void)UART5->SR;
 		(void)UART5->DR;
 	}

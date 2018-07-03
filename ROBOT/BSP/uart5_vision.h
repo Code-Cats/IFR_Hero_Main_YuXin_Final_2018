@@ -4,6 +4,6 @@
 #include "bsp.h"
 
 
-void USART5_WIFIDEBUG_Init(uint32_t baud_rate);	//WIFI调试初始化
+void UART5_Vision_Init(uint32_t baud_rate);	//WIFI调试初始化
 
 #endif

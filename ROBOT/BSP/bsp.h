@@ -10,10 +10,9 @@
 #include "gpio.h"
 #include "usart1_remote.h"
 #include "heartbeat.h"
+#include "uart5_vision_analysis.h"
 #include "usart6_viceboard.h"
-#include "viceboard_analysis.h"
-#include "usart5_wifi_Debug.h"
-#include "usart6_wifi_Debug.h"
+#include "usart6_viceboard_analysis.h"
 #include "usart3_judge.h"
 
 #include "uart4.h"

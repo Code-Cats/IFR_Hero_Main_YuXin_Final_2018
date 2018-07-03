@@ -17,8 +17,8 @@
 //#include "auto_lift.h"
 #include "can1_analysis.h"
 #include "can2_analysis.h"
-#include "remote_analysis.h"
-#include "usart6_wifi_Debug_OSC.h"
+#include "usart1_remote_analysis.h"
+
 #include "chassis.h"
 #include "protect.h"
 #include "shoot.h"
@@ -27,8 +27,9 @@
 #include "image_control.h"
 #include "replenish_bullet.h"
 #include "judge_analysis.h"
-#include "usart6_vision_analysis.h"
-#include "vision.h"
+#include "uart5_vision_analysis.h"
+#include "uart5_vision.h"
+#include "usart6_viceboard_analysis.h"
 
 #include "mpu6050IIC.h"
 #include "mpu6050_it.h"

@@ -22,13 +22,13 @@ extern u8 Robot_Level;
 
 u8 Friction_State=0;	//初始化不开启
 //const u16 FRICTION_INIT=800;
-u16 FRICTION_SHOOT=1800;	//发弹的PWM	在检录处测的射速13米每秒
+u16 FRICTION_SHOOT=1960;	//发弹的PWM	在检录处测的射速13米每秒
 u16 Friction_Send=FRICTION_INIT;
 void Shoot_Task(void)	//定时频率：1ms
 { 
 	if(time_1ms_count%100==0)
 	{
-		FRICTION_SHOOT=Friction_Adjust_DependOn_Vol(testPowerHeatData.chassisVolt);
+		FRICTION_SHOOT=Friction_Adjust_DependOn_Vol(testPowerHeatData.chassisVolt);	//自动调整输出
 	}
 	
 	Shoot_Instruction();
@@ -38,31 +38,12 @@ void Shoot_Task(void)	//定时频率：1ms
 	shoot_Motor_Data_Down.tarV=PID_General(shoot_Motor_Data_Down.tarP,shoot_Motor_Data_Down.fdbP,&PID_Shoot_Down_Position);
 	shoot_Motor_Data_Up.tarV=PID_General(shoot_Motor_Data_Up.tarP,shoot_Motor_Data_Up.fdbP,&PID_Shoot_Up_Position);
 
+	Friction_Send=FRICTION_INIT-(FRICTION_INIT-FRICTION_SHOOT)*Friction_State;	//1888对应射速20,1800-14	1830-14.7	1840-15.1（5.14）	1850最高16，最低15		//经过观察，可能和电压有关系，满电时1860为17.7，空电为15.7
 
-
-		Friction_Send=FRICTION_INIT-(FRICTION_INIT-FRICTION_SHOOT)*Friction_State;	//1888对应射速20,1800-14	1830-14.7	1840-15.1（5.14）	1850最高16，最低15		//经过观察，可能和电压有关系，满电时1860为17.7，空电为15.7
-	Friction_Send=800;
-////////////////	if(swicth_Last_state==RC_SWITCH_MIDDLE&&RC_Ctl.rc.switch_right==RC_SWITCH_UP)
-/////临时///////	{
-/////测试///////		static u8 frc_state=0;
-/////完整///////		frc_state=!frc_state;
-/////形态///////		fri_t=800-(800-2000)*frc_state;
-////////////////	}
-////////////////	else if(RC_Ctl.rc.switch_right==RC_SWITCH_MIDDLE)
-////////////////	{
-////////////////		shoot_Motor_Data_Down.tarV=0;
-////////////////	}
-////////////////	else if(RC_Ctl.rc.switch_right==RC_SWITCH_DOWN)
-////////////////	{
-////////////////		shoot_Motor_Data_Down.tarV=2000;
-////////////////	}
-////////////////swicth_Last_state=RC_Ctl.rc.switch_right;
 	shoot_Motor_Data_Down.output=PID_General(shoot_Motor_Data_Down.tarV,shoot_Motor_Data_Down.fdbV,&PID_Shoot_Down_Speed);//down
 	shoot_Motor_Data_Up.output=PID_General(shoot_Motor_Data_Up.tarV,shoot_Motor_Data_Up.fdbV,&PID_Shoot_Up_Speed);//Up
 	SetFrictionWheelSpeed(Friction_Send);	//摩擦轮数值发送
 
-//	CAN_Shoot_SendMsg(shoot_Motor_Data.output);
-//	CAN_Shoot_SendMsg(tem);
 }
 
 
@@ -128,8 +109,10 @@ void RC_Control_Shoot(u8* fri_state)
 		{
 			if(RC_Ctl.rc.switch_left==RC_SWITCH_UP&&swicth_Last_state==RC_SWITCH_MIDDLE&&RC_Ctl.rc.switch_right==RC_SWITCH_DOWN)
 			{
-				shoot_Data_Down.count+=1;
-				shoot_Data_Up.count+=1;
+//				shoot_Data_Down.count+=1;
+//				shoot_Data_Up.count+=1;
+				shoot_Data_Down.count-=1;
+				shoot_Data_Up.count-=1;
 				shoot_Data_Up.last_time=time_1ms_count;	//记录
 				shoot_Data_Down.last_time=time_1ms_count;
 			}
@@ -160,8 +143,8 @@ void PC_Control_Shoot(u8* fri_state)
 	{
 		if(RC_Ctl.mouse.press_l==1&&last_mouse_press_l==0)	//shoot_Motor_Data.tarP-shoot_Motor_Data.fdbP	//待加入
 		{
-			shoot_Data_Down.count++;
-			shoot_Data_Up.count++;
+			shoot_Data_Down.count--;
+			shoot_Data_Up.count--;
 			shoot_Data_Up.last_time=time_1ms_count;	//记录
 			shoot_Data_Down.last_time=time_1ms_count;
 		}
@@ -300,7 +283,7 @@ u8 Shoot_Heat_Lost_Fre_Limit(void)	//裁判lost情况对射频的限制，反返回1是OK
 	u8 limit_state=0;
 	if(Error_Check.statu[LOST_REFEREE]==1)	//裁判lost
 	{
-		if(time_1ms_count-shoot_Data_Down.last_time>1000)	//大于1s
+		if(time_1ms_count-shoot_Data_Down.last_time>250)	//大于1s	//临时测试，1秒4发	/////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		{
 			limit_state=1;
 		}

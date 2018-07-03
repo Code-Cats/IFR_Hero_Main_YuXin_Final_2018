@@ -464,19 +464,14 @@
               <FilePath>..\ROBOT\BSP\usart3_judge.c</FilePath>
             </File>
             <File>
-              <FileName>usart5_wifi_Debug.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\ROBOT\BSP\usart5_wifi_Debug.c</FilePath>
-            </File>
-            <File>
               <FileName>usart6_viceboard.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\ROBOT\BSP\usart6_viceboard.c</FilePath>
             </File>
             <File>
-              <FileName>usart6_wifi_Debug.c</FileName>
+              <FileName>uart5_vision.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\ROBOT\BSP\usart6_wifi_Debug.c</FilePath>
+              <FilePath>..\ROBOT\BSP\uart5_vision.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -677,24 +672,19 @@
               <FilePath>..\ROBOT\ANALYSIS\judge_analysis.c</FilePath>
             </File>
             <File>
-              <FileName>remote_analysis.c</FileName>
+              <FileName>usart6_viceboard_analysis.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\ROBOT\ANALYSIS\remote_analysis.c</FilePath>
+              <FilePath>..\ROBOT\ANALYSIS\usart6_viceboard_analysis.c</FilePath>
             </File>
             <File>
-              <FileName>usart6_vision_analysis.c</FileName>
+              <FileName>uart5_vision_analysis.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\ROBOT\ANALYSIS\usart6_vision_analysis.c</FilePath>
+              <FilePath>..\ROBOT\ANALYSIS\uart5_vision_analysis.c</FilePath>
             </File>
             <File>
-              <FileName>usart6_wifi_Debug_OSC.c</FileName>
+              <FileName>usart1_remote_analysis.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\ROBOT\ANALYSIS\usart6_wifi_Debug_OSC.c</FilePath>
-            </File>
-            <File>
-              <FileName>viceboard_analysis.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\ROBOT\ANALYSIS\viceboard_analysis.c</FilePath>
+              <FilePath>..\ROBOT\ANALYSIS\usart1_remote_analysis.c</FilePath>
             </File>
           </Files>
         </Group>

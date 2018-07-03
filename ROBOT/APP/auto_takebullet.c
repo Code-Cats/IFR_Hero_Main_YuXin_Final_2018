@@ -31,8 +31,8 @@ const u32 servo_GOODdelay[2]={2500,800};	//延时参数	//第一段为2500是将子弹落下的
 const u32 servo_POORdelay[2]={500,500};	//延时参数
 
 
-//#define VALVE_ISLAND 0		//电磁阀控制位定义
-//#define VALVE_BULLET_PROTRACT 1	//前伸
+//#define VALVE_BULLET_HORIZONTAL1 0		//原登岛--现平移1
+//#define VALVE_BULLET_HORIZONTAL2 1	//原前伸--现平移2
 //#define VALVE_BULLET_CLAMP 2	//夹紧
 
 void TakeBullet_Control_Center(void)
@@ -48,7 +48,7 @@ void TakeBullet_Control_Center(void)
 	static u32 servo_startPOOR_time[2]={0};	//记录逆向触发时间	//保持与工程车兼容性
 	
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	
+	//自动取弹放置位
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	/******************************************************************

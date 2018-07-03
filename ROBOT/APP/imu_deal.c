@@ -23,6 +23,7 @@ int Imu_Calibration(int angvel[])	//和陀螺仪角速度更新频率一致
 			Imu_CaliOK_State=1;
 		}
 	}
+	return 0;
 }
 
 

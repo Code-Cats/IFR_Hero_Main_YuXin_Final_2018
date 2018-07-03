@@ -1,5 +1,5 @@
-#ifndef __VICEBOARD_ANALYSIS_H
-#define __VICEBOARD_ANALYSIS_H
+#ifndef __USART6_VICEBOARD_ANALYSIS_H
+#define __USART6_VICEBOARD_ANALYSIS_H
 
 #include "bsp.h"
 

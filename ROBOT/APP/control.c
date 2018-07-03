@@ -56,15 +56,6 @@ void Control_Task(void)	//2ms
 
 	KeyboardRetset();	//对战场发生意外情况时，进行复位处理		CTRL SHIFT Z X按下	C V为0
 	
-	#ifdef USART6_WIFIDEBUG
-	if(time_1ms_count%50==0)
-	{
-//		Debug_Send_OSC();
-	}
-	#endif
-//	Vw_tem=Chassis_Attitude_Correct(Chassis_GYRO[2],Gyro_Data.angvel[2]+2);
-//  Chassis_Vw+=Vw_tem;
-	
 	if(time_1ms_count%1==0)	//1000hz
 	{
 		for(int keyid=0;keyid<KEY_NUMS;keyid++)	//放在定时器里
@@ -72,7 +63,6 @@ void Control_Task(void)	//2ms
 			ButtonStatu_Verdict(&KeyBoardData[keyid]);
 		}
 	}
-	
 	
 	Work_State_Change();	//工作状态切换
 	
@@ -456,7 +446,8 @@ void Motor_Send(void)
 		case PREPARE_STATE:	//预备模式
 		{	//等待车身状态稳定，并设置初值
 			CAN1_Yun_SendMsg(yunMotorData.yaw_output,yunMotorData.pitch_output);	//CAN2-1000	//取消反馈补偿
-//			CAN1_Yun_SendMsg(t_yaw_send,t_pitch_send);	//调试用模式
+//CAN1_Yun_SendMsg(0,0);	//CAN2-1000	//取消反馈补偿
+			//			CAN1_Yun_SendMsg(t_yaw_send,t_pitch_send);	//调试用模式
 //			CAN_Motor6623_calibration();
 			//CAN1_Yun_SendMsg(yunMotorData.yaw_output+Yaw_output_offset(yunMotorData.yaw_fdbP),yunMotorData.pitch_output+Pitch_output_offset(yunMotorData.pitch_tarP));	//CAN2-1000
 			CAN2_Chassis_SendMsg(0,0,0,0);

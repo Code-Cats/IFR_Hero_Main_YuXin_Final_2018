@@ -1,4 +1,4 @@
-#include "remote_analysis.h"
+#include "usart1_remote_analysis.h"
 
 RC_Ctl_t RC_Ctl=RC_DATA_DEFAULT;
 KeyBoardTypeDef KeyBoardData[KEY_NUMS]={0};

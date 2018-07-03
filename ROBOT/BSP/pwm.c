@@ -22,7 +22,7 @@ void PWM_Config(void)
 	  RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM5, ENABLE);   
 //		RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM14, ENABLE); 
 	
-    gpio.GPIO_Pin = GPIO_Pin_0 | GPIO_Pin_1  ;
+    gpio.GPIO_Pin = GPIO_Pin_0 | GPIO_Pin_1 ;
     gpio.GPIO_Mode = GPIO_Mode_AF;
     gpio.GPIO_Speed = GPIO_Speed_100MHz;
     GPIO_Init(GPIOB,&gpio);
