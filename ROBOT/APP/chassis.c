@@ -123,7 +123,7 @@ void Chassis_Control_External_Solution(void)	//陀螺仪正常的底盘解决方案
 			}
 		}
 		
-		PID_Chassis_Follow.k_p=CHASSIS_FOLLOW_PID_P/1;
+		PID_Chassis_Follow.k_p=CHASSIS_FOLLOW_PID_P/1.5f;
 	}
 	else
 	{
@@ -262,7 +262,7 @@ void Chassis_Control_External_Solution(void)	//陀螺仪正常的底盘解决方案
 //////////////////		t_Vx_k=cos(yaw_follow_real_error);
 ////////////////	}
 	
-	if(GetWorkState()==WAIST_STATE)	//扭腰前进	 国赛版
+	if(GetWorkState()==WAIST_STATE)	//扭腰前进	 国赛版		//该函数要求每次处理前都进行Vx,Vy的刷新
 	{
 		s16 Vx_record=Chassis_Vx;
 		s16 Vy_record=Chassis_Vy;
@@ -281,10 +281,10 @@ void Chassis_Control_External_Solution(void)	//陀螺仪正常的底盘解决方案
 		Chassis_Vx=0;
 		Chassis_Vy=0;
 		yaw_follow_real_error=yaw_follow_real_error/8192.0f*2*PI;
-		Chassis_Vx+=(s16)(Vx_record*(cos(yaw_follow_real_error)));
-		Chassis_Vy+=(s16)(Vx_record*(sin(yaw_follow_real_error))*1);	
-//		t_Vy_k=sin(yaw_follow_real_error);
-//		t_Vx_k=cos(yaw_follow_real_error);
+		Chassis_Vx+=(s16)((Vx_record*cos(-yaw_follow_real_error)+Vy_record*cos(-yaw_follow_real_error+PI/2))*0.91f);
+		Chassis_Vy+=(s16)((Vx_record*sin(-yaw_follow_real_error)+Vy_record*sin(-yaw_follow_real_error+PI/2))*1.09f);	
+//		t_Vy_k=sin(-yaw_follow_real_error);
+//		t_Vx_k=cos(-yaw_follow_real_error);
 	}
 	
 	
