@@ -33,10 +33,10 @@ void Shoot_Task(void)	//定时频率：1ms
 	
 	Shoot_Instruction();
 	shoot_Motor_Data_Down.tarP=(s32)shoot_Data_Down.motor_tarP;
-	shoot_Motor_Data_Up.tarP=(s32)shoot_Data_Up.motor_tarP;
+//	shoot_Motor_Data_Up.tarP=(s32)shoot_Data_Up.motor_tarP;
 	
 	shoot_Motor_Data_Down.tarV=PID_General(shoot_Motor_Data_Down.tarP,shoot_Motor_Data_Down.fdbP,&PID_Shoot_Down_Position);
-	shoot_Motor_Data_Up.tarV=PID_General(shoot_Motor_Data_Up.tarP,shoot_Motor_Data_Up.fdbP,&PID_Shoot_Up_Position);
+//	shoot_Motor_Data_Up.tarV=PID_General(shoot_Motor_Data_Up.tarP,shoot_Motor_Data_Up.fdbP,&PID_Shoot_Up_Position);
 
 	Friction_Send=FRICTION_INIT-(FRICTION_INIT-FRICTION_SHOOT)*Friction_State;	//1888对应射速20,1800-14	1830-14.7	1840-15.1（5.14）	1850最高16，最低15		//经过观察，可能和电压有关系，满电时1860为17.7，空电为15.7
 
@@ -92,7 +92,10 @@ void Shoot_Instruction(void)	//发弹指令模块
 //	shoot_time_record=shoot_time_measure(shoot_Data_Down.count,shoot_Data_Down.count_fdb,last_mouse_press_l);////////////////////////////////
 	
 	shoot_Data_Down.motor_tarP=((float)shoot_Data_Down.count*SINGLE_INCREMENT);	//新2006
-	shoot_Data_Up.motor_tarP=((float)shoot_Data_Up.count*SINGLE_INCREMENT);	//新2006
+//	shoot_Data_Up.motor_tarP=((float)shoot_Data_Up.count*SINGLE_INCREMENT);	//新2006
+	
+	shoot_Motor_Data_Up.tarV=-3000;
+	
 	Prevent_Jam_Down(&shoot_Data_Down,&shoot_Motor_Data_Down);
 	Prevent_Jam_Up(&shoot_Data_Up,&shoot_Motor_Data_Up);
 	
@@ -109,11 +112,7 @@ void RC_Control_Shoot(u8* fri_state)
 		{
 			if(RC_Ctl.rc.switch_left==RC_SWITCH_UP&&swicth_Last_state==RC_SWITCH_MIDDLE&&RC_Ctl.rc.switch_right==RC_SWITCH_DOWN)
 			{
-//				shoot_Data_Down.count+=1;
-//				shoot_Data_Up.count+=1;
 				shoot_Data_Down.count-=1;
-				shoot_Data_Up.count-=1;
-				shoot_Data_Up.last_time=time_1ms_count;	//记录
 				shoot_Data_Down.last_time=time_1ms_count;
 			}
 
@@ -144,8 +143,6 @@ void PC_Control_Shoot(u8* fri_state)
 		if(RC_Ctl.mouse.press_l==1&&last_mouse_press_l==0)	//shoot_Motor_Data.tarP-shoot_Motor_Data.fdbP	//待加入
 		{
 			shoot_Data_Down.count--;
-			shoot_Data_Up.count--;
-			shoot_Data_Up.last_time=time_1ms_count;	//记录
 			shoot_Data_Down.last_time=time_1ms_count;
 		}
 	}
@@ -377,7 +374,59 @@ void Prevent_Jam_Down(SHOOT_DATA * shoot_data,SHOOT_MOTOR_DATA * shoot_motor_Dat
 }   
 
 
-/*以下为上拨弹防卡弹*/
+void Prevent_Jam_Up(SHOOT_DATA * shoot_data,SHOOT_MOTOR_DATA * shoot_motor_Data)	//防卡弹程序	//同时包含防鸡蛋的功能	//放在tarP计算出之后
+{
+	static u8 jam_deal_state=0;
+	static u32 time_record_jam_start=0;
+	static u32 time_record_jam_end=0;
+	if(abs(shoot_motor_Data->fdbV)<100&&shoot_data->Jam.sign==0)	//卡弹了
+	{
+		shoot_data->Jam.count++;
+	}
+	else	//当速度不符合条件，进行清零，当在处理卡弹，也进行清零防止处理完后容易触发
+	{
+		shoot_data->Jam.count=0;
+	}
+	
+	if(shoot_data->Jam.count>50)	//50ms
+	{
+		shoot_data->Jam.sign=1;
+	}
+	
+	if(shoot_data->Jam.sign==1)	//处理卡弹模块
+	{
+		switch (jam_deal_state)
+		{
+				case 1:
+				{
+					shoot_motor_Data->tarV=1000;
+					time_record_jam_start=time_1ms_count;	//记录处理时间
+					if(time_1ms_count-time_record_jam_start>500&&time_record_jam_start!=0)	//半秒
+					{
+						jam_deal_state=2;
+						time_record_jam_start=0;
+					}
+					break;
+				}
+				case 2:
+				{
+					time_record_jam_end=time_1ms_count;
+					shoot_motor_Data->tarV=-3000;
+					if(time_1ms_count-time_record_jam_end>200&&time_record_jam_end!=0)
+					{
+						jam_deal_state=1;
+						shoot_data->Jam.sign=0;
+						time_record_jam_end=0;
+					}
+					break;
+				}
+		}
+	}
+	
+}
+
+/*******************************分区赛版*******************************
+以下为上拨弹防卡弹
 s32 jam_UpfdbP_record;
 //对tarP的操作
 void Prevent_Jam_Up(SHOOT_DATA * shoot_data,SHOOT_MOTOR_DATA * shoot_motor_Data)	//防卡弹程序	//同时包含防鸡蛋的功能	//放在tarP计算出之后
@@ -445,7 +494,7 @@ void Prevent_Jam_Up(SHOOT_DATA * shoot_data,SHOOT_MOTOR_DATA * shoot_motor_Data)
 	}
 	
 } 
-
+*************************************************/
 
 
 
