@@ -238,30 +238,54 @@ void Chassis_Control_External_Solution(void)	//陀螺仪正常的底盘解决方案
 //////////////////	}
 	
 	
-//////////////////	if(GetWorkState()==WAIST_STATE)	//扭腰前进	
-//////////////////	{
-//////////////////		s16 Vx_record=Chassis_Vx;
-//////////////////		if(YAW_INIT_DEFINE-yaw_follow_tarP>8192/2)	//防止过界
-//////////////////		{
-//////////////////			yaw_follow_real_error=YAW_INIT_DEFINE-(yaw_follow_tarP+8192);
-//////////////////		}
-//////////////////		else if(YAW_INIT_DEFINE-yaw_follow_tarP<-8192/2)
-//////////////////		{
-//////////////////			yaw_follow_real_error=YAW_INIT_DEFINE-(yaw_follow_tarP-8192);
-//////////////////		}
-//////////////////		else
-//////////////////		{
-//////////////////			yaw_follow_real_error=YAW_INIT_DEFINE-yaw_follow_tarP;
-//////////////////		}
+////////////////	if(GetWorkState()==WAIST_STATE)	//扭腰前进	 分区赛版
+////////////////	{
+////////////////		s16 Vx_record=Chassis_Vx;
+////////////////		if(YAW_INIT_DEFINE-yaw_follow_tarP>8192/2)	//防止过界
+////////////////		{
+////////////////			yaw_follow_real_error=YAW_INIT_DEFINE-(yaw_follow_tarP+8192);
+////////////////		}
+////////////////		else if(YAW_INIT_DEFINE-yaw_follow_tarP<-8192/2)
+////////////////		{
+////////////////			yaw_follow_real_error=YAW_INIT_DEFINE-(yaw_follow_tarP-8192);
+////////////////		}
+////////////////		else
+////////////////		{
+////////////////			yaw_follow_real_error=YAW_INIT_DEFINE-yaw_follow_tarP;
+////////////////		}
 
-//////////////////		Chassis_Vx=0;
-//////////////////		yaw_follow_real_error=yaw_follow_real_error/8192.0f*2*PI;
-//////////////////		Chassis_Vx+=(s16)(Vx_record*(cos(yaw_follow_real_error)));
-//////////////////		Chassis_Vy+=(s16)(Vx_record*(sin(yaw_follow_real_error))*1);	
-////////////////////		t_Vy_k=sin(yaw_follow_real_error);
-////////////////////		t_Vx_k=cos(yaw_follow_real_error);
-//////////////////	}
+////////////////		Chassis_Vx=0;
+////////////////		yaw_follow_real_error=yaw_follow_real_error/8192.0f*2*PI;
+////////////////		Chassis_Vx+=(s16)(Vx_record*(cos(yaw_follow_real_error)));
+////////////////		Chassis_Vy+=(s16)(Vx_record*(sin(yaw_follow_real_error))*1);	
+//////////////////		t_Vy_k=sin(yaw_follow_real_error);
+//////////////////		t_Vx_k=cos(yaw_follow_real_error);
+////////////////	}
 	
+	if(GetWorkState()==WAIST_STATE)	//扭腰前进	 国赛版
+	{
+		s16 Vx_record=Chassis_Vx;
+		s16 Vy_record=Chassis_Vy;
+		if(YAW_INIT_DEFINE-yunMotorData.yaw_fdbP>8192/2)	//防止过界
+		{
+			yaw_follow_real_error=YAW_INIT_DEFINE-(yunMotorData.yaw_fdbP+8192);
+		}
+		else if(YAW_INIT_DEFINE-yunMotorData.yaw_fdbP<-8192/2)
+		{
+			yaw_follow_real_error=YAW_INIT_DEFINE-(yunMotorData.yaw_fdbP-8192);
+		}
+		else
+		{
+			yaw_follow_real_error=YAW_INIT_DEFINE-yunMotorData.yaw_fdbP;
+		}
+		Chassis_Vx=0;
+		Chassis_Vy=0;
+		yaw_follow_real_error=yaw_follow_real_error/8192.0f*2*PI;
+		Chassis_Vx+=(s16)(Vx_record*(cos(yaw_follow_real_error)));
+		Chassis_Vy+=(s16)(Vx_record*(sin(yaw_follow_real_error))*1);	
+//		t_Vy_k=sin(yaw_follow_real_error);
+//		t_Vx_k=cos(yaw_follow_real_error);
+	}
 	
 	
 //////////////////	if(GetWorkState()==WAIST_STATE&&KeyBoardData[KEY_CTRL].value==1	)	//云台中心转向	//仅在扭腰时生效
@@ -321,7 +345,7 @@ void Chassis_Control_External_Solution(void)	//陀螺仪正常的底盘解决方案
 
 
 /******************************************************/	//陀螺仪失效时的底盘跟随等解决方案
-void Chassis_Control_Inscribe_Solution(void)	//陀螺仪正常的底盘解决方案	/////////////////////////////////////////仅跟随，扭腰可能不同
+void Chassis_Control_Inscribe_Solution(void)	//陀螺仪失效的底盘解决方案	/////////////////////////////////////////仅跟随，扭腰可能不同
 {
 	static u8 chassis_follow_statu_last=0;	//记录上一次状态、目的是消除按下键盘触发不跟随模式和键盘控制模式有Vw残留的问题
 	
@@ -758,6 +782,8 @@ void Overall_Motion_Ratio_Protect(CHASSIS_DATA* chassis_data)	//整体轮速比例保护
 	if(chassis_tarV_max>CHASSIS_SPEEDMAX)	//计算出保护系数为了减少计算量将缩小计算放在IF内
 	{
 		chassis_protect_k=CHASSIS_SPEEDMAX/chassis_tarV_max;
+		if(chassis_protect_k>1)	chassis_protect_k=1;
+		if(chassis_protect_k<0.2)	chassis_protect_k=0.2;	//保护
 		
 		chassis_data->lf_wheel_tarV*=chassis_protect_k;
 		chassis_data->rf_wheel_tarV*=chassis_protect_k;
