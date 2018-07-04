@@ -153,7 +153,7 @@ void Chassis_Control_External_Solution(void)	//陀螺仪正常的底盘解决方案
 	{
 		Chassis_Follow_Statu=1;
 	}
-	else if((GetWorkState()==TAKEBULLET_STATE&&Yun_WorkState_Turn180_statu==1)||Replenish_Bullet_Statu==1)	//取弹转向后不受控+补弹位=1时
+	else if((GetWorkState()==TAKEBULLET_STATE)||Replenish_Bullet_Statu==1)	//取弹转向后不受控+补弹位=1时
 	{
 		Chassis_Follow_Statu=0;
 	}
@@ -570,7 +570,7 @@ void RC_Control_Chassis(void)
 {
 	static s16 Chassis_Vx_last=0;
 	static s16 Chassis_Vy_last=0;
-	if((GetWorkState()==NORMAL_STATE||GetWorkState()==WAIST_STATE)&&Replenish_Bullet_Statu==0)	//如果在普通模式且补弹=0
+	if((GetWorkState()==NORMAL_STATE||GetWorkState()==WAIST_STATE||GetWorkState()==TAKEBULLET_STATE)&&Replenish_Bullet_Statu==0)	//如果在普通模式且补弹=0
 	{
 		if(time_1ms_count%1==0)
 		{
@@ -590,7 +590,7 @@ void RC_Control_Chassis(void)
 //		Chassis_Vx=RC_Ctl.rc.ch1-1024;	//代替为斜坡函数
 		Chassis_Vx_last=Chassis_Vx;
 	}
-	else if(GetWorkState()==TAKEBULLET_STATE||Replenish_Bullet_Statu==1)	//取弹时反向，补弹时反向
+	else if(Replenish_Bullet_Statu==1)	//取弹时反向，补弹时反向		//GetWorkState()==TAKEBULLET_STATE||
 	{
 		if(time_1ms_count%1==0)
 		{
@@ -602,7 +602,7 @@ void RC_Control_Chassis(void)
 	
 	if(time_1ms_count%1==0)
 	{
-		if(GetWorkState()!=TAKEBULLET_STATE&&Replenish_Bullet_Statu==0)	//取弹时反向
+		if(Replenish_Bullet_Statu==0)	//取弹时反向	GetWorkState()!=TAKEBULLET_STATE&&
 		{
 			if(RC_Ctl.rc.ch0-1024-Chassis_Vy_last>1&&RC_Ctl.rc.ch0-1024>10)
 			{

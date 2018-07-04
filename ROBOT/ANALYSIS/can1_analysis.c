@@ -1,5 +1,7 @@
 #include "can1_analysis.h"
 
+LIFT_POSITION_ENCODER bulletrotate_position_encoder={0};	//取弹旋转电机
+extern BULLETROTATE_DATA BulletRotate_Data;
 
 extern YUN_MOTOR_DATA	yunMotorData;	//云台挂载在CAN1上，因为CAN2预留了6pin接口，云台不需要该接口，为不浪费，故接CAN1
 
@@ -24,7 +26,10 @@ void CAN1_Feedback_Analysis(CanRxMsg *rx_message)
 		{
 			case 0x201:
 			 {
-				 LostCountFeed(&Error_Check.count[LOST_BULLETROTATE1]);
+				Speed_Data_deal(&BulletRotate_Data.fdbV,rx_message);
+				Position_Data_deal_DIV81(&BulletRotate_Data.fdbP,&bulletrotate_position_encoder,rx_message);
+				BulletRotate_Data.fdbP-=BulletRotate_Data.offsetP;
+				LostCountFeed(&Error_Check.count[LOST_BULLETROTATE1]);
 				 break;
 			 }
 			 case 0x202:

@@ -3,10 +3,13 @@
 
 #include "bsp.h"
 
-#define VALVE_ISLAND 0		//电磁阀控制位定义
-#define VALVE_BULLET_PROTRACT 1
-#define VALVE_BULLET_CLAMP 2
+////#define VALVE_ISLAND 0		//电磁阀控制位定义
+////#define VALVE_BULLET_PROTRACT 1
+////#define VALVE_BULLET_CLAMP 2
 
+#define VALVE_BULLET_HORIZONTAL1 0		//原登岛--现平移1
+#define VALVE_BULLET_HORIZONTAL2 1	//原前伸--现平移2
+#define VALVE_BULLET_CLAMP 2	//夹紧
 
 
 void ViceBoard_SendDataRun(void);

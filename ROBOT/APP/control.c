@@ -270,7 +270,7 @@ void Work_Execute(void)	//工作执行2018.7.1
 		}
 		case CALI_STATE:	//标定模式
 		{
-			if(1)	//待写取弹电机初始标定
+			if(BulletRotate_OffSetInit()==1)	//待写取弹电机初始标定
 			{
 				SetWorkState(NORMAL_STATE);
 			}
@@ -285,9 +285,9 @@ void Work_Execute(void)	//工作执行2018.7.1
 			Teleconltroller_Data_protect();	//遥控器数据保护
 			Yun_Task();	//开启云台处理
 			Remote_Task();	//执行移动
-	//		TakeBullet_Control_Center();	//取弹控制中心
+			TakeBullet_Control_Center();	//取弹控制中心
 			Shoot_Task();
-			
+			BulletRotate_Task();
 			break;
 		}
 		case WAIST_STATE:
@@ -298,6 +298,7 @@ void Work_Execute(void)	//工作执行2018.7.1
 //			AutoChassisAttitude_Lift_V2(Chassis_GYRO[PITCH]);
 			Shoot_Task();
 			TakeBullet_Control_Center();	//含有假设延时反馈和舵机执行，故加入
+			BulletRotate_Task();
 			break;
 		}
 		case TAKEBULLET_STATE:
@@ -307,6 +308,7 @@ void Work_Execute(void)	//工作执行2018.7.1
 			Yun_Task();	//开启云台处理
 			Remote_Task();	//执行移动
 			Shoot_Task();
+			BulletRotate_Task();
 			break;
 		}
 		case ERROR_STATE:	//错误模式
@@ -324,6 +326,7 @@ void Work_Execute(void)	//工作执行2018.7.1
 //////			Yun_Task();	//开启底盘
 		//	Vision_Task(&t_yaw_error,&t_pitch_error);
 			TakeBullet_Control_Center();	//含有假设延时反馈和舵机执行，故加入
+			BulletRotate_Task();
 			break;
 		}
 		case PROTECT_STATE:	//自我保护模式
@@ -428,7 +431,7 @@ LED_Blink_Run();
 
 
 //extern YUN_MOTOR_DATA 			yunMotorData;
-
+extern BULLETROTATE_DATA BulletRotate_Data;
 s16 t_yaw_send,t_pitch_send=0;
 
 void Motor_Send(void)
@@ -477,7 +480,7 @@ void Motor_Send(void)
 //		CAN_Chassis_SendMsg((s16)remote_tem,(s16)remote_tem,(s16)remote_tem,(s16)remote_tem);
 			CAN2_Chassis_SendMsg(chassis_Data.lf_wheel_output,chassis_Data.rf_wheel_output,chassis_Data.lb_wheel_output,chassis_Data.rb_wheel_output);
 //			CAN2_Chassis_SendMsg(0,0,0,0);
-			CAN2_Shoot_Bullet_SendMsg(0,0,(s16)shoot_Motor_Data_Down.output,(s16)shoot_Motor_Data_Up.output);//取弹旋转、0、下拨弹、上拨弹
+			CAN2_Shoot_Bullet_SendMsg((s16)BulletRotate_Data.output,0,(s16)shoot_Motor_Data_Down.output,(s16)shoot_Motor_Data_Up.output);//取弹旋转、0、下拨弹、上拨弹
 			break;
 		}
 		case WAIST_STATE:
@@ -487,7 +490,7 @@ void Motor_Send(void)
 //		CAN_Chassis_SendMsg((s16)remote_tem,(s16)remote_tem,(s16)remote_tem,(s16)remote_tem);
 			CAN2_Chassis_SendMsg(chassis_Data.lf_wheel_output,chassis_Data.rf_wheel_output,chassis_Data.lb_wheel_output,chassis_Data.rb_wheel_output);
 //			CAN_Chassis_SendMsg(0,0,0,0);
-			CAN2_Shoot_Bullet_SendMsg(0,0,(s16)shoot_Motor_Data_Down.output,(s16)shoot_Motor_Data_Up.output);//取弹旋转、0、下拨弹、上拨弹
+			CAN2_Shoot_Bullet_SendMsg((s16)BulletRotate_Data.output,0,(s16)shoot_Motor_Data_Down.output,(s16)shoot_Motor_Data_Up.output);//取弹旋转、0、下拨弹、上拨弹
 			break;
 		}
 		case ERROR_STATE:	//错误模式
@@ -515,7 +518,7 @@ void Motor_Send(void)
 		{
 			CAN1_Yun_SendMsg(yunMotorData.yaw_output,yunMotorData.pitch_output);	//CAN2-1000	//取消反馈补偿
 			CAN2_Chassis_SendMsg(chassis_Data.lf_wheel_output,chassis_Data.rf_wheel_output,chassis_Data.lb_wheel_output,chassis_Data.rb_wheel_output);
-			CAN2_Shoot_Bullet_SendMsg(0,0,0,0);//取弹旋转、0、下拨弹、上拨弹
+			CAN2_Shoot_Bullet_SendMsg((s16)BulletRotate_Data.output,0,0,0);//取弹旋转、0、下拨弹、上拨弹
 			break;
 		}
 		default:

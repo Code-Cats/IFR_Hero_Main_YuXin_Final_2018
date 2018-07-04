@@ -11,9 +11,14 @@ void TakeBullet_Control_Center(void);
 
 typedef enum
 {
-    BULLET_ACQUIRE,  		//前伸、夹紧、抬起动作	称之为获得过程
-    BULLET_POUROUT,			//车身倾斜、舵机旋转	称之为倒弹过程
-		BULLET_THROWOUT,			//舵机旋回、车身抬起、夹紧松开	称之为抛落过程
+    BULLET_ACQUIRE1,  		//前伸、夹紧、抬起动作	称之为获得过程
+    BULLET_POUROUT1,			//车身倾斜、舵机旋转	称之为倒弹过程
+		BULLET_THROWOUT1,			//舵机旋回、车身抬起、夹紧松开	称之为抛落过程
+		BULLET_ACQUIRE2,  		//2前伸、夹紧、抬起动作	称之为获得过程2
+    BULLET_POUROUT2,			//2车身倾斜、舵机旋转	称之为倒弹过程2
+		BULLET_THROWOUT2,			//2舵机旋回、车身抬起、夹紧松开	称之为抛落过程2
+		BULLET_WAITING,	//待命状态
+		BULLET_OTHER,	//非取弹状态
 }TakeBulletState_e;
 
 

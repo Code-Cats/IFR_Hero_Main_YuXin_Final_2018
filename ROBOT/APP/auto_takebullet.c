@@ -3,10 +3,14 @@
 
 #define LIFT_DISTANCE_BULLET 700
 
-TakeBulletState_e TakeBulletState=BULLET_ACQUIRE;	//（自动）取弹状态位
+TakeBulletState_e TakeBulletState=BULLET_OTHER;	//（自动）取弹状态位
 
-u8 take_bullet_auto_move_statu=0;	//取弹自动平移标志，在每一个自动取弹结束周期结束时触发，仅在连续取弹时触发，期间需要暂时屏蔽chassis的RC控制，执行完成自动归零	//暂时未加，因为弹药箱无法保证在正常归位
-u8 take_bullet_end_state=0;	//一次取弹结束的标志位	//作用是不管切出到什么状态，取弹能够顺利完成，其他比如舵机等等不受该控制，切出取弹保护预计需要跟随修改
+#define BULLETROTATE_OTHER	0	//非取弹位置
+#define BULLETROTATE_WAITING	-750//650	//等待（对位）时位置
+#define BULLETROTATE_ACQUIRE	-1150	//取弹位置
+#define BULLETROTATE_POUROUT	-170	//倒弹位置
+#define BULLETROTATE_THROWOUT	-1000//-280//310	//抛出位置
+
 
 extern u32 time_1ms_count;
 extern KeyBoardTypeDef KeyBoardData[KEY_NUMS];
@@ -14,6 +18,8 @@ extern RC_Ctl_t RC_Ctl;
 extern ViceControlDataTypeDef ViceControlData;
 extern PID_GENERAL PID_Chassis_Speed[4];
 extern u8 Replenish_Bullet_Statu;	//补弹模式特殊舵机状态
+
+extern BULLETROTATE_DATA BulletRotate_Data;	//国赛版
 
 #define STEER_UP_L_INIT 560//
 #define STEER_UP_R_INIT 2500//1950	//
@@ -25,8 +31,8 @@ float pwm_r_t=STEER_UP_R_INIT;
 
 u8 valve_fdbstate[6]={0};	//记录是否伸出的反馈标志
 u8 servo_fdbstate[2]={0};
-const u32 valve_GOODdelay[6]={300,1200,300,1000,1000,1000};	//待加入，延时参数
-const u32 valve_POORdelay[6]={300,1200,300,1000,1000,1000};	//待加入，延时参数
+const u32 valve_GOODdelay[6]={300,1200,300,1000,1000,1000};	//0--1//待加入，延时参数
+const u32 valve_POORdelay[6]={300,1200,100,1000,1000,1000};	//1--0//待加入，延时参数
 const u32 servo_GOODdelay[2]={2500,800};	//延时参数	//第一段为2500是将子弹落下的延时也加进去了，因为舵机翻转和子弹下落必须是连在一体的
 const u32 servo_POORdelay[2]={500,500};	//延时参数
 
@@ -35,6 +41,7 @@ const u32 servo_POORdelay[2]={500,500};	//延时参数
 //#define VALVE_BULLET_HORIZONTAL2 1	//原前伸--现平移2
 //#define VALVE_BULLET_CLAMP 2	//夹紧
 
+u8 t_statu=0;
 void TakeBullet_Control_Center(void)
 {
 	static u8 swicth_Last_state=0;	//右拨杆
@@ -47,8 +54,185 @@ void TakeBullet_Control_Center(void)
 	static u32 valve_startPOOR_time[6]={0};	//记录逆向触发时间	//保持与工程车兼容性
 	static u32 servo_startPOOR_time[2]={0};	//记录逆向触发时间	//保持与工程车兼容性
 	
+	
+	static WorkState_e State_Record=CHECK_STATE;
+	
+	if(GetWorkState()==TAKEBULLET_STATE)	//5.9更新//上一版--》//取弹升降给DOWN-MID，前伸出发-夹紧一套给DOWN-MID-->DOWN-DOWN;舵机旋转给DOWN-MID-->DOWN-UP
+	{
+		if(State_Record!=TAKEBULLET_STATE)
+		{
+			TakeBulletState=BULLET_WAITING;
+		}
+		
+		if(RC_Ctl.rc.ch3-1024>80&&TakeBulletState==BULLET_WAITING)	/////////////////////////////修改操作模式时需要修改
+		{
+			TakeBulletState=BULLET_ACQUIRE1;
+		}
+		else if(RC_Ctl.rc.ch3-1024<-80)
+		{
+			TakeBulletState=BULLET_WAITING;
+		}			
+	}	
+	else
+	{
+//		if(State_Record==TAKEBULLET_STATE)
+//		{
+//		}
+		
+		if(TakeBulletState==BULLET_WAITING)
+		{
+			TakeBulletState=BULLET_OTHER;
+		}
+	}
+			
+	State_Record=GetWorkState();
+	
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//自动取弹放置位
+	switch(TakeBulletState)	//自动取弹过程
+	{
+		case BULLET_WAITING:	//等待取弹动作（对位）状态
+		{
+			ViceControlData.valve[VALVE_BULLET_CLAMP]=0;
+			
+			if(valve_fdbstate[VALVE_BULLET_CLAMP]==0)	//气缸松开
+			{
+				BulletRotate_Data.tarP=BULLETROTATE_WAITING;
+				if(abs(BulletRotate_Data.fdbP-BULLETROTATE_WAITING)<30)	//电机收回
+				{
+					ViceControlData.valve[VALVE_BULLET_HORIZONTAL1]=0;
+					ViceControlData.valve[VALVE_BULLET_HORIZONTAL2]=1;
+				}
+			}
+			
+			break;
+		}
+		case BULLET_ACQUIRE1:	//前伸、夹紧、抬起动作	称之为获得过程
+		{
+			BulletRotate_Data.tarP=BULLETROTATE_ACQUIRE;
+			if(abs(BulletRotate_Data.fdbP-BULLETROTATE_ACQUIRE)<45)
+			{
+				ViceControlData.valve[VALVE_BULLET_CLAMP]=1;
+				if(valve_fdbstate[VALVE_BULLET_CLAMP]==1)
+				{
+					TakeBulletState=BULLET_POUROUT1;	//切换到倒弹
+				}
+			}
+			break;
+		}
+		case BULLET_POUROUT1:	//车身倾斜、舵机旋转	称之为倒弹过程
+		{
+			
+			BulletRotate_Data.tarP=BULLETROTATE_POUROUT;
+			if(abs(BulletRotate_Data.fdbP-BULLETROTATE_POUROUT)<50)
+			{
+				TakeBulletState=BULLET_THROWOUT1;	//切换到扔出
+			}
+			break;
+		}
+		case BULLET_THROWOUT1:	//舵机旋回、车身抬起、夹紧松开	称之为抛落过程
+		{
+			
+			if(valve_fdbstate[VALVE_BULLET_CLAMP]==1)	//夹紧时放下，放下后回来
+			{
+				BulletRotate_Data.tarP=BULLETROTATE_THROWOUT;
+			}
+			
+			if(abs(BulletRotate_Data.fdbP-BULLETROTATE_THROWOUT)<40)	//放回原位
+			{
+				ViceControlData.valve[VALVE_BULLET_CLAMP]=0;
+			}
+			
+			if(valve_fdbstate[VALVE_BULLET_CLAMP]==0)	//已经松开，开始回来
+			{
+				BulletRotate_Data.tarP=BULLETROTATE_WAITING;
+				ViceControlData.valve[VALVE_BULLET_HORIZONTAL1]=1;
+				ViceControlData.valve[VALVE_BULLET_HORIZONTAL2]=0;
+				t_statu++;
+			}
+			
+			if(valve_fdbstate[VALVE_BULLET_CLAMP]==0&&abs(BulletRotate_Data.fdbP-BULLETROTATE_WAITING)<40)	//松开后且到准备位置，可以开始下一次
+			{
+				TakeBulletState=BULLET_ACQUIRE2;	//下一次取弹
+			}
+			break;
+		}
+		case BULLET_ACQUIRE2:	//前伸、夹紧、抬起动作	称之为获得过程2
+		{
+			if(valve_fdbstate[VALVE_BULLET_HORIZONTAL1]==1)	//气缸平移
+			{
+				BulletRotate_Data.tarP=BULLETROTATE_ACQUIRE;
+				if(abs(BulletRotate_Data.fdbP-BULLETROTATE_ACQUIRE)<45)
+				{
+					ViceControlData.valve[VALVE_BULLET_CLAMP]=1;
+					if(valve_fdbstate[VALVE_BULLET_CLAMP]==1)
+					{
+						TakeBulletState=BULLET_POUROUT2;	//切换到倒弹
+					}
+				}
+			}
+			break;
+		}
+		case BULLET_POUROUT2:	//车身倾斜、舵机旋转	称之为倒弹过程2
+		{
+			
+			BulletRotate_Data.tarP=BULLETROTATE_POUROUT;
+			if(abs(BulletRotate_Data.fdbP-BULLETROTATE_POUROUT)<50)
+			{
+				TakeBulletState=BULLET_THROWOUT2;	//切换到扔出
+			}
+			break;
+		}
+		case BULLET_THROWOUT2:	//舵机旋回、车身抬起、夹紧松开	称之为抛落过程2
+		{
+			///////////////////////////////////////////
+			
+			if(valve_fdbstate[VALVE_BULLET_CLAMP]==1)	//夹紧时放下，放下后回来
+			{
+				BulletRotate_Data.tarP=BULLETROTATE_THROWOUT;
+			}
+			
+			if(abs(BulletRotate_Data.fdbP-BULLETROTATE_THROWOUT)<40)	//放回原位
+			{
+				ViceControlData.valve[VALVE_BULLET_CLAMP]=0;
+			}
+			
+			if(valve_fdbstate[VALVE_BULLET_CLAMP]==0)	//已经松开，开始回来
+			{
+				BulletRotate_Data.tarP=BULLETROTATE_WAITING;
+				ViceControlData.valve[VALVE_BULLET_HORIZONTAL1]=0;
+				ViceControlData.valve[VALVE_BULLET_HORIZONTAL2]=1;
+				t_statu++;
+			}
+			
+			if(valve_fdbstate[VALVE_BULLET_CLAMP]==0&&abs(BulletRotate_Data.fdbP-BULLETROTATE_WAITING)<40)	//松开后且到准备位置，可以开始下一次
+			{
+				TakeBulletState=BULLET_WAITING;	//下一次取弹
+			}
+			
+			break;
+		}
+		case BULLET_OTHER:	//其他非取弹状态
+		{
+			ViceControlData.valve[VALVE_BULLET_CLAMP]=0;
+//			
+//			if(valve_fdbstate[VALVE_BULLET_CLAMP]==0)	//气缸松开
+//			{
+//				BulletRotate_Data.tarP=BULLETROTATE_WAITING;
+//				if(abs(BulletRotate_Data.fdbP-BULLETROTATE_WAITING)<30)	//电机到了安全位置
+//				{
+					ViceControlData.valve[VALVE_BULLET_HORIZONTAL1]=0;	///////////////////////////////////////这里之后要改成回中星操作
+					ViceControlData.valve[VALVE_BULLET_HORIZONTAL1]=1;	//平移气缸回中
+					if(valve_fdbstate[VALVE_BULLET_HORIZONTAL1]==0)
+					{
+						BulletRotate_Data.tarP=BULLETROTATE_OTHER;
+					}
+//				}
+//			}
+			
+			break;
+		}
+	}
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	/******************************************************************

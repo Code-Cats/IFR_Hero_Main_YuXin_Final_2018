@@ -31,6 +31,8 @@
 #include "uart5_vision.h"
 #include "usart6_viceboard_analysis.h"
 
+#include "bullet_rotate.h"
+
 #include "mpu6050IIC.h"
 #include "mpu6050_it.h"
 #include "mpu6050_process.h"

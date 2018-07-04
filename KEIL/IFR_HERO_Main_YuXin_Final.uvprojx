@@ -533,6 +533,11 @@
               <FileType>1</FileType>
               <FilePath>..\ROBOT\APP\yun.c</FilePath>
             </File>
+            <File>
+              <FileName>bullet_rotate.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\ROBOT\APP\bullet_rotate.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
