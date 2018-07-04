@@ -223,53 +223,53 @@ void Chassis_Control_External_Solution(void)	//陀螺仪正常的底盘解决方案
 //		Chassis_Vw=(s16)((YAW_INIT-yunMotorData.yaw_fdbP)*0.6f);	//YUN_INIT为目标位置，故为YAW_INIT-
 	}
 	
-	if(GetWorkState()==NORMAL_STATE||GetWorkState()==TAKEBULLET_STATE)	//取弹为暂时加入
-	yaw_follow_error=yaw_follow_error/8192.0f*2*PI;	//每次都运算方便yun.c调用
-	if(GetWorkState()==NORMAL_STATE&&abs(YAW_INIT-yunMotorData.yaw_fdbP)>200)	//过弯漂移	//发现过弯飘移会影响转向，解决方法1，转向驱动力达到极限触顶导致实际速度比例偏差预期，设置一函数检测任意输出值大于8000时限制整体使比例预期，方法二，减弱Vy
-	{	//智能转向块
-		s16 Vx_record=Chassis_Vx;
-		float yaw_follow_error_deal=0.0;	//5.21加入的优化	防止转向过大直接停顿
-		Chassis_Vx=0;
-		
-		yaw_follow_error_deal=yaw_follow_error*0.8f;	//5.21加入的优化	防止转向过大直接停顿
-//		yaw_follow_error=yaw_follow_error/8192.0f*2*PI;
-		Chassis_Vx+=(s16)(Vx_record*(cos(yaw_follow_error_deal)));	//还原只需将yaw_follow_error_deal换成yaw_follow_error
-		Chassis_Vy+=(s16)(Vx_record*(sin(yaw_follow_error_deal))*1);
-	}
+//////////////////	if(GetWorkState()==NORMAL_STATE||GetWorkState()==TAKEBULLET_STATE)	//取弹为暂时加入
+//////////////////	yaw_follow_error=yaw_follow_error/8192.0f*2*PI;	//每次都运算方便yun.c调用
+//////////////////	if(GetWorkState()==NORMAL_STATE&&abs(YAW_INIT-yunMotorData.yaw_fdbP)>200)	//过弯漂移	//发现过弯飘移会影响转向，解决方法1，转向驱动力达到极限触顶导致实际速度比例偏差预期，设置一函数检测任意输出值大于8000时限制整体使比例预期，方法二，减弱Vy
+//////////////////	{	//智能转向块
+//////////////////		s16 Vx_record=Chassis_Vx;
+//////////////////		float yaw_follow_error_deal=0.0;	//5.21加入的优化	防止转向过大直接停顿
+//////////////////		Chassis_Vx=0;
+//////////////////		
+//////////////////		yaw_follow_error_deal=yaw_follow_error*0.8f;	//5.21加入的优化	防止转向过大直接停顿
+////////////////////		yaw_follow_error=yaw_follow_error/8192.0f*2*PI;
+//////////////////		Chassis_Vx+=(s16)(Vx_record*(cos(yaw_follow_error_deal)));	//还原只需将yaw_follow_error_deal换成yaw_follow_error
+//////////////////		Chassis_Vy+=(s16)(Vx_record*(sin(yaw_follow_error_deal))*1);
+//////////////////	}
 	
 	
-	if(GetWorkState()==WAIST_STATE)	//扭腰前进	
-	{
-		s16 Vx_record=Chassis_Vx;
-		if(YAW_INIT_DEFINE-yaw_follow_tarP>8192/2)	//防止过界
-		{
-			yaw_follow_real_error=YAW_INIT_DEFINE-(yaw_follow_tarP+8192);
-		}
-		else if(YAW_INIT_DEFINE-yaw_follow_tarP<-8192/2)
-		{
-			yaw_follow_real_error=YAW_INIT_DEFINE-(yaw_follow_tarP-8192);
-		}
-		else
-		{
-			yaw_follow_real_error=YAW_INIT_DEFINE-yaw_follow_tarP;
-		}
+//////////////////	if(GetWorkState()==WAIST_STATE)	//扭腰前进	
+//////////////////	{
+//////////////////		s16 Vx_record=Chassis_Vx;
+//////////////////		if(YAW_INIT_DEFINE-yaw_follow_tarP>8192/2)	//防止过界
+//////////////////		{
+//////////////////			yaw_follow_real_error=YAW_INIT_DEFINE-(yaw_follow_tarP+8192);
+//////////////////		}
+//////////////////		else if(YAW_INIT_DEFINE-yaw_follow_tarP<-8192/2)
+//////////////////		{
+//////////////////			yaw_follow_real_error=YAW_INIT_DEFINE-(yaw_follow_tarP-8192);
+//////////////////		}
+//////////////////		else
+//////////////////		{
+//////////////////			yaw_follow_real_error=YAW_INIT_DEFINE-yaw_follow_tarP;
+//////////////////		}
 
-		Chassis_Vx=0;
-		yaw_follow_real_error=yaw_follow_real_error/8192.0f*2*PI;
-		Chassis_Vx+=(s16)(Vx_record*(cos(yaw_follow_real_error)));
-		Chassis_Vy+=(s16)(Vx_record*(sin(yaw_follow_real_error))*1);	
-//		t_Vy_k=sin(yaw_follow_real_error);
-//		t_Vx_k=cos(yaw_follow_real_error);
-	}
+//////////////////		Chassis_Vx=0;
+//////////////////		yaw_follow_real_error=yaw_follow_real_error/8192.0f*2*PI;
+//////////////////		Chassis_Vx+=(s16)(Vx_record*(cos(yaw_follow_real_error)));
+//////////////////		Chassis_Vy+=(s16)(Vx_record*(sin(yaw_follow_real_error))*1);	
+////////////////////		t_Vy_k=sin(yaw_follow_real_error);
+////////////////////		t_Vx_k=cos(yaw_follow_real_error);
+//////////////////	}
 	
 	
 	
-	if(GetWorkState()==WAIST_STATE&&KeyBoardData[KEY_CTRL].value==1	)	//云台中心转向	//仅在扭腰时生效
-	{	//等到CTRL写好了开启
-		float chassis_vw_record=Chassis_Vw;
-		Chassis_Vy-=(s16)(chassis_vw_record/1.7f);	//2
-		Chassis_Vx+=21;	//对后退的补偿	//每次调节轮压需要重新调节		//思考？加在这里还是上面扭腰前进补偿之前合适
-	}
+//////////////////	if(GetWorkState()==WAIST_STATE&&KeyBoardData[KEY_CTRL].value==1	)	//云台中心转向	//仅在扭腰时生效
+//////////////////	{	//等到CTRL写好了开启
+//////////////////		float chassis_vw_record=Chassis_Vw;
+//////////////////		Chassis_Vy-=(s16)(chassis_vw_record/1.7f);	//2
+//////////////////		Chassis_Vx+=21;	//对后退的补偿	//每次调节轮压需要重新调节		//思考？加在这里还是上面扭腰前进补偿之前合适
+//////////////////	}
 
 //	Chassis_Vw=0;	//////////////////////////////临时测试
 				
@@ -305,6 +305,15 @@ void Chassis_Control_External_Solution(void)	//陀螺仪正常的底盘解决方案
 		chassis_Data.rf_wheel_output=(s32)output_limit_rf;
 		chassis_Data.lb_wheel_output=(s32)output_limit_lb;
 		chassis_Data.rb_wheel_output=(s32)output_limit_rb;
+		
+	if(chassis_Data.lf_wheel_output>10000)	chassis_Data.lf_wheel_output=10000;
+	if(chassis_Data.lf_wheel_output<-10000)	chassis_Data.lf_wheel_output=-10000;
+	if(chassis_Data.rf_wheel_output>10000)	chassis_Data.rf_wheel_output=10000;
+	if(chassis_Data.rf_wheel_output<-10000)	chassis_Data.rf_wheel_output=-10000;
+	if(chassis_Data.lb_wheel_output>10000)	chassis_Data.lb_wheel_output=10000;
+	if(chassis_Data.lb_wheel_output<-10000)	chassis_Data.lb_wheel_output=-10000;
+	if(chassis_Data.rb_wheel_output>10000)	chassis_Data.rb_wheel_output=10000;
+	if(chassis_Data.rb_wheel_output<-10000)	chassis_Data.rb_wheel_output=-10000;
 	}
 }
 /******************************************************/

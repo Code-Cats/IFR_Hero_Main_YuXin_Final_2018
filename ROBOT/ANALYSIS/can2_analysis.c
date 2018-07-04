@@ -80,6 +80,15 @@ void CAN2_Chassis_SendMsg(int16_t motor_201,int16_t motor_202,int16_t motor_203,
     TxMessage.RTR = CAN_RTR_DATA;  //数据帧
     TxMessage.DLC = 0x08;          //帧长度为8
     
+	if(motor_201>10000)	motor_201=10000;
+	if(motor_201<-10000)	motor_201=-10000;
+	if(motor_202>10000)	motor_202=10000;
+	if(motor_202<-10000)	motor_202=-10000;
+	if(motor_203>10000)	motor_203=10000;
+	if(motor_203<-10000)	motor_203=-10000;
+	if(motor_204>10000)	motor_204=10000;
+	if(motor_204<-10000)	motor_204=-10000;
+	
     TxMessage.Data[0] =(unsigned char)((motor_201>>8)&0xff);
     TxMessage.Data[1] = (unsigned char)(motor_201&0xff);
     TxMessage.Data[2] =(unsigned char)((motor_202>>8)&0xff);
