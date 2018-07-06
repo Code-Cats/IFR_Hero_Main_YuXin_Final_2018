@@ -94,7 +94,7 @@ void Shoot_Instruction(void)	//发弹指令模块
 	shoot_Data_Down.motor_tarP=((float)shoot_Data_Down.count*SINGLE_INCREMENT);	//新2006
 //	shoot_Data_Up.motor_tarP=((float)shoot_Data_Up.count*SINGLE_INCREMENT);	//新2006
 	
-	shoot_Motor_Data_Up.tarV=-3000;
+	shoot_Motor_Data_Up.tarV=-3500;
 	
 	Prevent_Jam_Down(&shoot_Data_Down,&shoot_Motor_Data_Down);
 	Prevent_Jam_Up(&shoot_Data_Up,&shoot_Motor_Data_Up);
@@ -374,7 +374,7 @@ void Prevent_Jam_Down(SHOOT_DATA * shoot_data,SHOOT_MOTOR_DATA * shoot_motor_Dat
 }   
 
 
-void Prevent_Jam_Up(SHOOT_DATA * shoot_data,SHOOT_MOTOR_DATA * shoot_motor_Data)	//防卡弹程序	//同时包含防鸡蛋的功能	//放在tarP计算出之后
+void Prevent_Jam_Up(SHOOT_DATA * shoot_data,SHOOT_MOTOR_DATA * shoot_motor_Data)	//待加入从STOP切换的保护//防卡弹程序	//同时包含防鸡蛋的功能	//放在tarP计算出之后
 {
 	static u8 jam_deal_state=0;
 	static u32 time_record_jam_start=0;
@@ -388,9 +388,10 @@ void Prevent_Jam_Up(SHOOT_DATA * shoot_data,SHOOT_MOTOR_DATA * shoot_motor_Data)
 		shoot_data->Jam.count=0;
 	}
 	
-	if(shoot_data->Jam.count>50)	//50ms
+	if(shoot_data->Jam.count>100)	//50ms
 	{
 		shoot_data->Jam.sign=1;
+		jam_deal_state=1;
 	}
 	
 	if(shoot_data->Jam.sign==1)	//处理卡弹模块
@@ -399,9 +400,12 @@ void Prevent_Jam_Up(SHOOT_DATA * shoot_data,SHOOT_MOTOR_DATA * shoot_motor_Data)
 		{
 				case 1:
 				{
-					shoot_motor_Data->tarV=1000;
-					time_record_jam_start=time_1ms_count;	//记录处理时间
-					if(time_1ms_count-time_record_jam_start>500&&time_record_jam_start!=0)	//半秒
+					shoot_motor_Data->tarV=2500;
+					if(time_record_jam_start==0)
+					{
+						time_record_jam_start=time_1ms_count;	//记录处理时间
+					}
+					if(time_1ms_count-time_record_jam_start>300&&time_record_jam_start!=0)	//半秒
 					{
 						jam_deal_state=2;
 						time_record_jam_start=0;
@@ -410,8 +414,12 @@ void Prevent_Jam_Up(SHOOT_DATA * shoot_data,SHOOT_MOTOR_DATA * shoot_motor_Data)
 				}
 				case 2:
 				{
-					time_record_jam_end=time_1ms_count;
-					shoot_motor_Data->tarV=-3000;
+					if(time_record_jam_end==0)
+					{
+						time_record_jam_end=time_1ms_count;
+					}
+					
+					shoot_motor_Data->tarV=-3500;
 					if(time_1ms_count-time_record_jam_end>200&&time_record_jam_end!=0)
 					{
 						jam_deal_state=1;

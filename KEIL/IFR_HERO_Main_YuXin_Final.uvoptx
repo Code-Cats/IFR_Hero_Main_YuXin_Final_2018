@@ -264,6 +264,16 @@
           <WinNumber>1</WinNumber>
           <ItemText>VisionData,0x0A</ItemText>
         </Ww>
+        <Ww>
+          <count>12</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>shoot_Data_Up,0x0A</ItemText>
+        </Ww>
+        <Ww>
+          <count>13</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>shoot_Motor_Data_Up,0x0A</ItemText>
+        </Ww>
       </WatchWindow1>
       <WatchWindow2>
         <Ww>
@@ -345,6 +355,11 @@
           <count>15</count>
           <WinNumber>2</WinNumber>
           <ItemText>Chassis_Vx,0x0A</ItemText>
+        </Ww>
+        <Ww>
+          <count>16</count>
+          <WinNumber>2</WinNumber>
+          <ItemText>shoot_data</ItemText>
         </Ww>
       </WatchWindow2>
       <Tracepoint>

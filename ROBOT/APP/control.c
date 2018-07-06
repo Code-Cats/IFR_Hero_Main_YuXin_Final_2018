@@ -399,7 +399,7 @@ void LED_Indicate(void)
 				{
 					LED_Blink_Set(1,10);
 				}
-				else
+				else if(t_error_record==LOST_IMU)
 				{
 					LED_Blink_Set(6,10);
 				}
