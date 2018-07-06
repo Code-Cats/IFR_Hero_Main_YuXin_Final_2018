@@ -1,5 +1,6 @@
 #include "yun.h"
 #include "usart1_remote_analysis.h"
+#include "vision.h"
 s32 YAW_INIT=YAW_INIT_DEFINE;
 /*
 整体结构：yaw轴暂定单独速度环//后期计划增加外接陀螺仪位置环进行选择
@@ -28,6 +29,8 @@ extern GYRO_DATA Gyro_Data;
 extern u8 Chassis_Follow_Statu;	//底盘跟随标志位
 extern volatile float yaw_follow_real_error;	//扭腰时的底盘跟随偏差
 extern float yaw_follow_error;	//普通时的底盘跟随误差
+
+extern VisionDataTypeDef	VisionData;
 
 extern u8 Replenish_Bullet_Statu;	//补弹状态位
 
@@ -69,17 +72,26 @@ void Yun_Control_External_Solution(void)	//外置反馈方案
 	
 //	Yun_WorkState_Turn_Task();	//新版无需取弹//取弹时云台转向标志位
 	
-	if(GetWorkState()==NORMAL_STATE||GetWorkState()==WAIST_STATE)	//仅在正常模式下受控	//取弹受控为暂时加入，之后以传感器自动进行	//取弹受控已取消，云台跟随底盘
+	if(!(RC_Ctl.rc.switch_right==RC_SWITCH_UP&&VisionData.vision_control_state==1))	//仅当视觉有信号才受控
 	{
-		if(Yun_Control_RCorPC==PC_CONTROL)
-		{	//PC控制数据
-			PC_Control_Yun(&yunMotorData.yaw_tarP,&yunMotorData.pitch_tarP);
+		if(GetWorkState()==NORMAL_STATE||GetWorkState()==WAIST_STATE)	//仅在正常模式下受控	//取弹受控为暂时加入，之后以传感器自动进行	//取弹受控已取消，云台跟随底盘
+		{
+			if(Yun_Control_RCorPC==PC_CONTROL)
+			{	//PC控制数据
+				PC_Control_Yun(&yunMotorData.yaw_tarP,&yunMotorData.pitch_tarP);
+			}
+			else if(Yun_Control_RCorPC==RC_CONTROL)
+			{	//RC控制数据
+				RC_Control_Yun(&yunMotorData.yaw_tarP,&yunMotorData.pitch_tarP);
+			}
 		}
-		else if(Yun_Control_RCorPC==RC_CONTROL)
-		{	//RC控制数据
-			RC_Control_Yun(&yunMotorData.yaw_tarP,&yunMotorData.pitch_tarP);
-		}
+
 	}
+	else
+	{
+		
+	}
+	
 	
 	yun_control_pcorrc_last=Yun_Control_RCorPC;
 	
@@ -93,10 +105,11 @@ void Yun_Control_External_Solution(void)	//外置反馈方案
 	}
 
 	/////////////////////
-//////////////	if(KeyBoardData[KEY_F].value==1)	//放在中断中运行
-//////////////	{
-//////////////		Vision_Task(&yunMotorData.yaw_tarP,&yunMotorData.pitch_tarP);
-//////////////	}
+//	if(KeyBoardData[KEY_F].value==1&&time_1ms_count%10==0)
+	if(RC_Ctl.rc.switch_right==RC_SWITCH_UP&&time_1ms_count%10==0)		//放在中断中运行
+	{
+		Vision_Task(&yunMotorData.yaw_tarP,&yunMotorData.pitch_tarP);
+	}
 	
 	////////////////////////////
 	

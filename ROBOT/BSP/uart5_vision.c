@@ -88,7 +88,6 @@ void UART5_IRQHandler(void)
 
 	if(USART_GetITStatus(UART5, USART_IT_RXNE) != RESET)
 	{
-		UART_count++;
 		UART5_Res=USART_ReceiveData(UART5);
 
 		VisionData_Receive(UART5_Res);

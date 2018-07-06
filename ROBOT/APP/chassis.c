@@ -123,7 +123,7 @@ void Chassis_Control_External_Solution(void)	//陀螺仪正常的底盘解决方案
 			}
 		}
 		
-		PID_Chassis_Follow.k_p=CHASSIS_FOLLOW_PID_P/1.5f;
+		PID_Chassis_Follow.k_p=CHASSIS_FOLLOW_PID_P/1.4f;
 	}
 	else
 	{
@@ -783,7 +783,7 @@ void Overall_Motion_Ratio_Protect(CHASSIS_DATA* chassis_data)	//整体轮速比例保护
 	{
 		chassis_protect_k=CHASSIS_SPEEDMAX/chassis_tarV_max;
 		if(chassis_protect_k>1)	chassis_protect_k=1;
-		if(chassis_protect_k<0.2)	chassis_protect_k=0.2;	//保护
+		if(chassis_protect_k<0.2f)	chassis_protect_k=0.2f;	//保护
 		
 		chassis_data->lf_wheel_tarV*=chassis_protect_k;
 		chassis_data->rf_wheel_tarV*=chassis_protect_k;

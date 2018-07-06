@@ -395,6 +395,10 @@ void LED_Indicate(void)
 				{
 					LED_Blink_Set(5,10);
 				}
+				else if(t_error_record==LOST_BULLETROTATE1)
+				{
+					LED_Blink_Set(1,10);
+				}
 				else
 				{
 					LED_Blink_Set(6,10);
