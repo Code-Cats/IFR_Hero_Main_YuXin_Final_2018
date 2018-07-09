@@ -1,40 +1,51 @@
 #include "usart3_judge.h"
 
-extern int realBulletNum;
-static uint8_t   _USART3_DMA_RX_BUF[2][BSP_USART3_DMA_RX_BUF_LEN];
-uint8_t  testbuff[100]={0};
-uint8_t d;
-uint8_t g_guiding_lights=0;
+//extern OS_EVENT * judgeMsg;
+char g_judgeFlag = 0;
+char g_judgeLost = 0;
+uint8_t   _USART3_DMA_RX_BUF[2][BSP_USART3_DMA_RX_BUF_LEN];
 u8              JudgeSendBuff[22];
+
+char            this_dma_type=0;
 uint16_t        testcmdId;
 uint16_t        testcmdIdCnt;
 uint16_t        recordData;
+
+float realShootSpeed = 27.0;
+int16_t shootedBulletNum;
+int16_t drop_rate_blood=0;
 JUDGEMENT_DATA judgementData={0};
+
+/*热量频率测试代码
+int16_t judgetimer = 1;
+int     judgeT = 0;
+*/ 
+
 tFrameHeader            testFrameHeader;
 tGameRobotState         testGameRobotState;      //比赛机器人状态
 tRobotHurt              testRobotHurt;          //机器人伤害数据
 tShootData              testShootData;          //实时射击数据
-tPowerHeatData 		    testPowerHeatData;      //实时功率热量数据
+tPowerHeatData 				  testPowerHeatData;      //实时功率热量数据
 tRfidDetect             testRfidDetect;          //场地交互数据
 tGameResult             testGameResult;          //比赛胜负数据
 tGetBuff                testGetBuff;             //Buff获取数据
 tGameRobotPos           testGameRobotPos;        //机器人位置朝向信息
 tShowData               testShowData;            //自定义数据
 JudgementSendData       testJudgementSendData=JUDGEMENTSENDDATA_DEFAULT;
-char            this_dma_type=0;
+
 void USART3_Configuration(uint32_t baud_rate)
 {
 
     GPIO_InitTypeDef gpio;
-	USART_InitTypeDef usart;
-	NVIC_InitTypeDef nvic;
+	  USART_InitTypeDef usart;
+	  NVIC_InitTypeDef nvic;
     DMA_InitTypeDef dma;
     
     RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);  //使能USART3，GPIOB时钟
     RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_DMA1, ENABLE);   //使能DMA传输
-	RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART3, ENABLE); //使能USART3时钟
+		RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART3, ENABLE); //使能USART3时钟
 	
-	USART_DeInit(USART3);//复位串口3
+	  USART_DeInit(USART3);//复位串口3
     
     GPIO_PinAFConfig(GPIOB,GPIO_PinSource10,GPIO_AF_USART3);
     GPIO_PinAFConfig(GPIOB,GPIO_PinSource11,GPIO_AF_USART3); 
@@ -46,7 +57,7 @@ void USART3_Configuration(uint32_t baud_rate)
     gpio.GPIO_PuPd = GPIO_PuPd_NOPULL;
     GPIO_Init(GPIOB,&gpio);
     
-	nvic.NVIC_IRQChannel = USART3_IRQn;
+		nvic.NVIC_IRQChannel = USART3_IRQn;
     nvic.NVIC_IRQChannelPreemptionPriority = 2;
     nvic.NVIC_IRQChannelSubPriority = 1;
     nvic.NVIC_IRQChannelCmd = ENABLE; 
@@ -61,12 +72,12 @@ void USART3_Configuration(uint32_t baud_rate)
     usart.USART_HardwareFlowControl = USART_HardwareFlowControl_None;  //无硬件数据流控制
 		
     USART_Init(USART3, &usart);  //初始化串口3
-	USART_ITConfig(USART3, USART_IT_IDLE, ENABLE);        //开启空闲中断
-	USART_DMACmd(USART3, USART_DMAReq_Rx, ENABLE);   //使能串口1 DMA接收
-	USART_Cmd(USART3, ENABLE);                 //使能串口 
+		USART_ITConfig(USART3, USART_IT_IDLE, ENABLE);        //开启空闲中断
+		USART_DMACmd(USART3, USART_DMAReq_Rx, ENABLE);   //使能串口1 DMA接收
+		USART_Cmd(USART3, ENABLE);                 //使能串口 
 		
 		//相应的DMA配置
-	DMA_DeInit(DMA1_Stream1);
+	  DMA_DeInit(DMA1_Stream1);
    // DMA_StructInit(&dma);
     dma.DMA_Channel = DMA_Channel_4;
     dma.DMA_PeripheralBaseAddr = (uint32_t)(&USART3->DR);  //DMA外设ADC基地址
@@ -84,15 +95,23 @@ void USART3_Configuration(uint32_t baud_rate)
     dma.DMA_MemoryBurst = DMA_MemoryBurst_Single;
     dma.DMA_PeripheralBurst = DMA_PeripheralBurst_Single;
     DMA_Init(DMA1_Stream1, &dma);
-				
+		
+		
 		    //配置Memory1,Memory0是第一个使用的Memory
     DMA_DoubleBufferModeConfig(DMA1_Stream1, (uint32_t)&_USART3_DMA_RX_BUF[1][0], DMA_Memory_0);   //first used memory configuration
     DMA_DoubleBufferModeCmd(DMA1_Stream1, ENABLE);
     
     DMA_Cmd(DMA1_Stream1, ENABLE);
-		   			   
+		
+   
+		
+		
+    
 }
-			
+		
+		
+
+
 const uint8_t CRC8_INIT = 0xff;
 const uint8_t CRC8_TAB[256] =
 {
@@ -114,6 +133,9 @@ const uint8_t CRC8_TAB[256] =
   0x74, 0x2a, 0xc8, 0x96, 0x15, 0x4b, 0xa9, 0xf7, 0xb6, 0xe8, 0x0a, 0x54, 0xd7, 0x89, 0x6b, 0x35,
 };
 
+
+
+
 /*
 ** Descriptions: CRC8 checksum function
 ** Input: Data to check,Stream length, initialized checksum
@@ -130,6 +152,7 @@ uint8_t Get_CRC8_Check_Sum(uint8_t *pchMessage,uint16_t dwLength,uint8_t ucCRC8)
   return(ucCRC8);
 }
 
+
 /*
 ** Descriptions: CRC8 Verify function
 ** Input: Data to Verify,Stream length = Data + checksum
@@ -143,6 +166,7 @@ uint16_t Verify_CRC8_Check_Sum(uint8_t *pchMessage, uint16_t dwLength)
   return ( ucExpected == pchMessage[dwLength-1] );
 }
 
+
 /*
 ** Descriptions: append CRC8 to the end of data
 ** Input: Data to CRC and append,Stream length = Data + checksum
@@ -155,6 +179,7 @@ void Append_CRC8_Check_Sum(uint8_t *pchMessage, uint16_t dwLength)
   ucCRC = Get_CRC8_Check_Sum ( (uint8_t *)pchMessage, dwLength-1, CRC8_INIT);
   pchMessage[dwLength-1] = ucCRC;
 }
+
 
 /*
 ** Descriptions: CRC16 checksum function
@@ -212,6 +237,7 @@ uint16_t Get_CRC16_Check_Sum(uint8_t *pchMessage,uint32_t dwLength,uint16_t wCRC
   return wCRC;
 }
 
+
 /*
 ** Descriptions: CRC16 Verify function
 ** Input: Data to Verify,Stream length = Data + checksum
@@ -227,6 +253,7 @@ uint32_t Verify_CRC16_Check_Sum(uint8_t *pchMessage, uint32_t dwLength)
   wExpected = Get_CRC16_Check_Sum ( pchMessage, dwLength - 2, CRC_INIT);
   return ((wExpected & 0xff) == pchMessage[dwLength - 2] && ((wExpected >> 8) & 0xff)== pchMessage[dwLength - 1]);
 }
+
 
 /*
 ** Descriptions: append CRC16 to the end of data
@@ -248,6 +275,7 @@ void Append_CRC16_Check_Sum(uint8_t * pchMessage,uint32_t dwLength)
 void USART3_IRQHandler(void)
 {
 	 static uint32_t this_frame_rx_len = 0;
+  
 	 if(USART_GetITStatus(USART3, USART_IT_IDLE) != RESET)
 	 {
 		  (void)USART3->SR;
@@ -257,95 +285,109 @@ void USART3_IRQHandler(void)
 			   this_dma_type=0;
 			   DMA_Cmd(DMA1_Stream1, DISABLE);
 			   this_frame_rx_len = BSP_USART3_DMA_RX_BUF_LEN - DMA_GetCurrDataCounter(DMA1_Stream1);
-			   DMA1_Stream1->NDTR = (uint16_t)BSP_USART3_DMA_RX_BUF_LEN;     //没用relocate the dma memory pointer to the beginning position
+			   DMA1_Stream1->NDTR = (uint16_t)BSP_USART3_DMA_RX_BUF_LEN;     //??relocate the dma memory pointer to the beginning position
 			   DMA1_Stream1->CR |= (uint32_t)(DMA_SxCR_CT);                  //enable the current selected memory is Memory 1
 			   DMA_Cmd(DMA1_Stream1, ENABLE);
-			   judgementDataHandler();
+				
+				 judgementDataHandler();
 		  }
 			else 
 		  {
 			   this_dma_type=1;
 			   DMA_Cmd(DMA1_Stream1, DISABLE);
 			   this_frame_rx_len = BSP_USART3_DMA_RX_BUF_LEN - DMA_GetCurrDataCounter(DMA1_Stream1);
-			   DMA1_Stream1->NDTR = (uint16_t)BSP_USART3_DMA_RX_BUF_LEN;      //没用relocate the dma memory pointer to the beginning position
+			   DMA1_Stream1->NDTR = (uint16_t)BSP_USART3_DMA_RX_BUF_LEN;      //??relocate the dma memory pointer to the beginning position
 			   DMA1_Stream1->CR &= ~(uint32_t)(DMA_SxCR_CT);                  //enable the current selected memory is Memory 0
 			   DMA_Cmd(DMA1_Stream1, ENABLE);
-			   judgementDataHandler();
+				
+				 judgementDataHandler();
 		  }
 	 }
 
 }
+
 void judgementDataHandler(void)
 {
-    uint8_t cnt = 5;
+  uint8_t cnt = 5;
+	
+/**热量数据反馈频率测试代码**/
+//	static int32_t error[2] = {0};
+//	if(judgementData.flag==0)
+//	{
+//	  judgementData.flag=1;
+//	}
+//	
+//	if(judgetimer == 1)
+//		error[0] = get_heartbeat();
+//	
+//	error[1] = get_heartbeat();
+//	
+//	if((error[1] - error[0]) > 1000) 
+//	{
+//		judgeT = judgetimer;
+//		judgetimer = 0;
+//	}
+/***************************/
 	
 	LostCountFeed(&Error_Check.count[LOST_REFEREE]);//////////////////////////////////////
 	
-    memcpy(&testFrameHeader, _USART3_DMA_RX_BUF[this_dma_type],FRAMEHEADER_LEN); 
-    memcpy(&testbuff, _USART3_DMA_RX_BUF[this_dma_type],100);
-
-	if(judgementData.flag==0)
+	memcpy(&testcmdId, (_USART3_DMA_RX_BUF[this_dma_type]+cnt), sizeof(testcmdId));  //04
+		recordData=cnt+2;
+	
+	if(testcmdId == PowerHeatDataId)
 	{
-	  judgementData.flag=1;
+		/*热量测试代码
+		judgetimer++;
+		*/
+		memcpy(&testPowerHeatData, (_USART3_DMA_RX_BUF[this_dma_type]+recordData),20);		
 	}
 	
-    if(testFrameHeader.sOF==(uint16_t)SOF_FIXED\
-      &&(1==Verify_CRC8_Check_Sum(_USART3_DMA_RX_BUF[this_dma_type],FRAMEHEADER_LEN)) \
-      &&(1==Verify_CRC16_Check_Sum(_USART3_DMA_RX_BUF[this_dma_type], testFrameHeader.dataLenth+9)))
-     {
-		 testcmdIdCnt++;
-		 if(testcmdIdCnt<100) 
-		 {
-		     memcpy(&testcmdId, (_USART3_DMA_RX_BUF[this_dma_type]+cnt), sizeof(testcmdId));  //04
-			 recordData=cnt+2;
-		 }
-		 else if(testcmdIdCnt==100)
-		 {
-		     memcpy(&testcmdId, (_USART3_DMA_RX_BUF[this_dma_type]+cnt+54), sizeof(testcmdId)); //01
-			 recordData=cnt+54+2;	
-		 }
-		 else
-		 {
-		     testcmdIdCnt=0;
-		 }
-		 
-         switch(testcmdId)
-         {
-              case GameRobotStateId://比赛机器人状态0x0001
-			  { 
-                  memcpy(&testGameRobotState,(_USART3_DMA_RX_BUF[this_dma_type]+recordData),testFrameHeader.dataLenth); 
-			  }break;
-              case RobotHurtId://机器人伤害数据0x0002
-			  {
-                  memcpy(&testRobotHurt, (_USART3_DMA_RX_BUF[this_dma_type]+recordData), testFrameHeader.dataLenth);
-			  }break;
-              case ShootDataId://实时射击数据0x0003
-			  {		  
-                  memcpy(&testShootData, (_USART3_DMA_RX_BUF[this_dma_type]+recordData), testFrameHeader.dataLenth);
-			  }break;
-	          case PowerHeatDataId://实时功率热量数据0x0004
-			  {				
-					RED_LED_ON();
-                    memcpy(&testPowerHeatData, (_USART3_DMA_RX_BUF[this_dma_type]+recordData), testFrameHeader.dataLenth);		  
-			  }break;		  
-	     }
-    }
+	if(testcmdId == ShootDataId)
+	{
+		memcpy(&testShootData, (_USART3_DMA_RX_BUF[this_dma_type]+recordData),6);
+		shootedBulletNum++;
+		BulletNum_Simu_ADD();	//////////////////////////////////////////////////////////////////
+	}
 	
+	if(testcmdId == GetBuffId)	////////////////////////////////////////////
+	{
+		//memcpy(&testShootData, (_USART3_DMA_RX_BUF[this_dma_type]+recordData),6);
+		testGetBuff.myselfBigBuff   = (_USART3_DMA_RX_BUF[this_dma_type][recordData] & 0x10) >> 4;
+    testGetBuff.enemyBigBuff    = (_USART3_DMA_RX_BUF[this_dma_type][recordData] & 0x20) >> 5;
+    testGetBuff.myselfSmallBuff = (_USART3_DMA_RX_BUF[this_dma_type][recordData] & 0x40) >> 6;
+    testGetBuff.enemySmallBuff =  (_USART3_DMA_RX_BUF[this_dma_type][recordData] & 0x80) >> 7; 		
+	}
+	
+	if(testcmdId == RobotHurtId )
+	{
+		testRobotHurt.armorType = _USART3_DMA_RX_BUF[this_dma_type][recordData] & 0x0f;
+		testRobotHurt.hurtType  = (_USART3_DMA_RX_BUF[this_dma_type][recordData] >> 4) & 0x0f;
+	}
+	
+	memcpy(&testcmdId, (_USART3_DMA_RX_BUF[this_dma_type]+cnt+29), sizeof(testcmdId)); //01
+		recordData=cnt+29+2;
+	
+	if(testcmdId == GameRobotPosId)
+		memcpy(&testGameRobotPos, (_USART3_DMA_RX_BUF[this_dma_type]+recordData), 16);
+	
+	memcpy(&testcmdId, (_USART3_DMA_RX_BUF[this_dma_type]+cnt+54), sizeof(testcmdId)); //01
+		recordData=cnt+54+2;
+	
+	if(testcmdId == GameRobotStateId)
+		memcpy(&testGameRobotState, (_USART3_DMA_RX_BUF[this_dma_type]+recordData), 8);
 }
-
 union var
 {
-    char c[4];
+  char c[4];
 	float f;
 };
-
 union var Data_A;
 union var Data_B;
 union var Data_C;
 union var Data_D;
 void Judgement_DataSend(float a,float b,float c,uint8_t d)
 {
-	    int i=0;
+	  int i=0;
 		testJudgementSendData.cSeq++;
 		testJudgementSendData.Data_A=a;
 		testJudgementSendData.Data_B=b;
@@ -361,38 +403,79 @@ void Judgement_DataSend(float a,float b,float c,uint8_t d)
 		JudgeSendBuff[6]=StudentSend>>8;
 		
 		Data_A.f=testJudgementSendData.Data_A;	
-		JudgeSendBuff[7]=Data_A.c[0];;
-		JudgeSendBuff[8]=Data_A.c[1];;
-		JudgeSendBuff[9]=Data_A.c[2];;
-		JudgeSendBuff[10]=Data_A.c[3];;
+		JudgeSendBuff[7]=0x0001;
+		JudgeSendBuff[8]=0x0000;
+		JudgeSendBuff[9]=0x0000;
+		JudgeSendBuff[10]=0x0000;
 
 		Data_B.f=testJudgementSendData.Data_B;			
-		JudgeSendBuff[11]=Data_B.c[0];
-		JudgeSendBuff[12]=Data_B.c[1];
-		JudgeSendBuff[13]=Data_B.c[2];
-		JudgeSendBuff[14]=Data_B.c[3];
+		JudgeSendBuff[11]=0x0002;
+		JudgeSendBuff[12]=0x0000;
+		JudgeSendBuff[13]=0x0000;
+		JudgeSendBuff[14]=0x0000;
 
 		Data_C.f=testJudgementSendData.Data_C;		
-		JudgeSendBuff[15]=Data_C.c[0];
-		JudgeSendBuff[16]=Data_C.c[1];
-		JudgeSendBuff[17]=Data_C.c[2];
-		JudgeSendBuff[18]=Data_C.c[3];
+		JudgeSendBuff[15]=0x0003;
+		JudgeSendBuff[16]=0x0000;
+		JudgeSendBuff[17]=0x0000;
+		JudgeSendBuff[18]=0x0000;
 		
 		Data_D.f=testJudgementSendData.Data_D;	
-		JudgeSendBuff[19]=d;
+		JudgeSendBuff[19]=0x0004;
 		Append_CRC16_Check_Sum(JudgeSendBuff,22);
 		for(i=0;i<22;i++)
 		{
-       USART_SendData(USART3, (uint8_t)JudgeSendBuff[i]);
-		   while (USART_GetFlagStatus(USART3,USART_FLAG_TC) == RESET);			
+    USART_SendData(USART3, (uint8_t)JudgeSendBuff[i]);
+		while (USART_GetFlagStatus(USART3,USART_FLAG_TC) == RESET);			
 		}
 }
 
-u8 Guiding_Lights_Data=0;	//指示灯
-uint8_t Judagement_Send_Guiding_lights(u8 stateA, u8 stateB, u8 stateC, u8 stateD, u8 stateE, u8 stateF)
+void Judagement_Send_Change_hero(float *a,float *b,float *c,uint8_t *d)
 {
-    static uint8_t output=0;
-    output=stateA|(stateB<<1)|(stateC<<2)|(stateD<<3)|(stateE<<4)|(stateF<<5);
-    return output;
+//		char color=testStudentPropInfo.RobotColor;	
+//		//获取弹量，数值a不做任何操作,
+//		if(color==0)//该机器人为红
+//		{
+//		//基地无敌状态	
+//		if(testStudentPropInfo.BlueBaseSta==0x01)*a=1000.001;
+//		else 	*a=1111.111;
+//		//恢复立柱状态
+//		if(testStudentPropInfo.BlueAirPortSta==0x02)*b=1999.001;
+//		else if(testStudentPropInfo.BlueAirPortSta==0x03)*b=1999.991;
+//		else 	*b=1000.001;
+//		//大神符状态	
+//		if((testStudentPropInfo.No0BigRuneSta==0x03)||(testStudentPropInfo.No1BigRuneSta==0x03))*c=1555.001;
+//		else if((testStudentPropInfo.No0BigRuneSta==0x05)||(testStudentPropInfo.No1BigRuneSta==0x05))*c=1555.551;
+//		else 	*c=1000.001;		
+//		}
+//		else if(color==1)//该机器人为蓝
+//		{
+//		if(testStudentPropInfo.RedBaseSta==0x01)*a=1000.001;
+//		else 	*a=1111.111;
+//		//神符立柱状态
+//		if(testStudentPropInfo.RedAirPortSta==0x02)*b=1999.001;
+//		else if(testStudentPropInfo.RedAirPortSta==0x03)*b=1999.991;
+//		else 	*b=1000.001;
+//		//大神符状态	
+//		if((testStudentPropInfo.No0BigRuneSta==0x02)||(testStudentPropInfo.No1BigRuneSta==0x02))*c=1555.001;
+//		else if((testStudentPropInfo.No0BigRuneSta==0x04)||(testStudentPropInfo.No1BigRuneSta==0x04))*c=1555.551;
+//		else 	*c=1000.001;		
+//		}
+//		else//获取数据失败
+//		{
+//		*a=0;
+//		*b=0;
+//		*c=0;	
+//		}
+		*a=1.00;
+		*b=2.00;
+		*c=3.00;	
+    *d=4;	
 }
 
+/*
+入口:裁判反馈的实时枪口热量
+     双目反馈的目标距离
+     计算得到的目标速度（由另一个函数生成）
+出口:射击频率
+*/

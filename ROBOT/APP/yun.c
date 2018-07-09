@@ -72,8 +72,8 @@ void Yun_Control_External_Solution(void)	//外置反馈方案
 	
 //	Yun_WorkState_Turn_Task();	//新版无需取弹//取弹时云台转向标志位
 	
-	if(!(RC_Ctl.rc.switch_right==RC_SWITCH_UP&&VisionData.vision_control_state==1))	//仅当视觉有信号才受控
-	{
+//	if(VisionData.vision_control_state==0)	//仅当视觉无信号才受控	//放在底层PC_Control
+//	{
 		if(GetWorkState()==NORMAL_STATE||GetWorkState()==WAIST_STATE)	//仅在正常模式下受控	//取弹受控为暂时加入，之后以传感器自动进行	//取弹受控已取消，云台跟随底盘
 		{
 			if(Yun_Control_RCorPC==PC_CONTROL)
@@ -86,11 +86,11 @@ void Yun_Control_External_Solution(void)	//外置反馈方案
 			}
 		}
 
-	}
-	else
-	{
-		
-	}
+//	}
+//	else
+//	{ 
+//		
+//	}
 	
 	
 	yun_control_pcorrc_last=Yun_Control_RCorPC;
@@ -103,10 +103,15 @@ void Yun_Control_External_Solution(void)	//外置反馈方案
 	{
 		yunMotorData.yaw_tarP=(Gyro_Data.angle[YAW]*10+(YAW_INIT-yunMotorData.yaw_fdbP)*3600/8192);	//反馈放大10倍并将目标位置置为中点
 	}
+	
+	if(GetWorkState()==STOP_STATE||GetWorkState()==LOST_STATE||GetWorkState()==PROTECT_STATE||GetWorkState()==CALI_STATE)	//停止模式下防止零点漂移
+	{
+		yunMotorData.yaw_tarP=(Gyro_Data.angle[YAW]*10+(YAW_INIT-yunMotorData.yaw_fdbP)*3600/8192);	//反馈放大10倍并将目标位置置为中点
+	}
 
 	/////////////////////
 //	if(KeyBoardData[KEY_F].value==1&&time_1ms_count%10==0)
-	if(RC_Ctl.rc.switch_right==RC_SWITCH_UP&&time_1ms_count%10==0)		//放在中断中运行
+	if(time_1ms_count%10==0)		//这里仅起到一个刷新控制=位的作用，否则串口无中断会致命
 	{
 		Vision_Task(&yunMotorData.yaw_tarP,&yunMotorData.pitch_tarP);
 	}
@@ -143,14 +148,17 @@ void Yun_Control_External_Solution(void)	//外置反馈方案
 
 void RC_Control_Yun(float * yaw_tarp,float * pitch_tarp)	//1000Hz
 {
-	if(time_1ms_count%15==0)	//66.67hz
+	if(VisionData.vision_control_state==0)	//没有视觉控制时才可控
 	{
-		yunMotorData.yaw_tarP+=((RC_Ctl.rc.ch2-1024)*35.0/660.0);
-		yunMotorData.yaw_tarP=yunMotorData.yaw_tarP>1800?yunMotorData.yaw_tarP-3600:yunMotorData.yaw_tarP;	//过零点
-		yunMotorData.yaw_tarP=yunMotorData.yaw_tarP<-1800?yunMotorData.yaw_tarP+3600:yunMotorData.yaw_tarP;	//过零点
+		if(time_1ms_count%15==0)	//66.67hz
+		{
+			yunMotorData.yaw_tarP+=((RC_Ctl.rc.ch2-1024)*35.0/660.0);
+			yunMotorData.yaw_tarP=yunMotorData.yaw_tarP>1800?yunMotorData.yaw_tarP-3600:yunMotorData.yaw_tarP;	//过零点
+			yunMotorData.yaw_tarP=yunMotorData.yaw_tarP<-1800?yunMotorData.yaw_tarP+3600:yunMotorData.yaw_tarP;	//过零点
+		}
+		
+		yunMotorData.pitch_tarP=((RC_Ctl.rc.ch3-1024)*460.0/660.0)+PITCH_INIT;	//-50是因为陀螺仪水平时云台上扬
 	}
-	
-	yunMotorData.pitch_tarP=((RC_Ctl.rc.ch3-1024)*460.0/660.0)+PITCH_INIT;	//-50是因为陀螺仪水平时云台上扬
 }
 
 
@@ -166,6 +174,7 @@ void PC_Control_Yun(float * yaw_tarp,float * pitch_tarp)	//1000Hz
 	static float pitch_tarp_float=PITCH_INIT;
 	static u8 start_state=0;	//初始位置
 
+	
 	if(yun_control_pcorrc_last==RC_CONTROL&&Yun_Control_RCorPC==PC_CONTROL)
 	{
 		yaw_tarp_float=(float)*yaw_tarp;
@@ -177,45 +186,56 @@ void PC_Control_Yun(float * yaw_tarp,float * pitch_tarp)	//1000Hz
 		start_state=1;
 	}
 	static u8 keyQ_last,keyE_last=0;	//暂时屏蔽
-	if(keyQ_last==0&&KeyBoardData[KEY_Q].value==1&&abs(yaw_follow_error)<PI/10)
-	{
-		yaw_tarp_float+=900;
-		yaw_tarp_float=yaw_tarp_float>1800?yaw_tarp_float-3600:yaw_tarp_float;	//过零点
-		yaw_tarp_float=yaw_tarp_float<-1800?yaw_tarp_float+3600:yaw_tarp_float;	//过零点
-	}
-	keyQ_last=KeyBoardData[KEY_Q].value;
 	
-	if(keyE_last==0&&KeyBoardData[KEY_E].value==1&&abs(yaw_follow_error)<PI/10)
+	if(VisionData.vision_control_state==0)	//没有视觉控制时才可控
 	{
-		yaw_tarp_float-=900;
-		yaw_tarp_float=yaw_tarp_float>1800?yaw_tarp_float-3600:yaw_tarp_float;	//过零点
-		yaw_tarp_float=yaw_tarp_float<-1800?yaw_tarp_float+3600:yaw_tarp_float;	//过零点
+		if(keyQ_last==0&&KeyBoardData[KEY_Q].value==1&&abs(yaw_follow_error)<PI/10)
+		{
+			yaw_tarp_float+=900;
+			yaw_tarp_float=yaw_tarp_float>1800?yaw_tarp_float-3600:yaw_tarp_float;	//过零点
+			yaw_tarp_float=yaw_tarp_float<-1800?yaw_tarp_float+3600:yaw_tarp_float;	//过零点
+		}
+		keyQ_last=KeyBoardData[KEY_Q].value;
+		
+		if(keyE_last==0&&KeyBoardData[KEY_E].value==1&&abs(yaw_follow_error)<PI/10)
+		{
+			yaw_tarp_float-=900;
+			yaw_tarp_float=yaw_tarp_float>1800?yaw_tarp_float-3600:yaw_tarp_float;	//过零点
+			yaw_tarp_float=yaw_tarp_float<-1800?yaw_tarp_float+3600:yaw_tarp_float;	//过零点
+		}
+		keyE_last=KeyBoardData[KEY_E].value;
+		
+		if(time_1ms_count%10==0)
+		{
+			yaw_tarp_float+=RC_Ctl.mouse.x*15.0f/40.0f;
+			pitch_tarp_float-=RC_Ctl.mouse.y*2.0f/3.0f;	//2/4
+			
+			yaw_tarp_float=yaw_tarp_float>1800?yaw_tarp_float-3600:yaw_tarp_float;	//过零点
+			yaw_tarp_float=yaw_tarp_float<-1800?yaw_tarp_float+3600:yaw_tarp_float;	//过零点
+			
+			if(KeyBoardData[KEY_SHIFT].value!=1)
+			{
+				pitch_tarp_float=pitch_tarp_float>(PITCH_INIT+YUN_DOWNMAX)?(PITCH_INIT+YUN_DOWNMAX):pitch_tarp_float;	//限制行程
+				pitch_tarp_float=pitch_tarp_float<(PITCH_INIT-YUN_UPMAX)?(PITCH_INIT-YUN_UPMAX):pitch_tarp_float;	//限制行程
+			}
+			else	//shift模式
+			{
+				pitch_tarp_float=pitch_tarp_float>(PITCH_INIT+YUN_DOWNMAX_EXTENSION)?(PITCH_INIT+YUN_DOWNMAX_EXTENSION):pitch_tarp_float;	//限制行程
+				pitch_tarp_float=pitch_tarp_float<(PITCH_INIT-YUN_UPMAX_EXTENSION)?(PITCH_INIT-YUN_UPMAX_EXTENSION):pitch_tarp_float;	//限制行程
+			}
+			
+			
+			*yaw_tarp=yaw_tarp_float;
+			*pitch_tarp=pitch_tarp_float;
+		}
 	}
-	keyE_last=KeyBoardData[KEY_E].value;
+	else
+	{
+		yaw_tarp_float=(float)*yaw_tarp;
+		pitch_tarp_float=(float)*pitch_tarp;
+	}
 	
-	if(time_1ms_count%10==0)
-	{
-		yaw_tarp_float+=RC_Ctl.mouse.x*15.0f/40.0f;
-		pitch_tarp_float-=RC_Ctl.mouse.y*2.0f/3.0f;	//2/4
-		
-		yaw_tarp_float=yaw_tarp_float>1800?yaw_tarp_float-3600:yaw_tarp_float;	//过零点
-		yaw_tarp_float=yaw_tarp_float<-1800?yaw_tarp_float+3600:yaw_tarp_float;	//过零点
-		
-		if(KeyBoardData[KEY_SHIFT].value!=1)
-		{
-			pitch_tarp_float=pitch_tarp_float>(PITCH_INIT+YUN_DOWNMAX)?(PITCH_INIT+YUN_DOWNMAX):pitch_tarp_float;	//限制行程
-			pitch_tarp_float=pitch_tarp_float<(PITCH_INIT-YUN_UPMAX)?(PITCH_INIT-YUN_UPMAX):pitch_tarp_float;	//限制行程
-		}
-		else	//shift模式
-		{
-			pitch_tarp_float=pitch_tarp_float>(PITCH_INIT+YUN_DOWNMAX_EXTENSION)?(PITCH_INIT+YUN_DOWNMAX_EXTENSION):pitch_tarp_float;	//限制行程
-			pitch_tarp_float=pitch_tarp_float<(PITCH_INIT-YUN_UPMAX_EXTENSION)?(PITCH_INIT-YUN_UPMAX_EXTENSION):pitch_tarp_float;	//限制行程
-		}
-		
-		
-		*yaw_tarp=yaw_tarp_float;
-		*pitch_tarp=pitch_tarp_float;
-	}
+
 }
 
 

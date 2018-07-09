@@ -538,6 +538,11 @@
               <FileType>1</FileType>
               <FilePath>..\ROBOT\APP\bullet_rotate.c</FilePath>
             </File>
+            <File>
+              <FileName>super_capacitor.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\ROBOT\APP\super_capacitor.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

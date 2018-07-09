@@ -25,12 +25,15 @@
 #define STEER_DOWN_L PWM3_3	//保持与工程兼容
 #define STEER_DOWN_R PWM3_4
 
-#define STEER_IMAGE PWM5_4
-#define IMAGE_START	PWM5_3
-#define STEER_RFID	PWM5_2
-#define t_AV_CUT PWM5_2	//临时的，给切换图传用的
+//////#define STEER_IMAGE PWM5_4
+//////#define IMAGE_START	PWM5_3
+//////#define STEER_RFID	PWM5_2
+//////#define t_AV_CUT PWM5_2	//临时的，给切换图传用的
+#define SUPERCAPACITOR_JUDGE	PWM5_1
+#define SUPERCAPACITOR_INPUT	PWM5_2
+#define SUPERCAPACITOR_OUTPUT	PWM5_3
 				
-#define FRICTION_INIT      800
+#define FRICTION_INIT      1000
 
 #define PWM_IO_ON	20000
 #define PWM_IO_OFF	0

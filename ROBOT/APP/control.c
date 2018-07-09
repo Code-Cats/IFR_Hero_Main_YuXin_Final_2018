@@ -8,6 +8,9 @@ extern u8 IMU_Check_Useless_State;	//陀螺仪失效检测位
 
 WorkState_e workState=PREPARE_STATE;
 
+
+extern tGameRobotState         testGameRobotState;      //比赛机器人状态
+extern tPowerHeatData 				  testPowerHeatData;      //实时功率热量数据
 //LIFT_DATA lift_Data={0};
 //PID_GENERAL PID_Lift_Position[4]={PID_LIFT_POSITION_DEFAULT,PID_LIFT_POSITION_DEFAULT,PID_LIFT_POSITION_DEFAULT,PID_LIFT_POSITION_DEFAULT};
 //PID_GENERAL PID_Lift_Speed[4]={PID_LIFT_SPEED_DEFAULT,PID_LIFT_SPEED_DEFAULT,PID_LIFT_SPEED_DEFAULT,PID_LIFT_SPEED_DEFAULT};
@@ -48,7 +51,17 @@ void Control_Task(void)	//2ms
 		Judge_Send_Statu=1; 
 	}
 
+	if(time_1ms_count%10==0)
+	{
+		Super_Capacitor_Task(testPowerHeatData.chassisPower,testPowerHeatData.chassisPowerBuffer);
+	}
+	
 	BulletNum_Calculate();
+	if(time_1ms_count%10==0)
+	{
+		Heat_Simulating(testPowerHeatData.shooterHeat1,testGameRobotState.remainHP);	//本地端热量模拟
+	}
+	
 	
 	Check_Task();
 
@@ -70,7 +83,7 @@ void Control_Task(void)	//2ms
 	
 	Work_Execute();	//工作状态执行
 	
-	Image_Cut_Task();	//摄像头切换、舵机
+//	Image_Cut_Task();	//摄像头切换、舵机
 	
 	LED_Indicate();
 	
@@ -323,7 +336,7 @@ void Work_Execute(void)	//工作执行2018.7.1
 		case STOP_STATE:	//停止状态
 		{
 //////			Vision_Task(&yunMotorData.yaw_tarP,&yunMotorData.pitch_tarP);
-//////			Yun_Task();	//开启底盘
+			Yun_Task();	//开启云台
 		//	Vision_Task(&t_yaw_error,&t_pitch_error);
 			TakeBullet_Control_Center();	//含有假设延时反馈和舵机执行，故加入
 			BulletRotate_Task();
@@ -391,11 +404,11 @@ void LED_Indicate(void)
 				{
 					LED_Blink_Set(2,10);
 				}
-				else if(t_error_record==LOST_PITCH||t_error_record==LOST_YAW)	//云台
+				else if(t_error_record==LOST_PITCH)	//云台||t_error_record==LOST_YAW
 				{
 					LED_Blink_Set(5,10);
 				}
-				else if(t_error_record==LOST_BULLETROTATE1)
+				else if(t_error_record==LOST_YAW)	//LOST_BULLETROTATE1
 				{
 					LED_Blink_Set(1,10);
 				}

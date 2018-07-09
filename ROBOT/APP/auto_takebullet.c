@@ -6,10 +6,10 @@
 TakeBulletState_e TakeBulletState=BULLET_OTHER;	//（自动）取弹状态位
 
 #define BULLETROTATE_OTHER	0	//非取弹位置
-#define BULLETROTATE_WAITING	-650//-750//650	//等待（对位）时位置
-#define BULLETROTATE_ACQUIRE	-1120	//取弹位置
-#define BULLETROTATE_POUROUT	-170	//倒弹位置
-#define BULLETROTATE_THROWOUT	-1000//-280//310	//抛出位置
+#define BULLETROTATE_WAITING	630//-750//650	//等待（对位）时位置
+#define BULLETROTATE_ACQUIRE	1100	//取弹位置
+#define BULLETROTATE_POUROUT	150	//倒弹位置
+#define BULLETROTATE_THROWOUT	1000//-280//310	//抛出位置
 
 
 extern u32 time_1ms_count;

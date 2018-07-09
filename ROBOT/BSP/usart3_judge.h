@@ -7,10 +7,39 @@
 
 #define JUDGEMENTSENDDATA_DEFAULT {0,SOF_FIXED,13,0,0,0,0,0,0} 
 #define  SOF_FIXED                          0xA5    //固定帧头字节
-#define  FRAMEHEADER_SIZE                  0x04      //帧头长度
-#define  FRAMEHEADER_LEN                   0x05    //帧头长度
-#define  BSP_USART3_DMA_RX_BUF_LEN         200u  
-#define  RC_JUDGEMENT_LENGTH               44u
+#define  FRAMEHEADER_SIZE                   0x04      //帧头长度
+#define  FRAMEHEADER_LEN                    0x05    //帧头长度
+#define  BSP_USART3_DMA_RX_BUF_LEN          100u  
+#define  RC_JUDGEMENT_LENGTH                44u
+
+#define  RESTART      1
+#define  NO_RESTART   0
+
+#define  ON           1
+#define  OFF          0
+
+#define  HURT         					 1
+#define  SMALLAMROR_FRAME_CHANGE 2
+#define  BIGARMOR_FRAME_CHANGE   2
+#define  BIGARMOR_LOST           3
+
+#define  GENERAL	    			   0
+#define  LITTLE_ADVANTAGE		   1
+#define  LARGE_ADVANTAGE	  	 2
+#define  LITTLE_DISADVANTAGE   3
+#define  LARGE_DISADVANTAGE		 4
+
+#define  START        0
+#define  PROCESSING   1
+#define  END          2
+
+#define  LEVEL_0    0
+#define  LEVEL_1    1
+#define  LEVEL_2    2
+#define  LEVEL_4    4
+#define  LEVEL_5    10
+#define  LEVEL_BIG  20
+
 typedef enum{
   GameRobotStateId  = 0x0001, //比赛机器人状态         8 Byte           10HZ
   RobotHurtId       = 0x0002,  //机器人伤害数据        1 Byte            ---
@@ -86,8 +115,10 @@ typedef __packed struct
 
 typedef __packed struct
 {
-  uint8_t buffType;
-	uint8_t buffAddition;
+  uint8_t enemySmallBuff;
+	uint8_t enemyBigBuff;
+	uint8_t myselfSmallBuff;
+	uint8_t myselfBigBuff;
 }tGetBuff;
 
 typedef __packed struct
@@ -107,7 +138,7 @@ typedef __packed struct
 }tShowData;
 
 typedef union{
-
+	
 	u8		U8[4];
 	float F32;
 }Send2PcDataConvertUnion;
@@ -131,14 +162,9 @@ typedef struct  __JUDGEMENT_DATA__
   char shootflag;	
 
 }JUDGEMENT_DATA;
-
-
 extern u8 JudgeSendBuff[22];
-extern u8 Guiding_Lights_Data;	//指示灯
-void judgementDataHandler(void);
 void Judgement_DataSend(float a,float b,float c,uint8_t d);
-uint8_t Judagement_Send_Guiding_lights(u8 stateA, u8 stateB, u8 stateC, u8 stateD, u8 stateE, u8 stateF);
-void Judagement_Send_Change_hero(float *a,float *b,float *c);
+void Judagement_Send_Change_hero(float *a,float *b,float *c,uint8_t *d);
 extern uint8_t judgementBuf[];
 extern JUDGEMENT_DATA judgementData;
 extern tFrameHeader            testFrameHeader;
@@ -152,12 +178,15 @@ extern tGetBuff                testGetBuff;             //Buff获取数据
 extern tGameRobotPos           testGameRobotPos;        //机器人位置朝向信息
 extern tShowData               testShowData;            //自定义数据
 extern JudgementSendData     testJudgementSendData;
-void judgementDataHandler(void);
-extern uint16_t  testcmdId;;
+
+extern uint16_t  testcmdId;
 extern int16_t testNum;
 extern JUDGEMENT_DATA Judgement_Data;
+//void judgementDataHandler(void);
 void USART3_Configuration(uint32_t baud_rate);
 void USART3_IRQHandler(void);
 void Frameheader_Prcess(uint8_t *pData);
 void BinocularVisionDataPrcess(uint8_t *pData);
+float get_speed(void);
+void judgementDataHandler(void);
 #endif

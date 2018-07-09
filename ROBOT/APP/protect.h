@@ -42,8 +42,8 @@ extern Error_check_t Error_Check;
 	2,\
 	2,\
 	2,\
-	2,\
-	2,\
+	4,\
+	4,\
 	2,\
 	2,\
 	3,\

@@ -39,12 +39,19 @@ float Pixel_V_to_angle_V(s16 pix_v,s16 pix_error)	//从最原始的数据进行计算可以减
 #define VISION_TARY	540//560//360//410//440	//左上原点	480
 void Vision_Task(float* yaw_tarP,float* pitch_tarP)	//处理目标角度
 {
-	if(Error_Check.statu[LOST_VISION]==1)	VisionData.armor_sign=0;
+	if(Error_Check.statu[LOST_VISION]==1)	VisionData.armor_sign=0;	//若无反馈=，该Task放在中断中主运行，及放在yun.c中以较慢频率保护运行
 	//t_yaw_angel_v=Pixel_V_to_angle_V(VisionData.pix_x_v,(s16)(VisionData.error_x-VISION_TARX));
 //	t_target_v=t_yaw_angel_v+Gyro_Data
-	VisionData.vision_control_state=VisionData.armor_sign;
+	if(RC_Ctl.rc.switch_right==RC_SWITCH_UP&&VisionData.armor_sign==1)
+	{
+		VisionData.vision_control_state=1;	//最终控制位
+	}
+	else
+	{
+		VisionData.vision_control_state=0;	//最终控制位
+	}
 	
-	if(VisionData.armor_sign==1)
+	if(VisionData.vision_control_state==1)
 	{
 //		t_yaw_error=Pixel_to_angle((s16)(VisionData.error_x-VISION_TARX))*10;
 //		t_pitch_error=Pixel_to_angle((s16)(VisionData.error_y-VISION_TARY))*8192/360;
@@ -54,7 +61,7 @@ void Vision_Task(float* yaw_tarP,float* pitch_tarP)	//处理目标角度
 		*yaw_tarP=(float)Gyro_Data.angle[2]*10+Pixel_to_angle((s16)(VisionData.tar_x-VISION_TARX))*10;
 		*pitch_tarP=(float)yunMotorData.pitch_fdbP-Pixel_to_angle((s16)(VisionData.tar_y-VISION_TARY))*8192/360;
 //		t_gravity_ballistic_set_angel=Gravity_Ballistic_Set(pitch_tarP,(float)(VisionData.armor_dis/10.0f+0.2));	//重力补偿
-		Tar_Move_Set(yaw_tarP,(float)(VisionData.armor_dis/10.0f+0.2f),VisionData.angel_x_v);
+//////		Tar_Move_Set(yaw_tarP,(float)(VisionData.armor_dis/10.0f+0.2f),VisionData.angel_x_v);	//待调节
 	}
 	
 }

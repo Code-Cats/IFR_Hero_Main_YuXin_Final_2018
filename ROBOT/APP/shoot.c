@@ -17,19 +17,20 @@ extern u32 time_1ms_count;
 
 extern KeyBoardTypeDef KeyBoardData[KEY_NUMS];
 
+extern RobotHeatDataSimuTypeDef RobotHeatDataSimu42;
 extern tGameRobotState         testGameRobotState;      //比赛机器人状态
 extern u8 Robot_Level;
 
 u8 Friction_State=0;	//初始化不开启
 //const u16 FRICTION_INIT=800;
-u16 FRICTION_SHOOT=1965;	//发弹的PWM	在检录处测的射速13米每秒
+u16 FRICTION_SHOOT=1540;	//发弹的PWM	在检录处测的射速13米每秒
 u16 Friction_Send=FRICTION_INIT;
 void Shoot_Task(void)	//定时频率：1ms
 { 
-	if(time_1ms_count%100==0)
-	{
-		FRICTION_SHOOT=Friction_Adjust_DependOn_Vol(testPowerHeatData.chassisVolt);	//自动调整输出
-	}
+//	if(time_1ms_count%100==0)
+//	{
+//		FRICTION_SHOOT=Friction_Adjust_DependOn_Vol(testPowerHeatData.chassisVolt);	//自动调整输出
+//	}
 	
 	Shoot_Instruction();
 	shoot_Motor_Data_Down.tarP=(s32)shoot_Data_Down.motor_tarP;
@@ -108,7 +109,7 @@ void RC_Control_Shoot(u8* fri_state)
 	static u8 swicth_Last_state=0;	//右拨杆
 	if(Shoot_RC_Control_State==1)
 	{
-		if(Shoot_Heat_Limit(testPowerHeatData.shooterHeat1,Robot_Level)==1&&Shoot_Heat_Lost_Fre_Limit()==1&&*fri_state==1)	//热量限制
+		if(Shoot_Heat_Limit(RobotHeatDataSimu42.heat,RobotHeatDataSimu42.maxheat)==1&&Shoot_Heat_Lost_Fre_Limit()==1&&*fri_state==1)	//热量限制
 		{
 			if(RC_Ctl.rc.switch_left==RC_SWITCH_UP&&swicth_Last_state==RC_SWITCH_MIDDLE&&RC_Ctl.rc.switch_right==RC_SWITCH_DOWN)
 			{
@@ -138,7 +139,7 @@ void PC_Control_Shoot(u8* fri_state)
 	}
 	
 	
-	if(Shoot_Heat_Limit(testPowerHeatData.shooterHeat1,Robot_Level)==1&&Shoot_Heat_Lost_Fre_Limit()==1&&*fri_state==1)	//热量限制
+	if(Shoot_Heat_Limit(RobotHeatDataSimu42.heat,RobotHeatDataSimu42.maxheat)==1&&Shoot_Heat_Lost_Fre_Limit()==1&&*fri_state==1)	//热量限制
 	{
 		if(RC_Ctl.mouse.press_l==1&&last_mouse_press_l==0)	//shoot_Motor_Data.tarP-shoot_Motor_Data.fdbP	//待加入
 		{
@@ -263,9 +264,9 @@ void Shoot_Frequency_Limit(int* ferquency,u16 rate,u16 heat)	//m/s为单位
 
 
 
-u8 Shoot_Heat_Limit(u16 heating,u8 level)	//还应当限制射频
+u8 Shoot_Heat_Limit(u16 heat,u16 maxheat)	//还应当限制射频
 {
-	if((80*pow(2,level-1)-heating>46)&&time_1ms_count-shoot_Data_Down.last_time>250)	//testPowerHeatData.shooterHeat1
+	if((maxheat-heat)>44&&time_1ms_count-shoot_Data_Down.last_time>160)	//testPowerHeatData.shooterHeat1
 	{
 		return 1;
 	}

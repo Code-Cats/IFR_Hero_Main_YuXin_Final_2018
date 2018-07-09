@@ -123,7 +123,7 @@ void Chassis_Control_External_Solution(void)	//ÍÓÂİÒÇÕı³£µÄµ×ÅÌ½â¾ö·½°¸
 			}
 		}
 		
-		PID_Chassis_Follow.k_p=CHASSIS_FOLLOW_PID_P/1.4f;
+		PID_Chassis_Follow.k_p=CHASSIS_FOLLOW_PID_P/1.2f;
 	}
 	else
 	{
@@ -754,7 +754,7 @@ float Limit_Power(float power,float powerbuffer)	//Ó¢ĞÛ120JÈÈÁ¿ÏŞÖÆ£¬Ö±½ÓÏŞÖÆ×ÜÊ
 	float limit_k=1;
 //	if(power>POWERLIMIT*0.6)
 //	{
-		limit_k=3.0f*powerbuffer/200.0f+0.1f;	//0.4
+		limit_k=3.0f*powerbuffer/200.0f+0.2f;	//0.4
 		limit_k=limit_k>1?1:limit_k;
 		limit_k=limit_k<0.1f?0.1f:limit_k;
 //	}

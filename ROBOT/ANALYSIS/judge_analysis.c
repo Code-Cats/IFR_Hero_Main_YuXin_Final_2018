@@ -76,3 +76,85 @@ void Heat_MAX_COOL_calc(int* maxheat,float* coolheat,int maxhp)	//根据步兵最大血
 		Robot_Level=1;
 	}
 }
+
+
+extern u32 time_1ms_count;
+
+RobotHeatDataSimuTypeDef RobotHeatDataSimu42={0};	//高尔夫
+const u16 MaxHeat[3]={80,120,200};	//三个等级下的最大热量
+const u16 CoolHeat[3]={20,40,60};	//三个等级下的冷却值
+	
+void Heat_Simulating(u16 heating,u8 level)	//热量仿真//运行频率1-10HZ
+{
+	static u16 bulletnum_last=0;
+	
+	if(RobotHeatDataSimu42.bullet_num!=bulletnum_last)	//我不认为10ms内能射出两发
+	{
+		RobotHeatDataSimu42.heat+=40;
+	}
+	
+	RobotHeatDataSimu42.maxheat=MaxHeat[level-1];
+	
+	if(time_1ms_count%100==0)	//结算频率10HZ
+	{
+		switch(level)
+		{
+			case 1:
+			{
+				if(RobotHeatDataSimu42.heat>2*MaxHeat[level-1])
+				{
+					RobotHeatDataSimu42.heat=2*MaxHeat[level-1];
+				}
+				
+				RobotHeatDataSimu42.heat-=CoolHeat[level-1]/10;
+				
+				RobotHeatDataSimu42.heat=RobotHeatDataSimu42.heat<0?0:RobotHeatDataSimu42.heat;
+				break;
+			}
+			case 2:
+			{
+				if(RobotHeatDataSimu42.heat>2*MaxHeat[level-1])
+				{
+					RobotHeatDataSimu42.heat=2*MaxHeat[level-1];
+				}
+				
+				RobotHeatDataSimu42.heat-=CoolHeat[level-1]/10;
+				
+				RobotHeatDataSimu42.heat=RobotHeatDataSimu42.heat<0?0:RobotHeatDataSimu42.heat;
+				break;
+			}
+			case 3:
+			{
+				if(RobotHeatDataSimu42.heat>2*MaxHeat[level-1])
+				{
+					RobotHeatDataSimu42.heat=2*MaxHeat[level-1];
+				}
+				
+				RobotHeatDataSimu42.heat-=CoolHeat[level-1]/10;
+				
+				RobotHeatDataSimu42.heat=RobotHeatDataSimu42.heat<0?0:RobotHeatDataSimu42.heat;
+				break;
+			}
+			default:
+			{
+				if(RobotHeatDataSimu42.heat>2*MaxHeat[0])
+				{
+					RobotHeatDataSimu42.heat=2*MaxHeat[0];
+				}
+				
+				RobotHeatDataSimu42.heat-=CoolHeat[0]/10;
+				
+				RobotHeatDataSimu42.heat=RobotHeatDataSimu42.heat<0?0:RobotHeatDataSimu42.heat;
+				break;
+			}
+		}
+	}
+	
+	bulletnum_last=RobotHeatDataSimu42.bullet_num;
+}
+
+
+void BulletNum_Simu_ADD(void)
+{
+	RobotHeatDataSimu42.bullet_num++;
+}
