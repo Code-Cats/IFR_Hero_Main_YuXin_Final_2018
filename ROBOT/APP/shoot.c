@@ -23,7 +23,7 @@ extern u8 Robot_Level;
 
 u8 Friction_State=0;	//初始化不开启
 //const u16 FRICTION_INIT=800;
-u16 FRICTION_SHOOT=1540;	//发弹的PWM	在检录处测的射速13米每秒
+u16 FRICTION_SHOOT=1500;//1540;	//发弹的PWM	在检录处测的射速13米每秒
 u16 Friction_Send=FRICTION_INIT;
 void Shoot_Task(void)	//定时频率：1ms
 { 
@@ -266,7 +266,7 @@ void Shoot_Frequency_Limit(int* ferquency,u16 rate,u16 heat)	//m/s为单位
 
 u8 Shoot_Heat_Limit(u16 heat,u16 maxheat)	//还应当限制射频
 {
-	if((maxheat-heat)>44&&time_1ms_count-shoot_Data_Down.last_time>200)	//testPowerHeatData.shooterHeat1
+	if((maxheat-heat)>=44&&time_1ms_count-shoot_Data_Down.last_time>170)	//testPowerHeatData.shooterHeat1
 	{
 		return 1;
 	}

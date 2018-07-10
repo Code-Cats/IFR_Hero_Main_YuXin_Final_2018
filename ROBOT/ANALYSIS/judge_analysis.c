@@ -92,8 +92,15 @@ void Heat_Simulating(u16 heating,u8 level)	//热量仿真//运行频率1-10HZ
 	{
 		RobotHeatDataSimu42.heat+=40;
 	}
+	if(level>0&&level<4)
+	{
+		RobotHeatDataSimu42.maxheat=MaxHeat[level-1];
+	}
+	else
+	{
+		RobotHeatDataSimu42.maxheat=MaxHeat[0];
+	}
 	
-	RobotHeatDataSimu42.maxheat=MaxHeat[level-1];
 	
 	if(time_1ms_count%100==0)	//结算频率10HZ
 	{

@@ -43,8 +43,8 @@ float Pixel_V_to_angle_V(s16 pix_v,s16 pix_error)	//从最原始的数据进行计算可以减
 #define YUN_DOWN_DISLIMIT 333	//正常的活动范围，DOWN为负
 
 
-#define VISION_TARX 1020//580	//左上原点	640
-#define VISION_TARY	520//540//560//360//410//440	//左上原点	480
+#define VISION_TARX 1035//1035是修正安装偏差1020//580	//左上原点	640
+#define VISION_TARY	480//490//500//520//540//560//360//410//440	//左上原点	480
 void Vision_Task(float* yaw_tarP,float* pitch_tarP)	//处理目标角度
 {
 	if(Error_Check.statu[LOST_VISION]==1)	VisionData.armor_sign=0;	//若无反馈=，该Task放在中断中主运行，及放在yun.c中以较慢频率保护运行
