@@ -12,7 +12,7 @@
 */
 extern GYRO_DATA Gyro_Data;
 
-#define LOST_THRESHOLD 5
+#define LOST_THRESHOLD 10
 
 Error_check_t Error_Check={LOST_CYCLE,{0},{0}};
 
@@ -58,7 +58,7 @@ void Check_Task(void)
 			SetWorkState(ERROR_STATE);
 		}
 //		
-		for(int i=5;i<LOST_TYPE_NUM-2;i++)	//电机比控更重要
+		for(int i=5;i<LOST_TYPE_NUM-1;i++)	//电机比控更重要
 		{
 			if(Error_Check.statu[i]==1)	//&&i!=LOST_BULLETROTATE1
 			{

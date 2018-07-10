@@ -171,10 +171,11 @@ void RC_Control_Yun(float * yaw_tarp,float * pitch_tarp)	//1000Hz
 extern KeyBoardTypeDef KeyBoardData[KEY_NUMS];
 void PC_Control_Yun(float * yaw_tarp,float * pitch_tarp)	//1000Hz	
 {
-	static float yaw_tarp_float=0;
+	static float yaw_tarp_float=0;	//在PID输入为整数时为了让鼠标微小值的浮点值能被吸取，故用内置float,之后转用floatPID，该方法失去作用，但在每次进入该函数时进行同步处理便无影响
 	static float pitch_tarp_float=PITCH_INIT;
 	static u8 start_state=0;	//初始位置
 
+	static u8 keyQ_last,keyE_last=0;	//暂时屏蔽
 	
 	if(yun_control_pcorrc_last==RC_CONTROL&&Yun_Control_RCorPC==PC_CONTROL)
 	{
@@ -186,7 +187,12 @@ void PC_Control_Yun(float * yaw_tarp,float * pitch_tarp)	//1000Hz
 		yaw_tarp_float=(float)*yaw_tarp;
 		start_state=1;
 	}
-	static u8 keyQ_last,keyE_last=0;	//暂时屏蔽
+	else	//非初始记录后
+	{
+		yaw_tarp_float=(float)*yaw_tarp;	//同步处理
+		pitch_tarp_float=(float)*pitch_tarp;
+	}
+	
 	
 	if(VisionData.vision_control_state==0)	//没有视觉控制时才可控
 	{

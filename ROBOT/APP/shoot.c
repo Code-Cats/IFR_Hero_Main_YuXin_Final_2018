@@ -23,7 +23,7 @@ extern u8 Robot_Level;
 
 u8 Friction_State=0;	//初始化不开启
 //const u16 FRICTION_INIT=800;
-u16 FRICTION_SHOOT=1500;//1540;	//发弹的PWM	在检录处测的射速13米每秒
+u16 FRICTION_SHOOT=1490;//1540;	//发弹的PWM	在检录处测的射速13米每秒
 u16 Friction_Send=FRICTION_INIT;
 void Shoot_Task(void)	//定时频率：1ms
 { 

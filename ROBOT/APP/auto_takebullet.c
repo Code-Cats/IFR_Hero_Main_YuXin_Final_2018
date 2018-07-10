@@ -255,7 +255,7 @@ void TakeBullet_Control_Center(void)
 					valve_getback_time_record=time_1ms_count;
 				}					
 
-				if(time_1ms_count-valve_getback_time_record>130)	//200延时到中间
+				if(time_1ms_count-valve_getback_time_record>140)	//140延时到中间
 				{
 					ViceControlData.valve[VALVE_BULLET_HORIZONTAL1]=0;
 					ViceControlData.valve[VALVE_BULLET_HORIZONTAL2]=0;
