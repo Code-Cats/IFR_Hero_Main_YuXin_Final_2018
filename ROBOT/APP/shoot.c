@@ -1,5 +1,6 @@
 #include "shoot.h"
 #include "math.h"
+#include "vision.h"
 
 SHOOT_DATA shoot_Data_Down=SHOOT_DATA_INIT;
 SHOOT_MOTOR_DATA shoot_Motor_Data_Down ={0};
@@ -136,6 +137,16 @@ void PC_Control_Shoot(u8* fri_state)
 	if(RC_Ctl.mouse.press_l==1||RC_Ctl.mouse.press_r==1||RC_Ctl.mouse.x>1||RC_Ctl.mouse.y>1)
 	{
 		Shoot_RC_Control_State=0;	//屏蔽RC，后期加入若PC失效临时启用RC的操作
+	}
+	
+	
+	if(Auto_Shoot_Aimfdb()==1&&Shoot_Heat_Limit(RobotHeatDataSimu42.heat,RobotHeatDataSimu42.maxheat)==1&&Shoot_Heat_Lost_Fre_Limit()==1&&*fri_state==1)	//自瞄自动打击
+	{
+		if(time_1ms_count-shoot_Data_Down.last_time>750)	//限制自瞄射击频率
+		{
+			shoot_Data_Down.count--;
+			shoot_Data_Down.last_time=time_1ms_count;
+		}
 	}
 	
 	
@@ -281,7 +292,7 @@ u8 Shoot_Heat_Lost_Fre_Limit(void)	//裁判lost情况对射频的限制，反返回1是OK
 	u8 limit_state=0;
 	if(Error_Check.statu[LOST_REFEREE]==1)	//裁判lost
 	{
-		if(time_1ms_count-shoot_Data_Down.last_time>250)	//大于1s	//临时测试，1秒4发	/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		if(time_1ms_count-shoot_Data_Down.last_time>1500)	//大于1s	//临时测试，1秒4发	/////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		{
 			limit_state=1;
 		}

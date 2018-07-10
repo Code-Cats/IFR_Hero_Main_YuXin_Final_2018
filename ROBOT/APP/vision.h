@@ -10,4 +10,7 @@ float Pixel_V_to_angle_V(s16 pix_v,s16 pix_error);	//´Ó×îÔ­Ê¼µÄÊı¾İ½øĞĞ¼ÆËã¿ÉÒÔ¼
 
 float Gravity_Ballistic_Set(float* pitch_tarP,float dis_m);	//ÖØÁ¦²¹³¥×ø±êÏµÖĞ£¬ÏòÏÂÎªÕı
 void Tar_Move_Set(float* yaw_tarP,float dis_m,float tar_v);
+
+u8 Auto_Shoot_Aimfdb(void);	//Ãé×¼×´Ì¬
+
 #endif

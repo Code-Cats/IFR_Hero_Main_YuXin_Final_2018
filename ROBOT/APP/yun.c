@@ -12,6 +12,9 @@ pitch位置
 
 
 */
+
+#define YUN_PITCH_TAKEBULLET	3745
+
 YUN_MOTOR_DATA 			yunMotorData=YUN_MOTOR_DATA_DEFAULT;
 YUN_DATA          	yunData=YUN_DATA_DEFAULT;
 
@@ -97,6 +100,7 @@ void Yun_Control_External_Solution(void)	//外置反馈方案
 	
 	if(GetWorkState()==TAKEBULLET_STATE)	//新版取消了旋转180//取弹模式且已经转了180°一直校准		//后续取消180°
 	{
+		yunMotorData.pitch_tarP=YUN_PITCH_TAKEBULLET;	//
 		yunMotorData.yaw_tarP=(Gyro_Data.angle[YAW]*10+(YAW_INIT-yunMotorData.yaw_fdbP)*3600/8192);	//反馈放大10倍并将目标位置置为中点
 	}
 	else if(GetWorkState()==NORMAL_STATE&&Replenish_Bullet_Statu==1)

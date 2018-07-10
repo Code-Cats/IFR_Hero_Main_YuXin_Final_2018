@@ -123,7 +123,7 @@ void Chassis_Control_External_Solution(void)	//陀螺仪正常的底盘解决方案
 			}
 		}
 		
-		PID_Chassis_Follow.k_p=CHASSIS_FOLLOW_PID_P/1.23f;
+		PID_Chassis_Follow.k_p=CHASSIS_FOLLOW_PID_P/1.3f;
 	}
 	else
 	{

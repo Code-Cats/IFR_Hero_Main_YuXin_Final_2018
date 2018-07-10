@@ -29,6 +29,8 @@
 //////#define IMAGE_START	PWM5_3
 //////#define STEER_RFID	PWM5_2
 //////#define t_AV_CUT PWM5_2	//临时的，给切换图传用的
+#define IMAGE_START	PWM5_4
+
 #define SUPERCAPACITOR_JUDGE	PWM5_1
 #define SUPERCAPACITOR_INPUT	PWM5_2
 #define SUPERCAPACITOR_OUTPUT	PWM5_3

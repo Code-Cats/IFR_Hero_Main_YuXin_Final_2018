@@ -38,15 +38,15 @@ extern Error_check_t Error_Check;
 	4,\
 	10,\
 	50,\
-	2,\
-	2,\
-	2,\
-	2,\
 	4,\
 	4,\
-	2,\
-	2,\
-	3,\
+	4,\
+	4,\
+	4,\
+	4,\
+	4,\
+	4,\
+	4,\
 }
 
 void LostCountAdd(u16* lostcount);

@@ -17,6 +17,7 @@ int main(void)
 	delay_ms(500);
 	while(1)
 	 {
+		 Screen_Start();
 	 }
 }
 

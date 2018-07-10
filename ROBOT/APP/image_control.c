@@ -8,39 +8,39 @@
 ////////{1,0},\
 ////////};	//分别为：补弹、底盘
 
-////////extern u32 time_1ms_count;
-////////extern KeyBoardTypeDef KeyBoardData[KEY_NUMS];
-////////extern RC_Ctl_t RC_Ctl;
-////////extern ViceControlDataTypeDef ViceControlData;
+extern u32 time_1ms_count;
+extern KeyBoardTypeDef KeyBoardData[KEY_NUMS];
+extern RC_Ctl_t RC_Ctl;
+extern ViceControlDataTypeDef ViceControlData;
 
 ////////#define STEER_IMAGE_INIT	1640
 ////////#define STEER_IMAGE_REVERSAL	510
 
-////////#define IMAGE_START_DELAY	(1000*5)	//5s后开始
-////////void Screen_Start(void)	//屏幕启动切换到AV信道
-////////{
-////////	if(KeyBoardData[KEY_G].value!=1)
-////////	{
-////////		if(time_1ms_count<IMAGE_START_DELAY)	//5s后开始
-////////		{
-////////			IMAGE_START=PWM_IO_ON;
-////////		}
-////////		else if(time_1ms_count>IMAGE_START_DELAY&&time_1ms_count<IMAGE_START_DELAY+1000)
-////////		{
-////////			IMAGE_START=PWM_IO_OFF;
-////////		}
-////////		else
-////////		{
-////////			IMAGE_START=PWM_IO_ON;
-////////		}
-////////	}
-////////	else
-////////	{
-////////		IMAGE_START=PWM_IO_OFF;
-////////	}
-////////		
+#define IMAGE_START_DELAY	(1000*5)	//5s后开始
+void Screen_Start(void)	//屏幕启动切换到AV信道
+{
+	if(KeyBoardData[KEY_G].value!=1)
+	{
+		if(time_1ms_count<IMAGE_START_DELAY)	//5s后开始
+		{
+			IMAGE_START=PWM_IO_ON;
+		}
+		else if(time_1ms_count>IMAGE_START_DELAY&&time_1ms_count<IMAGE_START_DELAY+1000)
+		{
+			IMAGE_START=PWM_IO_OFF;
+		}
+		else
+		{
+			IMAGE_START=PWM_IO_ON;
+		}
+	}
+	else
+	{
+		IMAGE_START=PWM_IO_OFF;
+	}
+		
 
-////////}
+}
 
 ////////extern u8 Replenish_Bullet_Statu;	//补弹状态位
 //////////u8 av_cut=0;

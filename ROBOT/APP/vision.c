@@ -112,3 +112,16 @@ void Tar_Move_Set(float* yaw_tarP,float dis_m,float tar_v)
 	if(pre_angle<-65)	pre_angle=-65;
 	*yaw_tarP+=pre_angle;
 }
+
+
+u8 Auto_Shoot_Aimfdb(void)	//Ãé×¼×´Ì¬
+{
+	if(abs(VisionData.tar_y-VISION_TARY)<30&&abs(VisionData.tar_x-VISION_TARX)<5&&Error_Check.statu[LOST_VISION]==0&&abs(VisionData.angel_x_v)<40)
+	{
+		return 1;
+	}
+	else
+	{
+		return 0;
+	}
+}
