@@ -60,7 +60,7 @@ void Check_Task(void)
 //		
 		for(int i=5;i<LOST_TYPE_NUM-2;i++)	//电机比控更重要
 		{
-			if(Error_Check.statu[i]==1&&i!=LOST_BULLETROTATE1)
+			if(Error_Check.statu[i]==1)	//&&i!=LOST_BULLETROTATE1
 			{
 				test_error_Satrt=-1;
 				t_error_record=i;

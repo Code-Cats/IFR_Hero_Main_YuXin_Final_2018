@@ -274,7 +274,7 @@ void Work_Execute(void)	//工作执行2018.7.1
 		{	//等待车身状态稳定，并设置初值
 			Yun_Task();	//开启底盘
 //			if(abs(Gyro_Data.angvel[0])<20&&abs(Gyro_Data.angvel[2])<20&&abs(yunMotorData.pitch_tarP-(Gyro_Data.angle[0]*8192/360.0f+PITCH_INIT))<50)	//云台已就位	//位置环情况下
-			if(abs(Gyro_Data.angvel[YAW])<3&&Error_Check.statu[LOST_IMU]!=1)	//云台已就位，且有反馈
+			if(abs(Gyro_Data.angvel[YAW])<2&&Error_Check.statu[LOST_IMU]!=1)	//云台已就位，且有反馈
 			{
 				SetWorkState(CALI_STATE);
 			}
@@ -283,7 +283,7 @@ void Work_Execute(void)	//工作执行2018.7.1
 		}
 		case CALI_STATE:	//标定模式
 		{
-			if(BulletRotate_OffSetInit()==1)	//待写取弹电机初始标定
+			if(BulletRotate_OffSetInit()==1&&Imu_Cali_State()==1)	//待写取弹电机初始标定
 			{
 				SetWorkState(NORMAL_STATE);
 			}
@@ -465,7 +465,8 @@ void Motor_Send(void)
 		}
 		case PREPARE_STATE:	//预备模式
 		{	//等待车身状态稳定，并设置初值
-			CAN1_Yun_SendMsg(yunMotorData.yaw_output,yunMotorData.pitch_output);	//CAN2-1000	//取消反馈补偿
+			CAN1_Yun_SendMsg(0,0);	//CAN2	//yaw,pitch
+////////			CAN1_Yun_SendMsg(yunMotorData.yaw_output,yunMotorData.pitch_output);	//CAN2-1000	//取消反馈补偿
 //CAN1_Yun_SendMsg(0,0);	//CAN2-1000	//取消反馈补偿
 			//			CAN1_Yun_SendMsg(t_yaw_send,t_pitch_send);	//调试用模式
 //			CAN_Motor6623_calibration();
@@ -480,7 +481,8 @@ void Motor_Send(void)
 			SetFrictionWheelSpeed(FRICTION_INIT);
 			
 //			CAN1_Yun_SendMsg(yunMotorData.yaw_output+Yaw_output_offset(yunMotorData.yaw_fdbP),yunMotorData.pitch_output+Pitch_output_offset(yunMotorData.pitch_tarP));	//CAN2-1000	//加入反馈补偿
-			CAN1_Yun_SendMsg(yunMotorData.yaw_output,yunMotorData.pitch_output);	//CAN2-1000	//取消反馈补偿
+			CAN1_Yun_SendMsg(0,0);	//CAN2	//yaw,pitch
+//////			CAN1_Yun_SendMsg(yunMotorData.yaw_output,yunMotorData.pitch_output);	//CAN2-1000	//取消反馈补偿
 //			CAN1_Yun_SendMsg(0,0);
 			CAN2_Chassis_SendMsg(0,0,0,0);
 //			CAN2_Shoot_SendMsg(0,0);//下拨弹、上拨弹
@@ -496,7 +498,7 @@ void Motor_Send(void)
 			
 //		CAN_Chassis_SendMsg((s16)remote_tem,(s16)remote_tem,(s16)remote_tem,(s16)remote_tem);
 			CAN2_Chassis_SendMsg(chassis_Data.lf_wheel_output,chassis_Data.rf_wheel_output,chassis_Data.lb_wheel_output,chassis_Data.rb_wheel_output);
-//			CAN2_Chassis_SendMsg(0,0,0,0);
+////			CAN2_Chassis_SendMsg(0,0,0,0);
 			CAN2_Shoot_Bullet_SendMsg((s16)BulletRotate_Data.output,0,(s16)shoot_Motor_Data_Up.output,(s16)shoot_Motor_Data_Down.output);//取弹旋转、0、上拨弹、下拨弹
 			break;
 		}

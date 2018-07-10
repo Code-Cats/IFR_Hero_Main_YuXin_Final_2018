@@ -77,7 +77,7 @@ extern s32 YAW_INIT;
 
 
 #define YAW_SPEED_PID_P 45//44//45	//30  
-#define YAW_SPEED_PID_I 0.03	//0.02
+#define YAW_SPEED_PID_I 0.025//0.03	//0.02
 #define YAW_SPEED_PID_D 1
 #define YAW_SPEED_PID_MER 260	//最大偏差输入
 #define YAW_SPEED_PID_MAXINPUT 320	//最大期望输入
@@ -91,7 +91,7 @@ extern s32 YAW_INIT;
 #define YAW_POSITION_PID_MER 280	//最大偏差输入
 #define YAW_POSITION_PID_MAXINPUT 5350	//最大期望输入
 #define YAW_POSITION_PID_MAXOUTPUT 300	//最大输出
-#define YAW_POSITION_PID_I_MAX 10/YAW_POSITION_PID_I	//I累加限制
+#define YAW_POSITION_PID_I_MAX 13/YAW_POSITION_PID_I	//I累加限制
 #define YAW_POSITION_PID_DEAD 0	//计算死区
 
 //PITCH电机位置环参数

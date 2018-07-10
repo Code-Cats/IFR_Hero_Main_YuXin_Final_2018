@@ -148,7 +148,7 @@ void TakeBullet_Control_Center(void)
 			{
 				BulletRotate_Data.tarP=BULLETROTATE_WAITING;
 				
-				if((BulletRotate_Data.fdbP-BULLETROTATE_THROWOUT)>60)	//微微抬起后开始平移
+				if((BulletRotate_Data.fdbP-BULLETROTATE_THROWOUT)<-60)	//微微抬起后开始平移
 				{
 					ViceControlData.valve[VALVE_BULLET_HORIZONTAL1]=1;
 					ViceControlData.valve[VALVE_BULLET_HORIZONTAL2]=0;

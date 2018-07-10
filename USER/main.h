@@ -35,6 +35,8 @@
 
 #include "super_capacitor.h"
 
+#include "imu_deal.h"
+
 #include "mpu6050IIC.h"
 #include "mpu6050_it.h"
 #include "mpu6050_process.h"

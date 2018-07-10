@@ -36,7 +36,7 @@ float Pixel_V_to_angle_V(s16 pix_v,s16 pix_error)	//´Ó×îÔ­Ê¼µÄÊı¾İ½øĞĞ¼ÆËã¿ÉÒÔ¼õ
 }
 
 #define VISION_TARX 1020//580	//×óÉÏÔ­µã	640
-#define VISION_TARY	540//560//360//410//440	//×óÉÏÔ­µã	480
+#define VISION_TARY	520//540//560//360//410//440	//×óÉÏÔ­µã	480
 void Vision_Task(float* yaw_tarP,float* pitch_tarP)	//´¦ÀíÄ¿±ê½Ç¶È
 {
 	if(Error_Check.statu[LOST_VISION]==1)	VisionData.armor_sign=0;	//ÈôÎŞ·´À¡=£¬¸ÃTask·ÅÔÚÖĞ¶ÏÖĞÖ÷ÔËĞĞ£¬¼°·ÅÔÚyun.cÖĞÒÔ½ÏÂıÆµÂÊ±£»¤ÔËĞĞ
@@ -61,12 +61,12 @@ void Vision_Task(float* yaw_tarP,float* pitch_tarP)	//´¦ÀíÄ¿±ê½Ç¶È
 		*yaw_tarP=(float)Gyro_Data.angle[2]*10+Pixel_to_angle((s16)(VisionData.tar_x-VISION_TARX))*10;
 		*pitch_tarP=(float)yunMotorData.pitch_fdbP-Pixel_to_angle((s16)(VisionData.tar_y-VISION_TARY))*8192/360;
 //		t_gravity_ballistic_set_angel=Gravity_Ballistic_Set(pitch_tarP,(float)(VisionData.armor_dis/10.0f+0.2));	//ÖØÁ¦²¹³¥
-//////		Tar_Move_Set(yaw_tarP,(float)(VisionData.armor_dis/10.0f+0.2f),VisionData.angel_x_v);	//´ıµ÷½Ú
+		Tar_Move_Set(yaw_tarP,(float)(VisionData.armor_dis/10.0f+0.2f),VisionData.angel_x_v);	//´ıµ÷½Ú
 	}
 	
 }
 
-#define SHOOT_V	14	//14M/s
+#define SHOOT_V	15	//14M/s
 #define SHOOT_V_2 (SHOOT_V*SHOOT_V)
 #define G	9.8f	//ÖØÁ¦¼ÓËÙ¶È
 float Gravity_Ballistic_Set(float* pitch_tarP,float dis_m)	//ÖØÁ¦²¹³¥×ø±êÏµÖĞ£¬ÏòÏÂÎªÕı
@@ -88,16 +88,16 @@ float Gravity_Ballistic_Set(float* pitch_tarP,float dis_m)	//ÖØÁ¦²¹³¥×ø±êÏµÖĞ£¬Ï
 void Tar_Move_Set(float* yaw_tarP,float dis_m,float tar_v)
 {
 	static float tar_v_fliter=0;
-	if(abs(tar_v)<8)	tar_v=0;
+//	if(abs(tar_v)<2)	tar_v=0;
 	
 	//tar_v_fliter=0.9f*tar_v_fliter+0.1f*tar_v;
-	if (dis_m>4)
+	if (dis_m>1.9)
 	{
-		dis_m=4;
+		dis_m=1.9;
 	}
 	float shoot_delay=dis_m/SHOOT_V;	//ÒÔÃëÎªµ¥Î»
 	float pre_angle=tar_v*shoot_delay;
-	if(pre_angle>10)	pre_angle=10;
-	if(pre_angle<-10)	pre_angle=-10;
-	*yaw_tarP-=pre_angle;
+	if(pre_angle>65)	pre_angle=65;
+	if(pre_angle<-65)	pre_angle=-65;
+	*yaw_tarP+=pre_angle;
 }

@@ -1,5 +1,6 @@
 #include "uart4.h"
 #include "protect.h"
+#include "imu_deal.h"
  /**
  * @brief  UART4 INIT
  * @note   UART4 INIT
@@ -167,6 +168,8 @@ void data_decode(uint16_t ch)
 						Gyro_Data.angvel[PITCH]= ((float)(short)(((short)wxH<<8)|(short)wxL)/32768.0f*2000.0f);
 						Gyro_Data.angvel[ROLL]= ((float)(short)(((short)wyH<<8)|(short)wyL)/32768.0f*2000.0f);
 						Gyro_Data.angvel[YAW]= -((float)(short)(((short)wzH<<8)|(short)wzL)/32768.0f*2000.0f);
+						
+						Imu_Offset(Gyro_Data.angvel);
 						/////////////////////////////////////////////////////////////
 						STATUS = IDLE;
 					}else STATUS = IDLE;

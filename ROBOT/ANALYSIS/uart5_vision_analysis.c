@@ -61,7 +61,7 @@ void VisionData_Deal(volatile u8 *pData)	//传感器数据在除了帧头的第1帧
 	VisionData.pix_x_v=*(pData+7)<<8|*(pData+8);
 	
 	t_yaw_angel_v=Pixel_V_to_angle_V(VisionData.pix_x_v,(s16)(VisionData.tar_x-VISION_TARX));
-	VisionData.angel_x_v=-10*Gyro_Data.angvel[2]-10*t_yaw_angel_v;	//解算得目标值
+	VisionData.angel_x_v=10*Gyro_Data.angvel[YAW]+10*t_yaw_angel_v;	//解算得目标值
 	if(RC_Ctl.rc.switch_right==RC_SWITCH_UP&&GetWorkState()==NORMAL_STATE )	//放在中断中运行
 	{
 		Vision_Task(&yunMotorData.yaw_tarP,&yunMotorData.pitch_tarP);

@@ -4,5 +4,6 @@
 #include "uart4.h"
 #include "stm32f4xx.h"
 
-
+u8 Imu_Cali_State(void);
+void Imu_Offset(float angvel[]);	//和陀螺仪角速度更新频率一致
 #endif
