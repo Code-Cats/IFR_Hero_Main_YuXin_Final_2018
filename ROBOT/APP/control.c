@@ -145,7 +145,7 @@ void Work_State_Change(void)
 				SetWorkState(TAKEBULLET_STATE);	//增加新模式//临时测试，取弹状态
 			}
 			
-			if(RC_Ctl.mouse.press_r==1&&RC_Ctl.rc.switch_left!=RC_SWITCH_MIDDLE)	//中间能不能扭腰？
+			if(KeyBoardData[KEY_SHIFT].value==1&&RC_Ctl.rc.switch_left!=RC_SWITCH_MIDDLE)	//中间能不能扭腰？
 			{
 				SetWorkState(WAIST_STATE);
 			}
@@ -153,7 +153,7 @@ void Work_State_Change(void)
 		}
 		case WAIST_STATE:
 		{
-			if(RC_Ctl.mouse.press_r!=1)
+			if(KeyBoardData[KEY_SHIFT].value!=1)
 			{
 				SetWorkState(NORMAL_STATE);
 			}
@@ -739,7 +739,7 @@ void Lift_Time_Gauge(u8 *trigger)	//升降时间自测量
 
 void KeyboardRetset(void)	//如果战场发生意外，就进行复位处理
 {
-	if(KeyBoardData[KEY_CTRL].value==1&&KeyBoardData[KEY_SHIFT].value==1&&KeyBoardData[KEY_Z].value==0&&KeyBoardData[KEY_X].value==0&&KeyBoardData[KEY_C].value==1&&KeyBoardData[KEY_V].value==1)	//后面的是防止初始化时全部为0
+	if(KeyBoardData[KEY_CTRL].value==1&&KeyBoardData[KEY_SHIFT].value==1&&KeyBoardData[KEY_X].value==0&&KeyBoardData[KEY_C].value==1&&KeyBoardData[KEY_V].value==1)	//后面的是防止初始化时全部为0
 	{
 		NVIC_SystemReset();
 	}

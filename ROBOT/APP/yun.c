@@ -213,16 +213,16 @@ void PC_Control_Yun(float * yaw_tarp,float * pitch_tarp)	//1000Hz
 			yaw_tarp_float=yaw_tarp_float>1800?yaw_tarp_float-3600:yaw_tarp_float;	//过零点
 			yaw_tarp_float=yaw_tarp_float<-1800?yaw_tarp_float+3600:yaw_tarp_float;	//过零点
 			
-			if(KeyBoardData[KEY_SHIFT].value!=1)
-			{
+//			if(KeyBoardData[KEY_SHIFT].value!=1)
+//			{
 				pitch_tarp_float=pitch_tarp_float>(PITCH_INIT+YUN_DOWNMAX)?(PITCH_INIT+YUN_DOWNMAX):pitch_tarp_float;	//限制行程
 				pitch_tarp_float=pitch_tarp_float<(PITCH_INIT-YUN_UPMAX)?(PITCH_INIT-YUN_UPMAX):pitch_tarp_float;	//限制行程
-			}
-			else	//shift模式
-			{
-				pitch_tarp_float=pitch_tarp_float>(PITCH_INIT+YUN_DOWNMAX_EXTENSION)?(PITCH_INIT+YUN_DOWNMAX_EXTENSION):pitch_tarp_float;	//限制行程
-				pitch_tarp_float=pitch_tarp_float<(PITCH_INIT-YUN_UPMAX_EXTENSION)?(PITCH_INIT-YUN_UPMAX_EXTENSION):pitch_tarp_float;	//限制行程
-			}
+//			}
+//			else	//shift模式
+//			{
+//				pitch_tarp_float=pitch_tarp_float>(PITCH_INIT+YUN_DOWNMAX_EXTENSION)?(PITCH_INIT+YUN_DOWNMAX_EXTENSION):pitch_tarp_float;	//限制行程
+//				pitch_tarp_float=pitch_tarp_float<(PITCH_INIT-YUN_UPMAX_EXTENSION)?(PITCH_INIT-YUN_UPMAX_EXTENSION):pitch_tarp_float;	//限制行程
+//			}
 			
 			
 			*yaw_tarp=yaw_tarp_float;
@@ -264,16 +264,16 @@ void Yun_Control_Inscribe_Solution(void)	//当陀螺仪崩了时单速度反馈方案
 		{
 			pitch_tarp_float+=RC_Ctl.mouse.y*2.0f/4.0f;	//2/4
 			
-			if(KeyBoardData[KEY_SHIFT].value!=1)
-			{
+//			if(KeyBoardData[KEY_SHIFT].value!=1)
+//			{
 				pitch_tarp_float=pitch_tarp_float>(PITCH_INIT+YUN_DOWNMAX)?(PITCH_INIT+YUN_DOWNMAX):pitch_tarp_float;	//限制行程
 				pitch_tarp_float=pitch_tarp_float<(PITCH_INIT-YUN_UPMAX)?(PITCH_INIT-YUN_UPMAX):pitch_tarp_float;	//限制行程
-			}
-			else	//shift模式
-			{
-				pitch_tarp_float=pitch_tarp_float>(PITCH_INIT+YUN_DOWNMAX_EXTENSION)?(PITCH_INIT+YUN_DOWNMAX_EXTENSION):pitch_tarp_float;	//限制行程
-				pitch_tarp_float=pitch_tarp_float<(PITCH_INIT-YUN_UPMAX_EXTENSION)?(PITCH_INIT-YUN_UPMAX_EXTENSION):pitch_tarp_float;	//限制行程
-			}
+//			}
+//			else	//shift模式
+//			{
+//				pitch_tarp_float=pitch_tarp_float>(PITCH_INIT+YUN_DOWNMAX_EXTENSION)?(PITCH_INIT+YUN_DOWNMAX_EXTENSION):pitch_tarp_float;	//限制行程
+//				pitch_tarp_float=pitch_tarp_float<(PITCH_INIT-YUN_UPMAX_EXTENSION)?(PITCH_INIT-YUN_UPMAX_EXTENSION):pitch_tarp_float;	//限制行程
+//			}
 			
 			yunMotorData.pitch_tarP=pitch_tarp_float;	//赋值位置
 		}

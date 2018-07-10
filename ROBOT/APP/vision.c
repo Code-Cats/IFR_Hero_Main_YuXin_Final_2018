@@ -42,7 +42,7 @@ void Vision_Task(float* yaw_tarP,float* pitch_tarP)	//处理目标角度
 	if(Error_Check.statu[LOST_VISION]==1)	VisionData.armor_sign=0;	//若无反馈=，该Task放在中断中主运行，及放在yun.c中以较慢频率保护运行
 	//t_yaw_angel_v=Pixel_V_to_angle_V(VisionData.pix_x_v,(s16)(VisionData.error_x-VISION_TARX));
 //	t_target_v=t_yaw_angel_v+Gyro_Data
-	if(RC_Ctl.rc.switch_right==RC_SWITCH_UP&&VisionData.armor_sign==1)
+	if(RC_Ctl.mouse.press_r==1&&VisionData.armor_sign==1)
 	{
 		VisionData.vision_control_state=1;	//最终控制位
 	}
@@ -91,7 +91,7 @@ void Tar_Move_Set(float* yaw_tarP,float dis_m,float tar_v)
 //	if(abs(tar_v)<2)	tar_v=0;
 	
 	//tar_v_fliter=0.9f*tar_v_fliter+0.1f*tar_v;
-	if (dis_m>1.9)
+	if (dis_m>1.9f)
 	{
 		dis_m=1.9;
 	}
