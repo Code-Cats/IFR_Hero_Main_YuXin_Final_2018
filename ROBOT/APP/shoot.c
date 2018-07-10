@@ -266,7 +266,7 @@ void Shoot_Frequency_Limit(int* ferquency,u16 rate,u16 heat)	//m/s为单位
 
 u8 Shoot_Heat_Limit(u16 heat,u16 maxheat)	//还应当限制射频
 {
-	if((maxheat-heat)>44&&time_1ms_count-shoot_Data_Down.last_time>160)	//testPowerHeatData.shooterHeat1
+	if((maxheat-heat)>44&&time_1ms_count-shoot_Data_Down.last_time>200)	//testPowerHeatData.shooterHeat1
 	{
 		return 1;
 	}

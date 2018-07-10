@@ -35,6 +35,14 @@ float Pixel_V_to_angle_V(s16 pix_v,s16 pix_error)	//从最原始的数据进行计算可以减
 	return angel_v;
 }
 
+
+//#define PITCH_INIT         3098	//2018.7.10	//限位用
+#define YUN_DOWN_VALUELIMIT 2765	//向下限位
+#define YUN_UP_VALUELIMIT 3650	//向上限位
+#define YUN_UP_DISLIMIT 552	//正常的活动范围，UP为正
+#define YUN_DOWN_DISLIMIT 333	//正常的活动范围，DOWN为负
+
+
 #define VISION_TARX 1020//580	//左上原点	640
 #define VISION_TARY	520//540//560//360//410//440	//左上原点	480
 void Vision_Task(float* yaw_tarP,float* pitch_tarP)	//处理目标角度
@@ -61,7 +69,10 @@ void Vision_Task(float* yaw_tarP,float* pitch_tarP)	//处理目标角度
 		*yaw_tarP=(float)Gyro_Data.angle[2]*10+Pixel_to_angle((s16)(VisionData.tar_x-VISION_TARX))*10;
 		*pitch_tarP=(float)yunMotorData.pitch_fdbP-Pixel_to_angle((s16)(VisionData.tar_y-VISION_TARY))*8192/360;
 //		t_gravity_ballistic_set_angel=Gravity_Ballistic_Set(pitch_tarP,(float)(VisionData.armor_dis/10.0f+0.2));	//重力补偿
-		Tar_Move_Set(yaw_tarP,(float)(VisionData.armor_dis/10.0f+0.2f),VisionData.angel_x_v);	//待调节
+//		Tar_Move_Set(yaw_tarP,(float)(VisionData.armor_dis/10.0f+0.2f),VisionData.angel_x_v);	//预测 待调节
+		
+		*pitch_tarP=*pitch_tarP>(PITCH_INIT+YUN_UP_DISLIMIT)?(PITCH_INIT+YUN_UP_DISLIMIT):*pitch_tarP;	//限制行程
+		*pitch_tarP=*pitch_tarP<(PITCH_INIT-YUN_DOWN_DISLIMIT)?(PITCH_INIT-YUN_DOWN_DISLIMIT):*pitch_tarP;	//限制行程
 	}
 	
 }
@@ -93,7 +104,7 @@ void Tar_Move_Set(float* yaw_tarP,float dis_m,float tar_v)
 	//tar_v_fliter=0.9f*tar_v_fliter+0.1f*tar_v;
 	if (dis_m>1.9f)
 	{
-		dis_m=1.9;
+		dis_m=1.9f;
 	}
 	float shoot_delay=dis_m/SHOOT_V;	//以秒为单位
 	float pre_angle=tar_v*shoot_delay;

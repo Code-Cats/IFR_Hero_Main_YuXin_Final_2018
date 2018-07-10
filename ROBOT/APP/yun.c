@@ -160,10 +160,11 @@ void RC_Control_Yun(float * yaw_tarp,float * pitch_tarp)	//1000Hz
 		yunMotorData.pitch_tarP=((RC_Ctl.rc.ch3-1024)*460.0/660.0)+PITCH_INIT;	//-50是因为陀螺仪水平时云台上扬
 	}
 }
-
-
-#define YUN_UPMAX 660	//正常的活动范围，UP为负
-#define YUN_DOWNMAX 460	//正常的活动范围，DOWN为正
+//#define PITCH_INIT         3098	//2018.7.10
+#define YUN_DOWN_VALUELIMIT 2765	//向下限位
+#define YUN_UP_VALUELIMIT 3650	//向上限位
+#define YUN_UP_DISLIMIT 552	//正常的活动范围，UP为正
+#define YUN_DOWN_DISLIMIT 333	//正常的活动范围，DOWN为负
 
 #define YUN_UPMAX_EXTENSION (YUN_UPMAX+200)	//补偿的活动范围，UP为负
 #define YUN_DOWNMAX_EXTENSION (YUN_DOWNMAX+200)	//补偿的活动范围，DOWN为正
@@ -215,8 +216,8 @@ void PC_Control_Yun(float * yaw_tarp,float * pitch_tarp)	//1000Hz
 			
 //			if(KeyBoardData[KEY_SHIFT].value!=1)
 //			{
-				pitch_tarp_float=pitch_tarp_float>(PITCH_INIT+YUN_DOWNMAX)?(PITCH_INIT+YUN_DOWNMAX):pitch_tarp_float;	//限制行程
-				pitch_tarp_float=pitch_tarp_float<(PITCH_INIT-YUN_UPMAX)?(PITCH_INIT-YUN_UPMAX):pitch_tarp_float;	//限制行程
+				pitch_tarp_float=pitch_tarp_float>(PITCH_INIT+YUN_UP_DISLIMIT)?(PITCH_INIT+YUN_UP_DISLIMIT):pitch_tarp_float;	//限制行程
+				pitch_tarp_float=pitch_tarp_float<(PITCH_INIT-YUN_DOWN_DISLIMIT)?(PITCH_INIT-YUN_DOWN_DISLIMIT):pitch_tarp_float;	//限制行程
 //			}
 //			else	//shift模式
 //			{
@@ -266,8 +267,8 @@ void Yun_Control_Inscribe_Solution(void)	//当陀螺仪崩了时单速度反馈方案
 			
 //			if(KeyBoardData[KEY_SHIFT].value!=1)
 //			{
-				pitch_tarp_float=pitch_tarp_float>(PITCH_INIT+YUN_DOWNMAX)?(PITCH_INIT+YUN_DOWNMAX):pitch_tarp_float;	//限制行程
-				pitch_tarp_float=pitch_tarp_float<(PITCH_INIT-YUN_UPMAX)?(PITCH_INIT-YUN_UPMAX):pitch_tarp_float;	//限制行程
+				pitch_tarp_float=pitch_tarp_float>(PITCH_INIT+YUN_UP_DISLIMIT)?(PITCH_INIT+YUN_UP_DISLIMIT):pitch_tarp_float;	//限制行程
+				pitch_tarp_float=pitch_tarp_float<(PITCH_INIT-YUN_DOWN_DISLIMIT)?(PITCH_INIT-YUN_DOWN_DISLIMIT):pitch_tarp_float;	//限制行程
 //			}
 //			else	//shift模式
 //			{

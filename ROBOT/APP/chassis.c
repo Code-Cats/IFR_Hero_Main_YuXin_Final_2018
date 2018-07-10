@@ -106,7 +106,7 @@ void Chassis_Control_External_Solution(void)	//陀螺仪正常的底盘解决方案
 			case 0:
 			{
 				YAW_INIT=yaw_init_def-WAIST_RANGE;
-				if(abs(YAW_INIT-yunMotorData.yaw_fdbP)<55)
+				if(abs(YAW_INIT-yunMotorData.yaw_fdbP)<58)
 				{
 					turn_flag=1;
 				}
@@ -115,7 +115,7 @@ void Chassis_Control_External_Solution(void)	//陀螺仪正常的底盘解决方案
 			case 1:
 			{
 				YAW_INIT=yaw_init_def+WAIST_RANGE;
-				if(abs(YAW_INIT-yunMotorData.yaw_fdbP)<55)
+				if(abs(YAW_INIT-yunMotorData.yaw_fdbP)<58)
 				{
 					turn_flag=0;
 				}
@@ -123,7 +123,7 @@ void Chassis_Control_External_Solution(void)	//陀螺仪正常的底盘解决方案
 			}
 		}
 		
-		PID_Chassis_Follow.k_p=CHASSIS_FOLLOW_PID_P/1.2f;
+		PID_Chassis_Follow.k_p=CHASSIS_FOLLOW_PID_P/1.23f;
 	}
 	else
 	{
