@@ -120,9 +120,17 @@ void Yun_Control_External_Solution(void)	//外置反馈方案
 		Vision_Task(&yunMotorData.yaw_tarP,&yunMotorData.pitch_tarP);
 	}
 	
-	if(VisionData.vision_control_state==1)
+	if(VisionData.vision_control_state==1)	//在自瞄模式，增大PID
 	{
-		
+//		PID_PITCH_POSITION.k_p=PITCH_POSITION_PID_P*1.2f;
+//		PID_PITCH_POSITION.k_i=PITCH_POSITION_PID_I*1.5f;
+//		PID_PITCH_POSITION.i_sum_max=PITCH_POSITION_PID_I_MAX*2;
+	}
+	else
+	{
+		PID_PITCH_POSITION.k_p=PITCH_POSITION_PID_P;
+		PID_PITCH_POSITION.k_i=PITCH_POSITION_PID_I;
+		PID_PITCH_POSITION.i_sum_max=PITCH_POSITION_PID_I_MAX;
 	}
 	////////////////////////////
 	

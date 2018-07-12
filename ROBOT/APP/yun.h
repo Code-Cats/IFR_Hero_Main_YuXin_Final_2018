@@ -7,8 +7,8 @@
 #define  YAW_INIT_DEFINE 3525//3160
 //s32 YAW_INIT=YAW_INIT_DEFINE;
 extern s32 YAW_INIT;
-#define PITCH_INIT         3098
-#define PITCH_GYRO_INIT 3098	//云台陀螺仪零点对应电机位置，陀螺仪更改位置需要重调	//反馈的太小，说明这个太大需要调
+#define PITCH_INIT         3045//3098
+#define PITCH_GYRO_INIT 3045//3098	//云台陀螺仪零点对应电机位置，陀螺仪更改位置需要重调	//反馈的太小，说明这个太大需要调
 
 #define 		Yaw_MAX 			   YAW_INIT+1000
 #define 		Yaw_MIN				   YAW_INIT-1000
