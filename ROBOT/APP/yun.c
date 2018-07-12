@@ -120,6 +120,10 @@ void Yun_Control_External_Solution(void)	//外置反馈方案
 		Vision_Task(&yunMotorData.yaw_tarP,&yunMotorData.pitch_tarP);
 	}
 	
+	if(VisionData.vision_control_state==1)
+	{
+		
+	}
 	////////////////////////////
 	
 	yunMotorData.pitch_tarV=PID_General(yunMotorData.pitch_tarP,(yunMotorData.pitch_fdbP),&PID_PITCH_POSITION);

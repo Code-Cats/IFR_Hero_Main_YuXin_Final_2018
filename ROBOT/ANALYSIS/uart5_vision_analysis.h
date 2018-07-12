@@ -24,6 +24,7 @@ typedef struct
 	s16 shooterror_y;	//实际目标偏差y	作为自动射击
 	s16 pix_x_v;
 	float angel_x_v;	//经融合的到的相对速度	//单位为0.1度每秒
+	float angle_x_v_filter;
 	u8 vision_control_state;	//是否受控
 }VisionDataTypeDef;	//经解析得到的传感器数据
 

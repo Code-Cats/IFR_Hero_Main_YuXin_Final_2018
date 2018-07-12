@@ -48,6 +48,9 @@ void VisionData_Receive(u8 data)	//从主板传过来的数据解析（主副板通用）
 	
 }
 
+
+s32 yaw_angvel_10=0;
+
 #define VISION_TARX 1020
 float t_yaw_angel_v=0;
 float t_target_v=0;
@@ -60,8 +63,11 @@ void VisionData_Deal(volatile u8 *pData)	//传感器数据在除了帧头的第1帧
 	VisionData.tar_y=*(pData+5)<<8|*(pData+6);
 	VisionData.pix_x_v=*(pData+7)<<8|*(pData+8);
 	
+	yaw_angvel_10=Gyro_Data.angvel[YAW]*10;
 	t_yaw_angel_v=Pixel_V_to_angle_V(VisionData.pix_x_v,(s16)(VisionData.tar_x-VISION_TARX));
-	VisionData.angel_x_v=10*Gyro_Data.angvel[YAW]+10*t_yaw_angel_v;	//解算得目标值
+
+	Tar_Relative_V_Mix(Gyro_Data.angvel[YAW],t_yaw_angel_v);
+	
 //	if(RC_Ctl.rc.switch_right==RC_SWITCH_UP&&GetWorkState()==NORMAL_STATE )	//放在中断中运行
 //	{
 		Vision_Task(&yunMotorData.yaw_tarP,&yunMotorData.pitch_tarP);	//控制键位集成再内部

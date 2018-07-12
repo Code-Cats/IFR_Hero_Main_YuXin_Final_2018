@@ -215,15 +215,16 @@ void Work_State_Change(void)
 		{
 			static u32 time_count=0;
 			time_count++;
-			if(Error_Check.statu[LOST_DBUS]==0&&abs(RC_Ctl.rc.ch0+RC_Ctl.rc.ch1+RC_Ctl.rc.ch2+RC_Ctl.rc.ch3-1024*4)>8)
+			if(Error_Check.statu[LOST_DBUS]==0&&abs(RC_Ctl.rc.ch0+RC_Ctl.rc.ch1+RC_Ctl.rc.ch2+RC_Ctl.rc.ch3-1024*4)<10)
 			{
-				yunMotorData.yaw_tarP=(Gyro_Data.angle[2]*10+(YAW_INIT-yunMotorData.yaw_fdbP)*3600/8192);	//重置云台目标位置
+				yunMotorData.yaw_tarP=(Gyro_Data.angle[YAW]*10+(YAW_INIT-yunMotorData.yaw_fdbP)*3600/8192);	//重置云台目标位置
 				SetWorkState(NORMAL_STATE);
 				time_count=0;
 			}
 			
 			if(Error_Check.statu[LOST_DBUS]==0&&time_count>8000)	//有反馈认为无法恢复
 			{
+				time_count=0;
 				NVIC_SystemReset();
 			}
 			break;
