@@ -90,6 +90,8 @@ void Vision_Task(float* yaw_tarP,float* pitch_tarP)	//处理目标角度
 #define G	9.8f	//重力加速度
 float Gravity_Ballistic_Set(float* pitch_tarP,float dis_m)	//重力补偿坐标系中，向下为正
 {
+	if(dis_m>4.6f)	dis_m=4.6f;
+	
 //	static float tar_angle_rad_fliter=0;
 	float tar_angle_rad=(PITCH_GYRO_INIT-*pitch_tarP)*0.000767f;	//弧度制简化计算2pi/8192//////////////////////////////////////////
 //	tar_angle_rad_fliter=0.9f*tar_angle_rad_fliter+0.1f*tar_angle_rad;
@@ -212,7 +214,7 @@ u8 Auto_Shoot_Aimfdb(void)	//瞄准状态总	//
 	{
 		if(Auto_Shoot_AimAppraisal_Dynamic(VisionData.angel_x_v,VisionData.armor_dis,VisionData.tar_x-VISION_TARX)==1)
 		{
-			return 0;
+			return 1;
 		}
 		else
 		{

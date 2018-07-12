@@ -13,7 +13,7 @@ pitch位置
 
 */
 
-#define YUN_PITCH_TAKEBULLET	3745
+#define YUN_PITCH_TAKEBULLET	3780
 
 YUN_MOTOR_DATA 			yunMotorData=YUN_MOTOR_DATA_DEFAULT;
 YUN_DATA          	yunData=YUN_DATA_DEFAULT;
@@ -61,6 +61,8 @@ u8 Yun_Control_RCorPC=RC_CONTROL;
 u8 yun_control_pcorrc_last=RC_CONTROL;	//记录上一次控制模式，便于在切换时对某些数据进行处理	//这里时架构问题，更改架构可以不用该变量
 void Yun_Control_External_Solution(void)	//外置反馈方案
 {
+	static WorkState_e State_Record=CHECK_STATE;
+	
 	if(GetWorkState()!=PREPARE_STATE&&GetWorkState()!=CALI_STATE)	//模式切换
 	{
 		if(RC_Ctl.mouse.press_l==1||RC_Ctl.mouse.press_r==1||RC_Ctl.mouse.x>1||RC_Ctl.mouse.y>1)
@@ -113,6 +115,10 @@ void Yun_Control_External_Solution(void)	//外置反馈方案
 		yunMotorData.yaw_tarP=(Gyro_Data.angle[YAW]*10+(YAW_INIT-yunMotorData.yaw_fdbP)*3600/8192);	//反馈放大10倍并将目标位置置为中点
 	}
 
+	if(State_Record==TAKEBULLET_STATE&&GetWorkState()!=TAKEBULLET_STATE)
+	{
+		yunMotorData.pitch_tarP=PITCH_INIT;
+	}
 	/////////////////////
 //	if(KeyBoardData[KEY_F].value==1&&time_1ms_count%10==0)
 	if(time_1ms_count%10==0)		//这里仅起到一个刷新控制=位的作用，否则串口无中断会致命
@@ -122,9 +128,9 @@ void Yun_Control_External_Solution(void)	//外置反馈方案
 	
 	if(VisionData.vision_control_state==1)	//在自瞄模式，增大PID
 	{
-//		PID_PITCH_POSITION.k_p=PITCH_POSITION_PID_P*1.2f;
-//		PID_PITCH_POSITION.k_i=PITCH_POSITION_PID_I*1.5f;
-//		PID_PITCH_POSITION.i_sum_max=PITCH_POSITION_PID_I_MAX*2;
+		PID_PITCH_POSITION.k_p=PITCH_POSITION_PID_P*1.2f;
+		PID_PITCH_POSITION.k_i=PITCH_POSITION_PID_I*1.5f;
+		PID_PITCH_POSITION.i_sum_max=PITCH_POSITION_PID_I_MAX*2;
 	}
 	else
 	{
@@ -157,6 +163,8 @@ void Yun_Control_External_Solution(void)	//外置反馈方案
 	
 	yunMotorData.pitch_output=-PID_General(yunMotorData.pitch_tarV,(Gyro_Data.angvel[PITCH]),&PID_PITCH_SPEED);
 	yunMotorData.yaw_output=-PID_General(yunMotorData.yaw_tarV,(Gyro_Data.angvel[YAW]),&PID_YAW_SPEED);	//采用外界陀螺仪做反馈
+	
+	State_Record=GetWorkState();
 }
 
 
