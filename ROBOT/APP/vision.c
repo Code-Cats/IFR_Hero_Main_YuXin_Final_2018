@@ -26,14 +26,14 @@ angel_error=atan(pix_error/1855.2f)*57.3f;	//arm_atan_f32为DSP
 #define CAMERA_D	1855	//相机镜片到感光片等效像素量
 float Pixel_V_to_angle_V(s16 pix_v,s16 pix_error)	//从最原始的数据进行计算可以减少单片机浮点运算的精度丢失（误差增加）
 {
-	int camera_d_2=CAMERA_D*CAMERA_D;	//距离平方
-	int r_2=camera_d_2+pix_error*pix_error;	//等效半径平方
-	float cos_angel_2=(float)camera_d_2/(float)r_2;
+//	int camera_d_2=CAMERA_D*CAMERA_D;	//距离平方
+//	int r_2=camera_d_2+pix_error*pix_error;	//等效半径平方
+//	float cos_angel_2=(float)camera_d_2/(float)r_2;
 	float angel_v=0;
-	angel_v=pix_v*cos_angel_2/(float)CAMERA_D;
-	angel_v=angel_v*57.3f;//*2*PI;	//进行还原处理
+//	angel_v=pix_v*cos_angel_2/(float)CAMERA_D;
+//	angel_v=angel_v*57.3f;//*2*PI;	//进行还原处理
 	
-//	angel_v=0.036081f*pix_v+0.1f;//+0.3026f;	//MATLAB拟合
+	angel_v=0.036081f*pix_v+0.1f;//+0.3026f;	//MATLAB拟合
 	
 	return angel_v;
 }
@@ -46,7 +46,12 @@ float Pixel_V_to_angle_V(s16 pix_v,s16 pix_error)	//从最原始的数据进行计算可以减
 #define YUN_DOWN_DISLIMIT 333	//正常的活动范围，DOWN为负
 
 float yaw_residual_error=0;	//打移动靶时云台跟随静差
-
+/////////////////
+s32 yaw_angvel_10=0;
+float t_yaw_angel_v=0;
+float t_target_v=0;
+////////////////
+u8 sign_count=0;	//第三帧才开始动态识别
 #define VISION_TARX 1053//1035是修正安装偏差1020//580	//左上原点	640
 #define VISION_TARY	360//510//490//480//490//500//520//540//560//360//410//440	//左上原点	480	//打5米内目标：向上补偿518-360个像素点	//因为有阻力恒定静态误差，故补偿
 void Vision_Task(float* yaw_tarP,float* pitch_tarP)	//处理目标角度
@@ -63,6 +68,33 @@ void Vision_Task(float* yaw_tarP,float* pitch_tarP)	//处理目标角度
 		VisionData.vision_control_state=0;	//最终控制位
 	}
 	
+	if(VisionData.armor_sign==1)	//保护性输出，前几帧速度置0
+	{
+		if(sign_count<20)
+		sign_count++;
+	}
+	else
+	{
+		sign_count=0;
+	}
+	
+//	yaw_angvel_10=Gyro_Data.angvel[YAW]*10;
+	t_yaw_angel_v=Pixel_V_to_angle_V(VisionData.pix_x_v,(s16)(VisionData.tar_x-VISION_TARX));
+	
+	if(sign_count>3)	//稳定后
+	{
+		Tar_Relative_V_Mix(Gyro_Data.angvel[YAW],t_yaw_angel_v);	//速度融合
+	}
+	else
+	{
+		Tar_Relative_V_Mix(0,0);	//速度融合
+	}
+	
+	if(sign_count<10)
+	{
+		VisionData.angle_x_v_filter*=sign_count/10.0f;
+	}
+	
 	if(VisionData.vision_control_state==1)
 	{
 //		t_yaw_error=Pixel_to_angle((s16)(VisionData.error_x-VISION_TARX))*10;
@@ -73,7 +105,11 @@ void Vision_Task(float* yaw_tarP,float* pitch_tarP)	//处理目标角度
 		*yaw_tarP=(float)Gyro_Data.angle[2]*10+Pixel_to_angle((s16)(VisionData.tar_x-VISION_TARX))*10;
 		*pitch_tarP=(float)yunMotorData.pitch_fdbP-Pixel_to_angle((s16)(VisionData.tar_y-VISION_TARY))*8192/360;
 		t_gravity_ballistic_set_angel=Gravity_Ballistic_Set(pitch_tarP,(float)(VisionData.armor_dis/10.0f));	//重力补偿
-		Tar_Move_Set(yaw_tarP,(float)(VisionData.armor_dis/10.0f),VisionData.angle_x_v_filter);	//预测 待调节
+		
+//		if(GetWorkState()!=WAIST_STATE)
+		{
+			Tar_Move_Set(yaw_tarP,(float)(VisionData.armor_dis/10.0f),VisionData.angle_x_v_filter);	//预测 待调节
+		}
 		
 		t_gravity_ballistic_set_angel_10=(s16)(t_gravity_ballistic_set_angel*10);
 		
@@ -112,7 +148,7 @@ s16 tar_v_ronghe_filter=0;
 #define FILTER_FACTOR	3	//5阶滤波
 void Tar_Relative_V_Mix(float yaw_angvel,s16 pix_x_v)
 {
-	static float yaw_angvel_last[2];
+	static float yaw_angvel_last[3];
 //	static s16 pix_x_v_last[FILTER_FACTOR-1]={0};	//4阶中值滤波
 //	static u8 last_count=0;
 //	s16 pix_x_v_now_sort[FILTER_FACTOR];
@@ -148,7 +184,7 @@ void Tar_Relative_V_Mix(float yaw_angvel,s16 pix_x_v)
 //	}
 	static float f_pix_x_v_filter=0;
 	
-	f_pix_x_v_filter=f_pix_x_v_filter*0.6f+pix_x_v*0.4f;
+	f_pix_x_v_filter=f_pix_x_v_filter*0.5f+pix_x_v*0.5f;	//6-4
 	
 	pix_x_v_filter_10=(s16)(f_pix_x_v_filter*10);
 	
@@ -157,7 +193,8 @@ void Tar_Relative_V_Mix(float yaw_angvel,s16 pix_x_v)
 	if(pix_x_v>45)	pix_x_v=45;
 	if(pix_x_v<-45)	pix_x_v=-45;
 	
-	VisionData.angel_x_v=10*yaw_angvel_last[1]+1.15f*pix_x_v_filter_10;	//解算得目标值
+	yaw_angvel_10=10*yaw_angvel_last[2];	//速度查看-jscope
+	VisionData.angel_x_v=10*yaw_angvel_last[2]+1.0f*pix_x_v_filter_10;	//解算得目标值
 tar_v_ronghe=(s16)VisionData.angel_x_v;////////////////////////////////////////////
 
 	VisionData.angle_x_v_filter=VisionData.angle_x_v_filter*0.6f+VisionData.angel_x_v*0.4f;
@@ -177,12 +214,14 @@ tar_v_ronghe_filter=(s16)VisionData.angle_x_v_filter;
 
 
 	//发现视觉信号延迟20ms左右，故融合用上一次
+	yaw_angvel_last[2]=yaw_angvel_last[1];
 	yaw_angvel_last[1]=yaw_angvel_last[0];	//上上
 	yaw_angvel_last[0]=yaw_angvel;	//上
 }
 
 void Tar_Move_Set(float* yaw_tarP,float dis_m,float tar_v)	//经过计算，只打35度/s内的物体
 {
+	float pre_angle_limit=0;
 //	static float tar_v_fliter=0;
 //	if(abs(tar_v)<2)	tar_v=0;
 	if(tar_v>400)	tar_v=400;	//350
@@ -192,10 +231,24 @@ void Tar_Move_Set(float* yaw_tarP,float dis_m,float tar_v)	//经过计算，只打35度/
 	{
 		dis_m=3.2f;
 	}
-	float shoot_delay=dis_m/SHOOT_V+0.08f;	//以秒为单位	//加上出弹延时
+	float shoot_delay=dis_m/SHOOT_V+0.06f;	//以秒为单位	//加上出弹延时0.08
 	float pre_angle=tar_v*shoot_delay;
+	
+//	if(dis_m>3)	//距离大于3m限制预测角度
+//	{
+//		pre_angle_limit=70-(dis_m-3)*30;
+//		pre_angle_limit=pre_angle_limit<15?15:pre_angle_limit;
+//		pre_angle_limit=pre_angle_limit>70?70:pre_angle_limit;
+//	}
+//	else
+//	{
+//		pre_angle_limit=70;
+//	}
+//	if(pre_angle>pre_angle_limit)	pre_angle=pre_angle_limit;
+//	if(pre_angle<-pre_angle_limit)	pre_angle=-pre_angle_limit;
 	if(pre_angle>70)	pre_angle=70;
 	if(pre_angle<-70)	pre_angle=-70;
+	
 	*yaw_tarP+=pre_angle;
 }
 
