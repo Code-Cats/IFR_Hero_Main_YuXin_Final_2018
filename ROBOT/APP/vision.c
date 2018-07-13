@@ -106,7 +106,7 @@ void Vision_Task(float* yaw_tarP,float* pitch_tarP)	//处理目标角度
 		*pitch_tarP=(float)yunMotorData.pitch_fdbP-Pixel_to_angle((s16)(VisionData.tar_y-VISION_TARY))*8192/360;
 		t_gravity_ballistic_set_angel=Gravity_Ballistic_Set(pitch_tarP,(float)(VisionData.armor_dis/10.0f));	//重力补偿
 		
-//		if(GetWorkState()!=WAIST_STATE)
+		if(GetWorkState()!=WAIST_STATE)
 		{
 			Tar_Move_Set(yaw_tarP,(float)(VisionData.armor_dis/10.0f),VisionData.angle_x_v_filter);	//预测 待调节
 		}
@@ -221,12 +221,24 @@ tar_v_ronghe_filter=(s16)VisionData.angle_x_v_filter;
 
 void Tar_Move_Set(float* yaw_tarP,float dis_m,float tar_v)	//经过计算，只打35度/s内的物体
 {
-	float pre_angle_limit=0;
+	float pre_angle_limit=70;
 //	static float tar_v_fliter=0;
 //	if(abs(tar_v)<2)	tar_v=0;
 	if(tar_v>400)	tar_v=400;	//350
 	if(tar_v<-400)	tar_v=-400;
 //	tar_v_fliter=0.6f*tar_v_fliter+0.4f*tar_v;
+	
+	if(dis_m>3.2)	//距离大于3m限制预测角度
+	{
+		pre_angle_limit=70-(dis_m-3.2)*20;
+		pre_angle_limit=pre_angle_limit<15?15:pre_angle_limit;
+		pre_angle_limit=pre_angle_limit>70?70:pre_angle_limit;
+	}
+	else
+	{
+		pre_angle_limit=70;
+	}
+	
 	if (dis_m>3.2f)	//2.5
 	{
 		dis_m=3.2f;
@@ -234,20 +246,12 @@ void Tar_Move_Set(float* yaw_tarP,float dis_m,float tar_v)	//经过计算，只打35度/
 	float shoot_delay=dis_m/SHOOT_V+0.06f;	//以秒为单位	//加上出弹延时0.08
 	float pre_angle=tar_v*shoot_delay;
 	
-//	if(dis_m>3)	//距离大于3m限制预测角度
-//	{
-//		pre_angle_limit=70-(dis_m-3)*30;
-//		pre_angle_limit=pre_angle_limit<15?15:pre_angle_limit;
-//		pre_angle_limit=pre_angle_limit>70?70:pre_angle_limit;
-//	}
-//	else
-//	{
-//		pre_angle_limit=70;
-//	}
+
+
 //	if(pre_angle>pre_angle_limit)	pre_angle=pre_angle_limit;
 //	if(pre_angle<-pre_angle_limit)	pre_angle=-pre_angle_limit;
-	if(pre_angle>70)	pre_angle=70;
-	if(pre_angle<-70)	pre_angle=-70;
+	if(pre_angle>pre_angle_limit)	pre_angle=pre_angle_limit;
+	if(pre_angle<-pre_angle_limit)	pre_angle=-pre_angle_limit;
 	
 	*yaw_tarP+=pre_angle;
 }

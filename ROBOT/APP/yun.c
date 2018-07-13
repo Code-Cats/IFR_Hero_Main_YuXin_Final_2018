@@ -13,7 +13,7 @@ pitchŒª÷√
 
 */
 
-#define YUN_PITCH_TAKEBULLET	3780
+#define YUN_PITCH_TAKEBULLET	3795
 
 YUN_MOTOR_DATA 			yunMotorData=YUN_MOTOR_DATA_DEFAULT;
 YUN_DATA          	yunData=YUN_DATA_DEFAULT;
