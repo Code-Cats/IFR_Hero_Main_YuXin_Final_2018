@@ -233,7 +233,7 @@ void Chassis_Control_External_Solution(void)	//陀螺仪正常的底盘解决方案
 	}
 	
 //////////////////	if(GetWorkState()==NORMAL_STATE||GetWorkState()==TAKEBULLET_STATE)	//取弹为暂时加入
-//////////////////	yaw_follow_error=yaw_follow_error/8192.0f*2*PI;	//每次都运算方便yun.c调用
+	yaw_follow_error=yaw_follow_error/8192.0f*2*PI;	//每次都运算方便yun.c调用
 //////////////////	if(GetWorkState()==NORMAL_STATE&&abs(YAW_INIT-yunMotorData.yaw_fdbP)>200)	//过弯漂移	//发现过弯飘移会影响转向，解决方法1，转向驱动力达到极限触顶导致实际速度比例偏差预期，设置一函数检测任意输出值大于8000时限制整体使比例预期，方法二，减弱Vy
 //////////////////	{	//智能转向块
 //////////////////		s16 Vx_record=Chassis_Vx;

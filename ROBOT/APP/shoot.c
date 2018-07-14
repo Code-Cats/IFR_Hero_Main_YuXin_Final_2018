@@ -142,7 +142,7 @@ void PC_Control_Shoot(u8* fri_state)
 	
 	if(Auto_Shoot_Aimfdb()==1&&Shoot_Heat_Limit(RobotHeatDataSimu42.heat,RobotHeatDataSimu42.maxheat)==1&&Shoot_Heat_Lost_Fre_Limit()==1&&*fri_state==1)	//自瞄自动打击
 	{
-		if(time_1ms_count-shoot_Data_Down.last_time>750)	//限制自瞄射击频率
+		if(time_1ms_count-shoot_Data_Down.last_time>500)	//限制自瞄射击频率
 		{
 			shoot_Data_Down.count--;
 			shoot_Data_Down.last_time=time_1ms_count;
@@ -277,7 +277,7 @@ void Shoot_Frequency_Limit(int* ferquency,u16 rate,u16 heat)	//m/s为单位
 
 u8 Shoot_Heat_Limit(u16 heat,u16 maxheat)	//还应当限制射频
 {
-	if((maxheat-heat)>=44&&time_1ms_count-shoot_Data_Down.last_time>170)	//testPowerHeatData.shooterHeat1
+	if((maxheat-heat)>=42&&time_1ms_count-shoot_Data_Down.last_time>170)	//testPowerHeatData.shooterHeat1
 	{
 		return 1;
 	}
