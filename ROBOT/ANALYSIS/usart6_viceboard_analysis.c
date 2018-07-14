@@ -83,9 +83,9 @@ void SensorData_Deal(volatile u8 *pData)	//传感器数据在除了帧头的第1帧
 		SensorData.Infrare[i]=*(pData+1)>>(3-i)&0x01;
 	}
 	
-	for(int i=0;i<2;i++)
+	for(int i=0;i<4;i++)
 	{
-		SensorData.Infrare[i+4]=*(pData+2)>>(7-i)&0x01;		//[4]为上下岛加速保护，[5]为拖车检测
+		SensorData.Infrare[i+4]=*(pData+2)>>(7-i)&0x01;		//[4]为上下岛加速保护，[5]为拖车检测	//[6]为左对位	0为触发	//[7]为右对位	0为触发
 	}
 }
 

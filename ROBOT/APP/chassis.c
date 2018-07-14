@@ -26,7 +26,7 @@ extern u8 Replenish_Bullet_Statu;
 /*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
 extern u8 IMU_Check_Useless_State;	//陀螺仪失效检测位
 /*************************************************************/
-
+extern AutoAimBulletTypeDef AutoAimBulletData;
 
 /***************底盘相关控制位（其他函数会引用）*****************/
 u8 Chassis_Follow_Statu=1;	//底盘跟随标志位，设立此标志位原因是方便的在传感器失效时切换底盘独立状态
@@ -85,13 +85,22 @@ void Chassis_Control_External_Solution(void)	//陀螺仪正常的底盘解决方案
 		}
 	}
 	
-	if(Chassis_Control_RCorPC==RC_CONTROL)
+	
+	if(AutoAimBulletData.control_state==1)	//自动对位时不开启手动控制
 	{
-		RC_Control_Chassis();
+		
 	}
-	else if(Chassis_Control_RCorPC==PC_CONTROL)
+	else	//关闭自动对位
 	{
-		PC_Control_Chassis(&Chassis_Vx,&Chassis_Vy);
+		if(Chassis_Control_RCorPC==RC_CONTROL)
+		{
+			RC_Control_Chassis();
+		}
+		else if(Chassis_Control_RCorPC==PC_CONTROL)
+		{
+			PC_Control_Chassis(&Chassis_Vx,&Chassis_Vy);
+		}
+
 	}
 	
 	

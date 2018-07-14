@@ -228,9 +228,9 @@ void Tar_Move_Set(float* yaw_tarP,float dis_m,float tar_v)	//经过计算，只打35度/
 	if(tar_v<-400)	tar_v=-400;
 //	tar_v_fliter=0.6f*tar_v_fliter+0.4f*tar_v;
 	
-	if(dis_m>3.2)	//距离大于3m限制预测角度
+	if(dis_m>3.2f)	//距离大于3m限制预测角度
 	{
-		pre_angle_limit=70-(dis_m-3.2)*20;
+		pre_angle_limit=70-(dis_m-3.2f)*20;
 		pre_angle_limit=pre_angle_limit<15?15:pre_angle_limit;
 		pre_angle_limit=pre_angle_limit>70?70:pre_angle_limit;
 	}
@@ -278,6 +278,10 @@ u8 Auto_Shoot_Aimfdb(void)	//瞄准状态总	//
 			return 0;
 		}
 	}
+	else
+	{
+		return 0;
+	}
 		
 }
 
@@ -312,7 +316,7 @@ u8 Auto_Shoot_AimAppraisal_Static(void)	//静态瞄准评估函数
 *******************************/
 #define SHOOT_V_APPR	16	//用来校验的速度
 #define SHOOT_DELAY_MS 80	//以毫秒为单位
-#define CORRECTION_FACTOR 0.9f	//矫正函数修正
+#define CORRECTION_FACTOR 0.9f	//矫正函数修正	//以此可能会存在残差
 u8 Auto_Shoot_AimAppraisal_Dynamic(float relative_v,s16 dis_dm,s16 pix_error)	//动态瞄准评估函数
 {
 	u8 state=0;
@@ -321,6 +325,8 @@ u8 Auto_Shoot_AimAppraisal_Dynamic(float relative_v,s16 dis_dm,s16 pix_error)	//
 	int delay_to_tar=dis_dm*100/SHOOT_V_APPR+SHOOT_DELAY_MS;	//延时ms
 	float	angel_error=atan(pix_error/1855.2f)*57.3f;	//以度为单位
 	float pre_angel_raw=delay_to_tar*relative_v/100;	//乘以以0.1度/s为单位的速度乘以ms处以100等于以度为单位
+	
+	pre_angel_raw*=CORRECTION_FACTOR;
 	
 	if(dis_dm>40)
 	{
@@ -333,7 +339,7 @@ u8 Auto_Shoot_AimAppraisal_Dynamic(float relative_v,s16 dis_dm,s16 pix_error)	//
 		if(count>50)	count=50;
 		if(count>1)	//连续两帧有效
 		{
-			if(abs(VisionData.tar_y-VISION_TARY)<30&&Error_Check.statu[LOST_VISION]==0)	//未丢帧、Y方向正常
+			if(abs(yunMotorData.pitch_tarP-yunMotorData.pitch_fdbP)<25&&Error_Check.statu[LOST_VISION]==0)	//未丢帧、Y方向正常
 			{
 				if(abs(VisionData.angle_x_v_filter)<410&&dis_dm<=50)	//距离小于5m2，速度小于41
 				{

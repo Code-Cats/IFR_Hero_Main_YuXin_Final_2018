@@ -49,7 +49,7 @@ typedef struct
 
 typedef struct
 {
-	u8 Infrare[6];	//新加入两个红外
+	u8 Infrare[8];	//新加入两个红外	//又加两个红外	[6]为左对位 [7]为右对位
 	u8 Limit[4];
 }SensorDataTypeDef;	//经解析得到的传感器数据
 
