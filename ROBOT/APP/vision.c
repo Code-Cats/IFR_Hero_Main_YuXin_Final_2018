@@ -108,7 +108,10 @@ void Vision_Task(float* yaw_tarP,float* pitch_tarP)	//处理目标角度
 		
 		if(GetWorkState()!=WAIST_STATE)
 		{
-			Tar_Move_Set(yaw_tarP,(float)(VisionData.armor_dis/10.0f),VisionData.angle_x_v_filter);	//预测 待调节
+			if(VisionData.armor_dis<40)	//只预测4m以内
+			{
+				Tar_Move_Set(yaw_tarP,(float)(VisionData.armor_dis/10.0f),VisionData.angle_x_v_filter);	//预测 待调节
+			}
 		}
 		
 		t_gravity_ballistic_set_angel_10=(s16)(t_gravity_ballistic_set_angel*10);
@@ -341,7 +344,7 @@ u8 Auto_Shoot_AimAppraisal_Dynamic(float relative_v,s16 dis_dm,s16 pix_error)	//
 		{
 			if(abs(yunMotorData.pitch_tarP-yunMotorData.pitch_fdbP)<25&&Error_Check.statu[LOST_VISION]==0)	//未丢帧、Y方向正常
 			{
-				if(abs(VisionData.angle_x_v_filter)<410&&dis_dm<=50)	//距离小于5m2，速度小于41
+				if(abs(VisionData.angle_x_v_filter)<410&&dis_dm<=46)	//距离小于5m2，速度小于41
 				{
 					state=1;
 				}

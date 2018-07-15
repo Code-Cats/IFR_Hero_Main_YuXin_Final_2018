@@ -30,9 +30,9 @@ float PID_General(float target,float current,PID_GENERAL *pid)
 
 		if(pid->inte>pid->i_sum_max){pid->inte=pid->i_sum_max;}
 		if(pid->inte<-pid->i_sum_max){pid->inte=-pid->i_sum_max;}
-pid->t_error=(s16)(pid->Data_Save[1]*pid->k_p);
-pid->t_dire=(s16)pid->dire;
-pid->t_inte=(s16)(pid->inte * pid->k_i);
+//pid->t_error=(s16)(pid->Data_Save[1]*pid->k_p);
+//pid->t_dire=(s16)pid->dire;
+//pid->t_inte=(s16)(pid->inte * pid->k_i);
 		pid->output = pid->Data_Save[1] * pid->k_p + pid->inte * pid->k_i + pid->dire; 
 	
 		//Êä³öÊı¾İ´óĞ¡ÏŞÖÆ
@@ -65,6 +65,8 @@ float PID_ChassisFollow_Variable_kp(float error)	//µ×ÅÌµç»ú8192Îª360¶È£¬15Îª341£
 *****************************************/
 float PID_ChassisFollow(float target,float current,PID_GENERAL *pid)
 {
+//float kp_vari=1;
+	
 	  //Ä¿±êÊı¾İ´óĞ¡ÏŞÖÆ
 		if(target>pid->input_max){target=pid->input_max;}
 		if(target<pid->input_min){target=pid->input_min;}
@@ -77,14 +79,21 @@ float PID_ChassisFollow(float target,float current,PID_GENERAL *pid)
 		
 		if(abs(target - current)<=pid->tiny)pid->Data_Save[1]=0;
 		
+//		if(pid->Data_Save[1]<250)
+//		{
+//			kp_vari=1-0.5f*(250-pid->Data_Save[1])/250;
+//		}
+		
+		
+		
 		pid->inte = 0.999f*pid->inte+pid->Data_Save[1];
 		pid->dire = pid->k_d * (pid->Data_Save[1] - pid->Data_Save[0]);
 
 		if(pid->inte>pid->i_sum_max){pid->inte=pid->i_sum_max;}
 		if(pid->inte<-pid->i_sum_max){pid->inte=-pid->i_sum_max;}
-pid->t_error=(s16)(pid->Data_Save[1]*pid->k_p);
-pid->t_dire=(s16)pid->dire;
-pid->t_inte=(s16)(pid->inte * pid->k_i);
+//pid->t_error=(s16)(pid->Data_Save[1]*pid->k_p);
+//pid->t_dire=(s16)pid->dire;
+//pid->t_inte=(s16)(pid->inte * pid->k_i);
 		pid->output = pid->Data_Save[1] * pid->k_p *PID_ChassisFollow_Variable_kp(pid->Data_Save[1]) + pid->inte * pid->k_i + pid->dire; 
 	
 		//Êä³öÊı¾İ´óĞ¡ÏŞÖÆ
@@ -114,9 +123,9 @@ float PID_Robust(float target,float current,float differential,PID_GENERAL *pid)
 
 		if(pid->inte>pid->i_sum_max){pid->inte=pid->i_sum_max;}
 		if(pid->inte<-pid->i_sum_max){pid->inte=-pid->i_sum_max;}
-pid->t_error=(s16)(pid->Data_Save[1]*pid->k_p);
-pid->t_dire=(s16)pid->dire;
-pid->t_inte=(s16)(pid->inte * pid->k_i);
+//pid->t_error=(s16)(pid->Data_Save[1]*pid->k_p);
+//pid->t_dire=(s16)pid->dire;
+//pid->t_inte=(s16)(pid->inte * pid->k_i);
 		pid->output = pid->Data_Save[1] * pid->k_p + pid->inte * pid->k_i + pid->dire; 
 	
 		//Êä³öÊı¾İ´óĞ¡ÏŞÖÆ

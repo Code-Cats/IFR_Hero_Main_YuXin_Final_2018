@@ -679,7 +679,7 @@ void PC_Control_Chassis(s16 * chassis_vx,s16 * chassis_vy)	//1000Hz
 {
 	static s16 chassis_vx_record=0;
 	static s16 chassis_vy_record=0;
-	if(GetWorkState()==NORMAL_STATE||GetWorkState()==WAIST_STATE)
+	if(GetWorkState()==NORMAL_STATE||GetWorkState()==WAIST_STATE||GetWorkState()==TAKEBULLET_STATE)
 	{
 		if(time_1ms_count%2==0)
 		{

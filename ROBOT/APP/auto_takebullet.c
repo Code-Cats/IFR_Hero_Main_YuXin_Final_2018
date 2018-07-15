@@ -147,6 +147,12 @@ void TakeBullet_Control_Center(void)
 			
 	State_Record=GetWorkState();
 	
+	
+	if(TakeBullet_AutoAimState==0)	//一个保护
+	{
+		AutoAimBulletData.control_state=0;	//关闭对位
+		AutoAimBulletData.aim_state=0;
+	}
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	if(AutoAimBulletData.take_count<2)	//第一次取弹（或者一次取两箱）
@@ -484,6 +490,7 @@ void TakeBullet_Control_Center(void)
 				{
 					TakeBulletState=BULLET_WAITING;	//下一次取弹
 					AutoAimBulletData.take_count+=1;	//标记取弹数量+1
+					TakeBullet_AutoAimState=0;	//取到第一个块之后取消自动对位，好处是如果第一个块不成功就一直保持自动对位
 				}
 				break;
 			}

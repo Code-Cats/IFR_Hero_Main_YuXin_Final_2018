@@ -184,12 +184,14 @@ void RC_Control_Yun(float * yaw_tarp,float * pitch_tarp)	//1000Hz
 		yunMotorData.pitch_tarP=((RC_Ctl.rc.ch3-1024)*460.0/660.0)+PITCH_INIT;	//-50是因为陀螺仪水平时云台上扬
 	}
 }
+
+u32 test_turn_count=0;
 //#define PITCH_INIT         3098	//2018.7.10
 #define YUN_DOWN_VALUELIMIT 2765	//向下限位
 #define YUN_UP_VALUELIMIT 3650	//向上限位
 #define YUN_UP_DISLIMIT 552	//正常的活动范围，UP为正
 #define YUN_DOWN_DISLIMIT 333	//正常的活动范围，DOWN为负
-
+//u8 keyQ_last,keyE_last=0;	//暂时屏蔽
 #define YUN_UPMAX_EXTENSION (YUN_UPMAX+200)	//补偿的活动范围，UP为负
 #define YUN_DOWNMAX_EXTENSION (YUN_DOWNMAX+200)	//补偿的活动范围，DOWN为正
 extern KeyBoardTypeDef KeyBoardData[KEY_NUMS];
@@ -220,17 +222,19 @@ void PC_Control_Yun(float * yaw_tarp,float * pitch_tarp)	//1000Hz
 	
 	if(VisionData.vision_control_state==0)	//没有视觉控制时才可控
 	{
-		if(keyQ_last==0&&KeyBoardData[KEY_Q].value==1&&abs(yaw_follow_error)<PI/10)
+		if(keyQ_last==0&&KeyBoardData[KEY_Q].value==1&&abs(yunMotorData.yaw_tarP-Gyro_Data.angle[YAW]*10)<50)	//abs(yaw_follow_error)<PI/7	&&abs(yunMotorData.yaw_tarP-Gyro_Data.angle[YAW]*10)<50
 		{
-			yaw_tarp_float+=900;
+			test_turn_count++;
+			yaw_tarp_float-=900;
 			yaw_tarp_float=yaw_tarp_float>1800?yaw_tarp_float-3600:yaw_tarp_float;	//过零点
 			yaw_tarp_float=yaw_tarp_float<-1800?yaw_tarp_float+3600:yaw_tarp_float;	//过零点
 		}
 		keyQ_last=KeyBoardData[KEY_Q].value;
 		
-		if(keyE_last==0&&KeyBoardData[KEY_E].value==1&&abs(yaw_follow_error)<PI/10)
+		if(keyE_last==0&&KeyBoardData[KEY_E].value==1&&abs(yunMotorData.yaw_tarP-Gyro_Data.angle[YAW]*10)<50)	//abs(yaw_follow_error)<PI/7	&&abs(yunMotorData.yaw_tarP-Gyro_Data.angle[YAW]*10)<50
 		{
-			yaw_tarp_float-=900;
+			test_turn_count++;
+			yaw_tarp_float+=900;
 			yaw_tarp_float=yaw_tarp_float>1800?yaw_tarp_float-3600:yaw_tarp_float;	//过零点
 			yaw_tarp_float=yaw_tarp_float<-1800?yaw_tarp_float+3600:yaw_tarp_float;	//过零点
 		}
@@ -256,9 +260,9 @@ void PC_Control_Yun(float * yaw_tarp,float * pitch_tarp)	//1000Hz
 //			}
 			
 			
-			*yaw_tarp=yaw_tarp_float;
-			*pitch_tarp=pitch_tarp_float;
 		}
+		*yaw_tarp=yaw_tarp_float;
+		*pitch_tarp=pitch_tarp_float;
 	}
 	else
 	{
