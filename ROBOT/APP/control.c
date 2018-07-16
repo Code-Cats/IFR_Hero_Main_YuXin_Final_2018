@@ -51,10 +51,10 @@ void Control_Task(void)	//2ms
 		Judge_Send_Statu=1; 
 	}
 
-	if(time_1ms_count%10==0)
-	{
-		Super_Capacitor_Task(testPowerHeatData.chassisPower,testPowerHeatData.chassisPowerBuffer);
-	}
+//	if(time_1ms_count%10==0)
+//	{
+		Super_Capacitor_Task(testPowerHeatData.chassisPower,testPowerHeatData.chassisPowerBuffer);	//超级电容处理
+//	}
 	
 	BulletNum_Calculate();
 	if(time_1ms_count%10==0)
@@ -284,10 +284,11 @@ void Work_Execute(void)	//工作执行2018.7.1
 		}
 		case CALI_STATE:	//标定模式
 		{
-			if(BulletRotate_OffSetInit()==1&&Imu_Cali_State()==1)	//待写取弹电机初始标定
+			if(BulletRotate_Cali()==1&&Imu_Cali_State()==1)	//改为闭环标定	//BulletRotate_OffSetInit()==1
 			{
 				SetWorkState(NORMAL_STATE);
 			}
+			BulletRotate_Task();
 			Yun_Task();	//开启云台处理
 			Shoot_Task();	//临时调试
 			TakeBullet_Control_Center();	//含有假设延时反馈和舵机执行，故加入
@@ -487,8 +488,9 @@ void Motor_Send(void)
 //			CAN1_Yun_SendMsg(0,0);
 			CAN2_Chassis_SendMsg(0,0,0,0);
 //			CAN2_Shoot_SendMsg(0,0);//下拨弹、上拨弹
+			CAN2_Shoot_Bullet_SendMsg((s16)BulletRotate_Data.output,0,0,0);//取弹旋转、0、上拨弹、下拨弹
 
-			CAN2_Shoot_Bullet_SendMsg(0,0,0,0);//取弹旋转、0、下拨弹、上拨弹
+//			CAN2_Shoot_Bullet_SendMsg(0,0,0,0);//取弹旋转、0、下拨弹、上拨弹
 			break;
 		}
 		case NORMAL_STATE:	//正常操作模式

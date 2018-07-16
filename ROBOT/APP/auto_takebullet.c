@@ -6,7 +6,7 @@
 TakeBulletState_e TakeBulletState=BULLET_OTHER;	//（自动）取弹状态位
 AutoAimBulletTypeDef AutoAimBulletData={0};
 
-#define BULLETROTATE_OTHER	0	//非取弹位置
+#define BULLETROTATE_OTHER	18//0	//非取弹位置
 #define BULLETROTATE_WAITING	450//-750//650	//等待（对位）时位置
 #define BULLETROTATE_ACQUIRE	1030	//取弹位置
 #define BULLETROTATE_POUROUT	120	//倒弹位置
@@ -107,16 +107,16 @@ void TakeBullet_Control_Center(void)
 //		AutoAimBulletData.take_count=0;	//清零取块数量记录
 		AutoAimBulletData.aim_state=0;	//back
 		
-		if(AutoAimBulletData.take_count==0)	//第一次取块
-		{
-			AutoAimBulletData.control_state=1;	//第一次开启对位	//该变量影响自动对位底盘屏蔽
-			TakeBullet_AutoAimState=1;	//默认开启自动模式
-		}
-		else
-		{
+//		if(AutoAimBulletData.take_count==0)	//第一次取块
+//		{
+//			AutoAimBulletData.control_state=1;	//第一次开启对位	//该变量影响自动对位底盘屏蔽
+//			TakeBullet_AutoAimState=1;	//默认开启自动模式
+//		}
+//		else
+//		{
 			AutoAimBulletData.control_state=0;	//关闭对位	//该变量影响自动对位底盘屏蔽
 			TakeBullet_AutoAimState=0;	//默认关闭自动模式
-		}
+//		}
 		
 	}
 	

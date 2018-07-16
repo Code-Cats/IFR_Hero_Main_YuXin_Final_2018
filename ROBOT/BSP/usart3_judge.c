@@ -1,5 +1,7 @@
 #include "usart3_judge.h"
 
+extern u16 FRICTION_SHOOT;	//自动调整
+
 //extern OS_EVENT * judgeMsg;
 char g_judgeFlag = 0;
 char g_judgeLost = 0;
@@ -306,6 +308,7 @@ void USART3_IRQHandler(void)
 
 }
 
+
 void judgementDataHandler(void)
 {
   uint8_t cnt = 5;
@@ -347,6 +350,8 @@ void judgementDataHandler(void)
 		memcpy(&testShootData, (_USART3_DMA_RX_BUF[this_dma_type]+recordData),6);
 		shootedBulletNum++;
 		BulletNum_Simu_ADD();	//////////////////////////////////////////////////////////////////
+
+		Friction_Adjust_DependOn_fdbV(&FRICTION_SHOOT,testShootData.bulletSpeed);
 	}
 	
 	if(testcmdId == GetBuffId)	////////////////////////////////////////////

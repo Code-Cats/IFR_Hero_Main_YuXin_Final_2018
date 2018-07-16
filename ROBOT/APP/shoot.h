@@ -131,5 +131,5 @@ u8 Shoot_Heat_Limit(u16 heat,u16 maxheat);	//还应当限制射频
 u8 Shoot_Heat_Lost_Fre_Limit(void);	//裁判lost情况对射频的限制，反返回1是OK
 
 u16 Friction_Adjust_DependOn_Vol(float voltage);	//运算频率10HZ
-
+void Friction_Adjust_DependOn_fdbV(u16* friction_shoot,float bullet_fdbV);	//放在裁判反馈中断中
 #endif

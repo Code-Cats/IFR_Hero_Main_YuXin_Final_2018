@@ -24,7 +24,7 @@ extern u8 Robot_Level;
 
 u8 Friction_State=0;	//初始化不开启
 //const u16 FRICTION_INIT=800;
-u16 FRICTION_SHOOT=1640;//1470;//1540;	//发弹的PWM	在检录处测的射速13米每秒
+u16 FRICTION_SHOOT=1660;//1640白天;//1470;//1540;	//发弹的PWM	在检录处测的射速13米每秒
 u16 Friction_Send=FRICTION_INIT;
 void Shoot_Task(void)	//定时频率：1ms
 { 
@@ -209,6 +209,53 @@ u16 Friction_Adjust_DependOn_Vol(float voltage)	//运算频率10HZ
 	
 	return pwm_set;
 	//根据电压得出最优PWM
+}
+
+//目标速度15-16
+void Friction_Adjust_DependOn_fdbV(u16* friction_shoot,float bullet_fdbV)	//放在裁判反馈中断中
+{
+	static u16 error_count_down=0;
+	static u16 error_count_up=0;
+	static u16 error_upup=0;
+	static u16 error_downdown=0;
+	if(bullet_fdbV<14.5f)
+	{
+		error_downdown++;
+		if(error_downdown>1)
+		*friction_shoot+=(u16)((15.6f-bullet_fdbV)*15);
+	}
+	else if(bullet_fdbV>=16.4f)
+	{
+		error_upup++;
+		if(error_upup>1)
+		*friction_shoot-=(u16)((bullet_fdbV-15.5f)*12);
+	}
+	
+	if(bullet_fdbV>=14.5f&&bullet_fdbV<15.1f)
+	{
+		error_count_down++;
+		if(error_count_down>1)
+		{
+			*friction_shoot+=(u16)((15.6f-bullet_fdbV)*6);
+		}
+	}
+	
+	if(bullet_fdbV>=15.9f&&bullet_fdbV<16.4f)
+	{
+		error_count_up++;
+		if(error_count_up>1)
+		{
+			*friction_shoot-=(u16)((bullet_fdbV-15.6f)*6);
+		}
+	}
+	
+	if(bullet_fdbV<15.9f&&bullet_fdbV>15.1f)
+	{
+		error_count_down=0;
+		error_count_up=0;
+		error_upup=0;
+		error_downdown=0;
+	}
 }
 
 

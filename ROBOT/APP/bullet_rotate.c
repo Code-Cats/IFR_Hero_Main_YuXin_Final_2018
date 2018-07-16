@@ -15,8 +15,11 @@ extern ViceControlDataTypeDef ViceControlData;
 void BulletRotate_Task(void)
 {
 //	BulletRotate_Data.tarP=(s16)(12*(RC_Ctl.rc.ch3-1024)/600.0);
-	
-	BulletRotate_Data.tarV=PID_General(BulletRotate_Data.tarP,BulletRotate_Data.fdbP,&PID_BulletRotate_Position);
+	if(GetWorkState()!=CALI_STATE)
+	{
+			BulletRotate_Data.tarV=PID_General(BulletRotate_Data.tarP,BulletRotate_Data.fdbP,&PID_BulletRotate_Position);
+	}
+//	BulletRotate_Data.tarV=PID_General(BulletRotate_Data.tarP,BulletRotate_Data.fdbP,&PID_BulletRotate_Position);
 	
 	BulletRotate_Data.output=PID_General(BulletRotate_Data.tarV,BulletRotate_Data.fdbV,&PID_BulletRotate_Speed);
 	
@@ -59,3 +62,62 @@ u8 BulletRotate_OffSetInit(void)	//³õÊ¼OFFSET	//ÔÚcali(outputÎª0Ê±)×´Ì¬ÏÂ½øĞĞ±ê¶
 	return offset_statu;
 }
 
+
+u8 BulletRotate_Cali_Statu=0;
+u8 BulletRotate_Cali(void)	//³õÊ¼Î»ÖÃ±ê¶¨	//ÔÚÓĞÊä³ö×´Ì¬ÏÂ½øĞĞ±ê¶¨
+{
+	u8 cali_state=0;
+	if(Error_Check.statu[LOST_BULLETROTATE1]==0)	//»¹ÔÚ
+	{
+		switch(BulletRotate_Cali_Statu)
+		{
+			case 0:
+			{
+				static u16 time_count=0;
+				time_count++;	//1msÀÛ¼ÓÒ»´Î
+				BulletRotate_Data.tarV=-2000;
+				if(time_count>400)	//Õâ¸öÑÓÊ±Ä¿µÄÊÇÈ·±£µç»úÒÑ¾­Æô¶¯
+				{
+					time_count=0;
+					BulletRotate_Data.tarV=-1500;
+					BulletRotate_Cali_Statu=1;
+				}
+				break;
+			}
+			case 1:
+			{
+				static u16 time_count=0;
+				
+				BulletRotate_Data.tarV=-1500;
+				if(abs(BulletRotate_Data.fdbV)<20)
+				{
+					time_count++;	//1msÀÛ¼ÓÒ»´Î
+				}
+				else
+				{
+					time_count=0;
+				}
+				
+				if(time_count>500)	//±ê¶¨Íê³É
+				{
+					time_count=0;
+					BulletRotate_Cali_Statu=2;
+					BulletRotate_Data.offsetP=BulletRotate_Data.fdbP;
+				}
+				break;
+			}
+			case 2:
+			{
+				cali_state=1;
+				break;
+			}
+		}
+	}
+	else if(GetWorkState()==CALI_STATE)//¶ªÊ§·´À¡
+	{
+//		static u16 time_count=0;
+//		time_count++;	//1msÀÛ¼ÓÒ»´Î
+//		if(time_count>)
+	}
+	return cali_state;
+}
