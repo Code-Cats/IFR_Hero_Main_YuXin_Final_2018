@@ -222,7 +222,7 @@ void Work_State_Change(void)
 				time_count=0;
 			}
 			
-			if(Error_Check.statu[LOST_DBUS]==0&&time_count>8000)	//有反馈认为无法恢复
+			if(Error_Check.statu[LOST_DBUS]==0&&time_count>8000)	//有反馈认为无法恢复	（数据错乱）
 			{
 				time_count=0;
 				NVIC_SystemReset();
@@ -296,6 +296,7 @@ void Work_Execute(void)	//工作执行2018.7.1
 		}
 		case NORMAL_STATE:	//正常操作模式
 		{
+			BulletRotate_Cali();	//取弹时进行标定
 	//		Replenish_Bullet_Task(KeyBoardData[KEY_R].value);
 			Teleconltroller_Data_protect();	//遥控器数据保护
 			Yun_Task();	//开启云台处理
@@ -318,6 +319,7 @@ void Work_Execute(void)	//工作执行2018.7.1
 		}
 		case TAKEBULLET_STATE:
 		{
+			BulletRotate_Cali();	//取弹时进行标定
 			Teleconltroller_Data_protect();	//遥控器数据保护
 			TakeBullet_Control_Center();	//取弹控制中心
 			Yun_Task();	//开启云台处理

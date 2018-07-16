@@ -222,13 +222,13 @@ void Friction_Adjust_DependOn_fdbV(u16* friction_shoot,float bullet_fdbV)	//放在
 	{
 		error_downdown++;
 		if(error_downdown>1)
-		*friction_shoot+=(u16)((15.6f-bullet_fdbV)*15);
+		*friction_shoot+=(u16)((15.6f-bullet_fdbV)*13);
 	}
 	else if(bullet_fdbV>=16.4f)
 	{
 		error_upup++;
 		if(error_upup>1)
-		*friction_shoot-=(u16)((bullet_fdbV-15.5f)*12);
+		*friction_shoot-=(u16)((bullet_fdbV-15.5f)*10);
 	}
 	
 	if(bullet_fdbV>=14.5f&&bullet_fdbV<15.1f)
@@ -256,6 +256,9 @@ void Friction_Adjust_DependOn_fdbV(u16* friction_shoot,float bullet_fdbV)	//放在
 		error_upup=0;
 		error_downdown=0;
 	}
+	
+	if(*friction_shoot<1600)	*friction_shoot=1600;
+	if(*friction_shoot>1680)	*friction_shoot=1680;
 }
 
 

@@ -1,16 +1,16 @@
 #include "auto_takebullet.h"
 #include "main.h"
 
-#define LIFT_DISTANCE_BULLET 700
+#define LIFT_DISTANCE_BULLET 700d
 
 TakeBulletState_e TakeBulletState=BULLET_OTHER;	//（自动）取弹状态位
 AutoAimBulletTypeDef AutoAimBulletData={0};
 
 #define BULLETROTATE_OTHER	18//0	//非取弹位置
-#define BULLETROTATE_WAITING	450//-750//650	//等待（对位）时位置
-#define BULLETROTATE_ACQUIRE	1030	//取弹位置
-#define BULLETROTATE_POUROUT	120	//倒弹位置
-#define BULLETROTATE_THROWOUT	960//-280//310	//抛出位置
+#define BULLETROTATE_WAITING	476//455//-750//650	//等待（对位）时位置
+#define BULLETROTATE_ACQUIRE	1050//1030	//取弹位置
+#define BULLETROTATE_POUROUT	130//120	//倒弹位置
+#define BULLETROTATE_THROWOUT	970//960//-280//310	//抛出位置
 
 
 extern u32 time_1ms_count;
@@ -46,6 +46,7 @@ const u32 servo_POORdelay[2]={500,500};	//延时参数
 
 extern s16 Chassis_Vx;
 extern s16 Chassis_Vy;
+extern u8 BulletRotate_Cali_Statu;	//标定状态	//置0重新标定
 
 u8 TakeBullet_AutoAimState=1;	//默认开启自动对位，单词取弹模式可取消，对本次有效
 u8 t_statu=0;
@@ -68,13 +69,19 @@ void TakeBullet_Control_Center(void)
 	if(GetWorkState()==TAKEBULLET_STATE)	//5.9更新//上一版--》//取弹升降给DOWN-MID，前伸出发-夹紧一套给DOWN-MID-->DOWN-DOWN;舵机旋转给DOWN-MID-->DOWN-UP
 	{
 		static u8 key_ctrl_last=0;
-		
+		static u8 key_shift_last=0;
+			
 		if(key_ctrl_last==0&&KeyBoardData[KEY_CTRL].value==1)	//取弹模式按了CTRL就取消自动取块
 		{
 			TakeBullet_AutoAimState=!TakeBullet_AutoAimState;	//屏蔽自动对位模块
 		}
 		key_ctrl_last=KeyBoardData[KEY_CTRL].value;
 
+		if(key_shift_last==0&&KeyBoardData[KEY_SHIFT].value==1&&TakeBulletState==BULLET_WAITING)	//SHIFT重新开始取两块
+		{
+			AutoAimBulletData.take_count=0;
+		}
+		key_shift_last=KeyBoardData[KEY_SHIFT].value;
 		
 		if(State_Record!=TAKEBULLET_STATE)
 		{
@@ -89,6 +96,11 @@ void TakeBullet_Control_Center(void)
 		{
 			TakeBulletState=BULLET_WAITING;
 		}			
+		
+		if(TakeBulletState==BULLET_WAITING&&KeyBoardData[KEY_Q].value==1&&KeyBoardData[KEY_E].value==1)	//qe同时按重新标定
+		{
+			BulletRotate_Cali_Statu=0;	//重新标定
+		}
 	}	
 	else
 	{

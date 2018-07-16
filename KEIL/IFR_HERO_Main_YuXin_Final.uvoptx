@@ -349,6 +349,11 @@
           <WinNumber>1</WinNumber>
           <ItemText>limit_power_statu</ItemText>
         </Ww>
+        <Ww>
+          <count>29</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>BulletRotate_Cali_Statu</ItemText>
+        </Ww>
       </WatchWindow1>
       <WatchWindow2>
         <Ww>

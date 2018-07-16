@@ -12,10 +12,11 @@ PID_GENERAL   PID_BulletRotate_Speed=PID_BULLETROTATE_SPEED_DEFAULT;
 extern u32 time_1ms_count;
 extern ViceControlDataTypeDef ViceControlData;
 
+extern u8 BulletRotate_Cali_Statu;	//±ê¶¨×´Ì¬
 void BulletRotate_Task(void)
 {
 //	BulletRotate_Data.tarP=(s16)(12*(RC_Ctl.rc.ch3-1024)/600.0);
-	if(GetWorkState()!=CALI_STATE)
+	if(GetWorkState()!=CALI_STATE&&BulletRotate_Cali_Statu==2)	//±ê¶¨×´Ì¬
 	{
 			BulletRotate_Data.tarV=PID_General(BulletRotate_Data.tarP,BulletRotate_Data.fdbP,&PID_BulletRotate_Position);
 	}
@@ -62,7 +63,7 @@ u8 BulletRotate_OffSetInit(void)	//³õÊ¼OFFSET	//ÔÚcali(outputÎª0Ê±)×´Ì¬ÏÂ½øÐÐ±ê¶
 	return offset_statu;
 }
 
-
+extern LIFT_POSITION_ENCODER bulletrotate_position_encoder;	//ÇåÁãÈ¦Êý
 u8 BulletRotate_Cali_Statu=0;
 u8 BulletRotate_Cali(void)	//³õÊ¼Î»ÖÃ±ê¶¨	//ÔÚÓÐÊä³ö×´Ì¬ÏÂ½øÐÐ±ê¶¨
 {
@@ -92,6 +93,7 @@ u8 BulletRotate_Cali(void)	//³õÊ¼Î»ÖÃ±ê¶¨	//ÔÚÓÐÊä³ö×´Ì¬ÏÂ½øÐÐ±ê¶¨
 				if(abs(BulletRotate_Data.fdbV)<20)
 				{
 					time_count++;	//1msÀÛ¼ÓÒ»´Î
+					bulletrotate_position_encoder.turns=0;	//ÇåÁãÈ¦Êý
 				}
 				else
 				{
@@ -102,6 +104,7 @@ u8 BulletRotate_Cali(void)	//³õÊ¼Î»ÖÃ±ê¶¨	//ÔÚÓÐÊä³ö×´Ì¬ÏÂ½øÐÐ±ê¶¨
 				{
 					time_count=0;
 					BulletRotate_Cali_Statu=2;
+					//ÇåÁãÈ¦Êý
 					BulletRotate_Data.offsetP=BulletRotate_Data.fdbP;
 				}
 				break;

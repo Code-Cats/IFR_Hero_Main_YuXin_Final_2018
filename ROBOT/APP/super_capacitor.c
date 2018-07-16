@@ -132,11 +132,11 @@ void Super_Capacitor_Task(float power,float powerbuffer)
 //			SUPERCAPACITOR_INPUT=PWM_IO_ON;
 //		}
 		
-		if(SuperC_OutputTime>5000)	//大于6000ms即6s，处理频率1000HZ
+		if(SuperC_OutputTime>6000)	//大于6000ms即6s，处理频率1000HZ
 		{
 			SuperC_Output_Enable=0;
 		}
-		else if(SuperC_OutputTime<2200)
+		else if(SuperC_OutputTime<2500)
 		{
 			SuperC_Output_Enable=1;
 		}
