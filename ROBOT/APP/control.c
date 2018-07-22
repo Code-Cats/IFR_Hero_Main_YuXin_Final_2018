@@ -452,7 +452,7 @@ LED_Blink_Run();
 
 
 //extern YUN_MOTOR_DATA 			yunMotorData;
-extern BULLETROTATE_DATA BulletRotate_Data;
+extern BULLETROTATE_DATA BulletRotate_Data[2];
 s16 t_yaw_send,t_pitch_send=0;
 
 void Motor_Send(void)
@@ -490,7 +490,7 @@ void Motor_Send(void)
 //			CAN1_Yun_SendMsg(0,0);
 			CAN2_Chassis_SendMsg(0,0,0,0);
 //			CAN2_Shoot_SendMsg(0,0);//下拨弹、上拨弹
-			CAN2_Shoot_Bullet_SendMsg((s16)BulletRotate_Data.output,0,0,0);//取弹旋转、0、上拨弹、下拨弹
+			CAN2_Shoot_Bullet_SendMsg((s16)BulletRotate_Data[BULLETROTATE_RIGHT].output,0,0,0);//取弹旋转、0、上拨弹、下拨弹
 
 //			CAN2_Shoot_Bullet_SendMsg(0,0,0,0);//取弹旋转、0、下拨弹、上拨弹
 			break;
@@ -504,7 +504,7 @@ void Motor_Send(void)
 //		CAN_Chassis_SendMsg((s16)remote_tem,(s16)remote_tem,(s16)remote_tem,(s16)remote_tem);
 			CAN2_Chassis_SendMsg(chassis_Data.lf_wheel_output,chassis_Data.rf_wheel_output,chassis_Data.lb_wheel_output,chassis_Data.rb_wheel_output);
 ////			CAN2_Chassis_SendMsg(0,0,0,0);
-			CAN2_Shoot_Bullet_SendMsg((s16)BulletRotate_Data.output,0,(s16)shoot_Motor_Data_Up.output,(s16)shoot_Motor_Data_Down.output);//取弹旋转、0、上拨弹、下拨弹
+			CAN2_Shoot_Bullet_SendMsg((s16)BulletRotate_Data[BULLETROTATE_RIGHT].output,(s16)BulletRotate_Data[BULLETROTATE_LEFT].output,(s16)shoot_Motor_Data_Up.output,(s16)shoot_Motor_Data_Down.output);//取弹旋转、0、上拨弹、下拨弹
 			break;
 		}
 		case WAIST_STATE:
@@ -514,7 +514,7 @@ void Motor_Send(void)
 //		CAN_Chassis_SendMsg((s16)remote_tem,(s16)remote_tem,(s16)remote_tem,(s16)remote_tem);
 			CAN2_Chassis_SendMsg(chassis_Data.lf_wheel_output,chassis_Data.rf_wheel_output,chassis_Data.lb_wheel_output,chassis_Data.rb_wheel_output);
 //			CAN_Chassis_SendMsg(0,0,0,0);
-			CAN2_Shoot_Bullet_SendMsg((s16)BulletRotate_Data.output,0,(s16)shoot_Motor_Data_Up.output,(s16)shoot_Motor_Data_Down.output);//取弹旋转、0、上拨弹、下拨弹
+			CAN2_Shoot_Bullet_SendMsg((s16)BulletRotate_Data[BULLETROTATE_RIGHT].output,(s16)BulletRotate_Data[BULLETROTATE_LEFT].output,(s16)shoot_Motor_Data_Up.output,(s16)shoot_Motor_Data_Down.output);//取弹旋转、0、上拨弹、下拨弹
 			break;
 		}
 		case ERROR_STATE:	//错误模式
@@ -542,7 +542,7 @@ void Motor_Send(void)
 		{
 			CAN1_Yun_SendMsg(yunMotorData.yaw_output,yunMotorData.pitch_output);	//CAN2-1000	//取消反馈补偿
 			CAN2_Chassis_SendMsg(chassis_Data.lf_wheel_output,chassis_Data.rf_wheel_output,chassis_Data.lb_wheel_output,chassis_Data.rb_wheel_output);
-			CAN2_Shoot_Bullet_SendMsg((s16)BulletRotate_Data.output,0,(s16)shoot_Motor_Data_Up.output,(s16)shoot_Motor_Data_Down.output);//取弹旋转、0、上拨弹、下拨弹
+			CAN2_Shoot_Bullet_SendMsg((s16)BulletRotate_Data[BULLETROTATE_RIGHT].output,(s16)BulletRotate_Data[BULLETROTATE_LEFT].output,(s16)shoot_Motor_Data_Up.output,(s16)shoot_Motor_Data_Down.output);//取弹旋转、0、上拨弹、下拨弹
 			break;
 		}
 		default:

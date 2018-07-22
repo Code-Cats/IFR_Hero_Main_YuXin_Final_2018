@@ -1,7 +1,7 @@
 #include "can1_analysis.h"
 
-LIFT_POSITION_ENCODER bulletrotate_position_encoder={0};	//取弹旋转电机
-extern BULLETROTATE_DATA BulletRotate_Data;
+LIFT_POSITION_ENCODER bulletrotate_position_encoder[2]={0};	//取弹旋转电机
+extern BULLETROTATE_DATA BulletRotate_Data[2];
 
 extern YUN_MOTOR_DATA	yunMotorData;	//云台挂载在CAN1上，因为CAN2预留了6pin接口，云台不需要该接口，为不浪费，故接CAN1
 
@@ -24,16 +24,20 @@ void CAN1_Feedback_Analysis(CanRxMsg *rx_message)
 		CAN_Receive(CAN1, CAN_FIFO0, rx_message);//读取数据	
 		switch(rx_message->StdId)
 		{
-			case 0x201:
+			case 0x201:	//右
 			 {
-				Speed_Data_deal(&BulletRotate_Data.fdbV,rx_message);
-				Position_Data_deal_DIV81(&BulletRotate_Data.fdbP,&bulletrotate_position_encoder,rx_message);
-				BulletRotate_Data.fdbP-=BulletRotate_Data.offsetP;
+				Speed_Data_deal(&BulletRotate_Data[BULLETROTATE_RIGHT].fdbV,rx_message);
+				Position_Data_deal_DIV81(&BulletRotate_Data[BULLETROTATE_RIGHT].fdbP,&bulletrotate_position_encoder[BULLETROTATE_RIGHT],rx_message);
+				BulletRotate_Data[BULLETROTATE_RIGHT].fdbP-=BulletRotate_Data[BULLETROTATE_RIGHT].offsetP;
 				LostCountFeed(&Error_Check.count[LOST_BULLETROTATE1]);
 				 break;
 			 }
-			 case 0x202:
+			 case 0x202:	//左
 			 {
+				 Speed_Data_deal(&BulletRotate_Data[BULLETROTATE_LEFT].fdbV,rx_message);
+				 Position_Data_deal_DIV81(&BulletRotate_Data[BULLETROTATE_LEFT].fdbP,&bulletrotate_position_encoder[BULLETROTATE_LEFT],rx_message);
+			   BulletRotate_Data[BULLETROTATE_LEFT].fdbP-=BulletRotate_Data[BULLETROTATE_LEFT].offsetP;
+			   LostCountFeed(&Error_Check.count[LOST_BULLETROTATE2]);
 				 break;
 			 }
 			 case 0x203:	//shoot 上

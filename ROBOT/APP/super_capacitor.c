@@ -150,7 +150,7 @@ void Super_Capacitor_Task(float power,float powerbuffer)
 		SUPERCAPACITOR_OUTPUT=PWM_IO_ON;
 	}
 	
-//	SuperC_Output_Enable=0;	//试验
+	SuperC_Output_Enable=0;	//试验
 	
 //	if(powerbuffer<POWERBUFFER)	//20	//带底盘可控的版本
 //	{

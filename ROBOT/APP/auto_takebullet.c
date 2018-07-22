@@ -8,10 +8,11 @@ AutoAimBulletTypeDef AutoAimBulletData={0};
 
 #define BULLETROTATE_OTHER	18//0	//非取弹位置
 #define BULLETROTATE_WAITING	476//455//-750//650	//等待（对位）时位置
-#define BULLETROTATE_ACQUIRE	1050//1030	//取弹位置
-#define BULLETROTATE_POUROUT	130//120	//倒弹位置
+#define BULLETROTATE_ACQUIRE	1050//1050//1030	//取弹位置
+#define BULLETROTATE_POUROUT	80//130//120	//倒弹位置
 #define BULLETROTATE_THROWOUT	970//960//-280//310	//抛出位置
 
+#define BULLETROTATE_POUROUT_DELAY	200	//300ms
 
 extern u32 time_1ms_count;
 extern KeyBoardTypeDef KeyBoardData[KEY_NUMS];
@@ -52,6 +53,8 @@ u8 TakeBullet_AutoAimState=1;	//默认开启自动对位，单词取弹模式可取消，对本次有效
 u8 t_statu=0;
 void TakeBullet_Control_Center(void)
 {
+	static u32 time_record_pourout=0;	//用来记录倒弹延时等待
+	
 	static u8 swicth_Last_state=0;	//右拨杆
 	
 	static u8 valve_last[6]={0};	//记录上一次数值	//保持与工程车兼容性
@@ -129,7 +132,7 @@ void TakeBullet_Control_Center(void)
 			AutoAimBulletData.control_state=0;	//关闭对位	//该变量影响自动对位底盘屏蔽
 			TakeBullet_AutoAimState=0;	//默认关闭自动模式
 //		}
-		
+		time_record_pourout=0;	//防止意外退出导致BUG
 	}
 	
 	if(State_Record==TAKEBULLET_STATE&&GetWorkState()!=TAKEBULLET_STATE)	//退出取弹模式
@@ -140,6 +143,8 @@ void TakeBullet_Control_Center(void)
 //		AutoAimBulletData.take_count=0;	//清零取块数量记录
 		AutoAimBulletData.aim_state=0;	//back
 		TakeBullet_AutoAimState=0;	//默认关闭自动模式
+		
+		time_record_pourout=0;	//防止意外退出导致BUG
 	}
 	
 	
@@ -228,11 +233,21 @@ void TakeBullet_Control_Center(void)
 			}
 			case BULLET_POUROUT1:	//车身倾斜、舵机旋转	称之为倒弹过程
 			{
+//				static u32 time_record=0;
 				
 				BulletRotate_Data.tarP=BULLETROTATE_POUROUT;
 				if(abs(BulletRotate_Data.fdbP-BULLETROTATE_POUROUT)<50)
 				{
-					TakeBulletState=BULLET_THROWOUT1;	//切换到扔出
+					if(time_record_pourout==0)
+					{
+						time_record_pourout=time_1ms_count;	//记录进入的时间
+					}
+					
+					if(time_record_pourout!=0&&time_1ms_count-time_record_pourout>BULLETROTATE_POUROUT_DELAY)	//300ms延时
+					{
+						TakeBulletState=BULLET_THROWOUT1;	//切换到扔出
+						time_record_pourout=0;
+					}
 				}
 				break;
 			}
@@ -288,11 +303,22 @@ void TakeBullet_Control_Center(void)
 			}
 			case BULLET_POUROUT2:	//车身倾斜、舵机旋转	称之为倒弹过程2
 			{
+//				static u32 time_record=0;
 				
 				BulletRotate_Data.tarP=BULLETROTATE_POUROUT;
 				if(abs(BulletRotate_Data.fdbP-BULLETROTATE_POUROUT)<50)
 				{
-					TakeBulletState=BULLET_THROWOUT2;	//切换到扔出
+					if(time_record_pourout==0)
+					{
+						time_record_pourout=time_1ms_count;	//记录进入的时间
+					}
+					
+					if(time_record_pourout!=0&&time_1ms_count-time_record_pourout>BULLETROTATE_POUROUT_DELAY)	//300ms延时
+					{
+						TakeBulletState=BULLET_THROWOUT2;	//切换到扔出
+						time_record_pourout=0;
+					}
+					
 				}
 				break;
 			}
@@ -464,11 +490,22 @@ void TakeBullet_Control_Center(void)
 			}
 			case BULLET_POUROUT1:	//车身倾斜、舵机旋转	称之为倒弹过程
 			{
+//				static u32 time_record=0;
 				
 				BulletRotate_Data.tarP=BULLETROTATE_POUROUT;
 				if(abs(BulletRotate_Data.fdbP-BULLETROTATE_POUROUT)<50)
 				{
-					TakeBulletState=BULLET_THROWOUT1;	//切换到扔出
+					if(time_record_pourout==0)
+					{
+						time_record_pourout=time_1ms_count;	//记录进入的时间
+					}
+					
+					if(time_record_pourout!=0&&time_1ms_count-time_record_pourout>BULLETROTATE_POUROUT_DELAY)	//300ms延时
+					{
+						TakeBulletState=BULLET_THROWOUT1;	//切换到扔出
+						time_record_pourout=0;
+					}
+					
 				}
 				break;
 			}
@@ -708,8 +745,8 @@ void TakeBullet_Control_Center(void)
 
 
 #define AUTOAIM_SPEENX	7	//向前压力
-#define AUTOAIM_VOIDSPEEDY	130//110	//自动取块空时对位速度	//以向右为正方向
-#define AUTOAIM_EXISTSPEEDY	75//55	//自动取块有障碍时速度
+#define AUTOAIM_VOIDSPEEDY	150//130//110	//自动取块空时对位速度	//以向右为正方向
+#define AUTOAIM_EXISTSPEEDY	120//75//55	//自动取块有障碍时速度
 u8 AutoAimBullet_Task(s16* chassis_vx,s16* chassis_vy)	//自动对位任务
 {
 	static u8 aim_control_state_last=0;

@@ -15,7 +15,8 @@ enum LOST_TYPES
 	LOST_CM4,
 	LOST_YAW,
 	LOST_PITCH,
-	LOST_BULLETROTATE1,	//取弹一号电机，CAN1 ID201
+	LOST_BULLETROTATE1,	//取弹一号电机，CAN1 ID201	右
+	LOST_BULLETROTATE2,	//取弹二号电机，CAN1 ID202	左
 	LOST_SM_DOWN,
 	LOST_SM_UP,
 	LOST_TYPE_NUM,
@@ -38,6 +39,7 @@ extern Error_check_t Error_Check;
 	4,\
 	10,\
 	10,\
+	4,\
 	4,\
 	4,\
 	4,\

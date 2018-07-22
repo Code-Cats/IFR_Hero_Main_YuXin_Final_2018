@@ -781,7 +781,7 @@ float Limit_Power(float power,float powerbuffer)	//Ó¢ĞÛ120JÈÈÁ¿ÏŞÖÆ£¬Ö±½ÓÏŞÖÆ×ÜÊ
 	else	//µçÈİ¿ÉÒÔ·Åµç£¬·Å¿íÏŞÖÆ
 	{
 		limit_power_statu=2;
-		limit_k=3.0f*powerbuffer/125.0f+0.16f;//+0.25f;	//30j¿ªÊ¼ÏŞÖÆ
+		limit_k=3.0f*powerbuffer/125.0f+0.1f;//+0.16f;//+0.25f;	//30j¿ªÊ¼ÏŞÖÆ
 		limit_k=limit_k>1?1:limit_k;
 		limit_k=limit_k<0.1f?0.1f:limit_k;
 	}
