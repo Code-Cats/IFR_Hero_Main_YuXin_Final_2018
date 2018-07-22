@@ -164,7 +164,8 @@ typedef struct  __JUDGEMENT_DATA__
 }JUDGEMENT_DATA;
 extern u8 JudgeSendBuff[22];
 void Judgement_DataSend(float a,float b,float c,uint8_t d);
-void Judagement_Send_Change_hero(float *a,float *b,float *c,uint8_t *d);
+uint8_t Judagement_Send_Guiding_lights(u8 stateA, u8 stateB, u8 stateC, u8 stateD, u8 stateE, u8 stateF);
+//void Judagement_Send_Change_hero(float *a,float *b,float *c,uint8_t *d);
 extern uint8_t judgementBuf[];
 extern JUDGEMENT_DATA judgementData;
 extern tFrameHeader            testFrameHeader;

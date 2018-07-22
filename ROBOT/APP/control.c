@@ -46,7 +46,7 @@ void Control_Task(void)	//2ms
 {
 	time_1ms_count++;
 
-	if(time_1ms_count%100==0)
+	if(time_1ms_count%100==0)	//裁判数据刷新，10HZ
 	{
 		Judge_Send_Statu=1; 
 	}
@@ -88,10 +88,10 @@ void Control_Task(void)	//2ms
 	LED_Indicate();
 	
 	Motor_Send();
-	if(time_1ms_count%2==0)
+	if(time_1ms_count>1000&&time_1ms_count%2==0)	//1s后500hz频率
 	{
 		ViceBoard_SendDataRefresh();
-		ViceBoard_SendDataRun();
+//		ViceBoard_SendDataRun();
 	}
 	
 }

@@ -381,6 +381,7 @@ void judgementDataHandler(void)
 	if(testcmdId == GameRobotStateId)
 		memcpy(&testGameRobotState, (_USART3_DMA_RX_BUF[this_dma_type]+recordData), 8);
 }
+
 union var
 {
   char c[4];
@@ -435,47 +436,12 @@ void Judgement_DataSend(float a,float b,float c,uint8_t d)
 		}
 }
 
-void Judagement_Send_Change_hero(float *a,float *b,float *c,uint8_t *d)
+u8 Guiding_Lights_Data=0;	//指示灯
+uint8_t Judagement_Send_Guiding_lights(u8 stateA, u8 stateB, u8 stateC, u8 stateD, u8 stateE, u8 stateF)
 {
-//		char color=testStudentPropInfo.RobotColor;	
-//		//获取弹量，数值a不做任何操作,
-//		if(color==0)//该机器人为红
-//		{
-//		//基地无敌状态	
-//		if(testStudentPropInfo.BlueBaseSta==0x01)*a=1000.001;
-//		else 	*a=1111.111;
-//		//恢复立柱状态
-//		if(testStudentPropInfo.BlueAirPortSta==0x02)*b=1999.001;
-//		else if(testStudentPropInfo.BlueAirPortSta==0x03)*b=1999.991;
-//		else 	*b=1000.001;
-//		//大神符状态	
-//		if((testStudentPropInfo.No0BigRuneSta==0x03)||(testStudentPropInfo.No1BigRuneSta==0x03))*c=1555.001;
-//		else if((testStudentPropInfo.No0BigRuneSta==0x05)||(testStudentPropInfo.No1BigRuneSta==0x05))*c=1555.551;
-//		else 	*c=1000.001;		
-//		}
-//		else if(color==1)//该机器人为蓝
-//		{
-//		if(testStudentPropInfo.RedBaseSta==0x01)*a=1000.001;
-//		else 	*a=1111.111;
-//		//神符立柱状态
-//		if(testStudentPropInfo.RedAirPortSta==0x02)*b=1999.001;
-//		else if(testStudentPropInfo.RedAirPortSta==0x03)*b=1999.991;
-//		else 	*b=1000.001;
-//		//大神符状态	
-//		if((testStudentPropInfo.No0BigRuneSta==0x02)||(testStudentPropInfo.No1BigRuneSta==0x02))*c=1555.001;
-//		else if((testStudentPropInfo.No0BigRuneSta==0x04)||(testStudentPropInfo.No1BigRuneSta==0x04))*c=1555.551;
-//		else 	*c=1000.001;		
-//		}
-//		else//获取数据失败
-//		{
-//		*a=0;
-//		*b=0;
-//		*c=0;	
-//		}
-		*a=1.00;
-		*b=2.00;
-		*c=3.00;	
-    *d=4;	
+    static uint8_t output=0;
+    output=stateA|(stateB<<1)|(stateC<<2)|(stateD<<3)|(stateE<<4)|(stateF<<5);
+    return output;
 }
 
 /*

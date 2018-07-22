@@ -34,7 +34,7 @@ float yaw_follow_error=0;	//»¡¶ÈÖÆ±ØĞë¸¡µã	//ÕâÀïÔÚÔÆÌ¨ÄÇÀïÅ¤Ñü²¿·Ö»áÓÃµ½
 /*************************************************************/
 
 
-#define WAIST_RANGE 780//750
+#define WAIST_RANGE 800//721¸Ä780//750
 #define K_SPEED 10
 s32 t_Vw_PID=0;
 s32 yaw_follow_tarP=YAW_INIT_DEFINE;
@@ -115,7 +115,7 @@ void Chassis_Control_External_Solution(void)	//ÍÓÂİÒÇÕı³£µÄµ×ÅÌ½â¾ö·½°¸
 			case 0:
 			{
 				YAW_INIT=yaw_init_def-WAIST_RANGE;
-				if(abs(YAW_INIT-yunMotorData.yaw_fdbP)<58)
+				if(abs(YAW_INIT-yunMotorData.yaw_fdbP)<58)	//ÓÅ»¯-´óÓÚÒ»¸ö0¸½½ü ¸ºÖµ¾Í¿ÉÒÔ
 				{
 					turn_flag=1;
 				}
@@ -124,7 +124,7 @@ void Chassis_Control_External_Solution(void)	//ÍÓÂİÒÇÕı³£µÄµ×ÅÌ½â¾ö·½°¸
 			case 1:
 			{
 				YAW_INIT=yaw_init_def+WAIST_RANGE;
-				if(abs(YAW_INIT-yunMotorData.yaw_fdbP)<58)
+				if(abs(YAW_INIT-yunMotorData.yaw_fdbP)<58)	//ÓÅ»¯-Ğ¡ÓÚÒ»¸ö0¸½½üµÄÕıÖµ
 				{
 					turn_flag=0;
 				}
@@ -774,14 +774,14 @@ float Limit_Power(float power,float powerbuffer)	//Ó¢ĞÛ120JÈÈÁ¿ÏŞÖÆ£¬Ö±½ÓÏŞÖÆ×ÜÊ
 	if(SuperC_Output_Enable==0)//µçÈİ²»ÄÜ·Åµç
 	{
 		limit_power_statu=1;
-		limit_k=3.0f*powerbuffer/200.0f+0.1f;	//0.4
+		limit_k=3.0f*powerbuffer/200.0f+0.08f;	//0.4
 		limit_k=limit_k>1?1:limit_k;
 		limit_k=limit_k<0.1f?0.1f:limit_k;
 	}
 	else	//µçÈİ¿ÉÒÔ·Åµç£¬·Å¿íÏŞÖÆ
 	{
 		limit_power_statu=2;
-		limit_k=3.0f*powerbuffer/120.0f+0.30f;//+0.25f;	//30j¿ªÊ¼ÏŞÖÆ
+		limit_k=3.0f*powerbuffer/125.0f+0.16f;//+0.25f;	//30j¿ªÊ¼ÏŞÖÆ
 		limit_k=limit_k>1?1:limit_k;
 		limit_k=limit_k<0.1f?0.1f:limit_k;
 	}
