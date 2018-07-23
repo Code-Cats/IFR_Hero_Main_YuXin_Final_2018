@@ -83,10 +83,12 @@ u8 BulletRotate_Cali(void)	//初始位置标定	//在有输出状态下进行标定
 				static u16 time_count=0;
 				time_count++;	//1ms累加一次
 				BulletRotate_Data[BULLETROTATE_RIGHT].tarV=-2000;
+				BulletRotate_Data[BULLETROTATE_LEFT].tarV=2000;
 				if(time_count>400)	//这个延时目的是确保电机已经启动
 				{
 					time_count=0;
 					BulletRotate_Data[BULLETROTATE_RIGHT].tarV=-1500;
+					BulletRotate_Data[BULLETROTATE_LEFT].tarV=1500;
 					BulletRotate_Cali_Statu=1;
 				}
 				break;
@@ -96,6 +98,7 @@ u8 BulletRotate_Cali(void)	//初始位置标定	//在有输出状态下进行标定
 				static u16 time_count=0;
 				
 				BulletRotate_Data[BULLETROTATE_RIGHT].tarV=-1500;
+				BulletRotate_Data[BULLETROTATE_LEFT].tarV=1500;
 				if(abs(BulletRotate_Data[BULLETROTATE_RIGHT].fdbV)<20)
 				{
 					time_count++;	//1ms累加一次

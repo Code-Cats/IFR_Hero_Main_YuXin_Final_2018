@@ -21,7 +21,7 @@ extern ViceControlDataTypeDef ViceControlData;
 extern PID_GENERAL PID_Chassis_Speed[4];
 extern u8 Replenish_Bullet_Statu;	//补弹模式特殊舵机状态
 
-extern BULLETROTATE_DATA BulletRotate_Data;	//国赛版
+extern BULLETROTATE_DATA BulletRotate_Data[2];	//国赛版
 
 extern SensorDataTypeDef SensorData;
 
@@ -36,7 +36,7 @@ float pwm_r_t=STEER_UP_R_INIT;
 u8 valve_fdbstate[6]={0};	//记录是否伸出的反馈标志
 u8 servo_fdbstate[2]={0};
 const u32 valve_GOODdelay[6]={370,370,300,1000,1000,1000};	//0--1//待加入，延时参数
-const u32 valve_POORdelay[6]={370,370,100,1000,1000,1000};	//1--0//待加入，延时参数
+const u32 valve_POORdelay[6]={370,370,70,1000,1000,1000};	//1--0//待加入，延时参数
 const u32 servo_GOODdelay[2]={2500,800};	//延时参数	//第一段为2500是将子弹落下的延时也加进去了，因为舵机翻转和子弹下落必须是连在一体的
 const u32 servo_POORdelay[2]={500,500};	//延时参数
 
@@ -208,8 +208,8 @@ void TakeBullet_Control_Center(void)
 				
 				if(valve_fdbstate[VALVE_BULLET_CLAMP]==0)	//气缸松开
 				{
-					BulletRotate_Data.tarP=BULLETROTATE_WAITING;
-					if(abs(BulletRotate_Data.fdbP-BULLETROTATE_WAITING)<30)	//电机收回
+					BulletRotate_Data[BULLETROTATE_RIGHT].tarP=BULLETROTATE_WAITING;
+					if(abs(BulletRotate_Data[BULLETROTATE_RIGHT].fdbP-BULLETROTATE_WAITING)<30)	//电机收回
 					{
 						ViceControlData.valve[VALVE_BULLET_HORIZONTAL1]=0;
 						ViceControlData.valve[VALVE_BULLET_HORIZONTAL2]=1;
@@ -220,8 +220,8 @@ void TakeBullet_Control_Center(void)
 			}
 			case BULLET_ACQUIRE1:	//前伸、夹紧、抬起动作	称之为获得过程
 			{
-				BulletRotate_Data.tarP=BULLETROTATE_ACQUIRE;
-				if(abs(BulletRotate_Data.fdbP-BULLETROTATE_ACQUIRE)<45)
+				BulletRotate_Data[BULLETROTATE_RIGHT].tarP=BULLETROTATE_ACQUIRE;
+				if(abs(BulletRotate_Data[BULLETROTATE_RIGHT].fdbP-BULLETROTATE_ACQUIRE)<45)
 				{
 					ViceControlData.valve[VALVE_BULLET_CLAMP]=1;
 					if(valve_fdbstate[VALVE_BULLET_CLAMP]==1)
@@ -235,8 +235,8 @@ void TakeBullet_Control_Center(void)
 			{
 //				static u32 time_record=0;
 				
-				BulletRotate_Data.tarP=BULLETROTATE_POUROUT;
-				if(abs(BulletRotate_Data.fdbP-BULLETROTATE_POUROUT)<50)
+				BulletRotate_Data[BULLETROTATE_RIGHT].tarP=BULLETROTATE_POUROUT;
+				if(abs(BulletRotate_Data[BULLETROTATE_RIGHT].fdbP-BULLETROTATE_POUROUT)<50)
 				{
 					if(time_record_pourout==0)
 					{
@@ -256,19 +256,19 @@ void TakeBullet_Control_Center(void)
 				
 				if(valve_fdbstate[VALVE_BULLET_CLAMP]==1)	//夹紧时放下，放下后回来
 				{
-					BulletRotate_Data.tarP=BULLETROTATE_THROWOUT;
+					BulletRotate_Data[BULLETROTATE_RIGHT].tarP=BULLETROTATE_THROWOUT;
 				}
 				
-				if(abs(BulletRotate_Data.fdbP-BULLETROTATE_THROWOUT)<40)	//放回原位
+				if(abs(BulletRotate_Data[BULLETROTATE_RIGHT].fdbP-BULLETROTATE_THROWOUT)<40)	//放回原位
 				{
 					ViceControlData.valve[VALVE_BULLET_CLAMP]=0;
 				}
 				
 				if(valve_fdbstate[VALVE_BULLET_CLAMP]==0)	//已经松开，开始回来
 				{
-					BulletRotate_Data.tarP=BULLETROTATE_WAITING;
+					BulletRotate_Data[BULLETROTATE_RIGHT].tarP=BULLETROTATE_WAITING;
 					
-					if((BulletRotate_Data.fdbP-BULLETROTATE_THROWOUT)<-60)	//微微抬起后开始平移
+					if((BulletRotate_Data[BULLETROTATE_RIGHT].fdbP-BULLETROTATE_THROWOUT)<-60)	//微微抬起后开始平移
 					{
 						ViceControlData.valve[VALVE_BULLET_HORIZONTAL1]=1;
 						ViceControlData.valve[VALVE_BULLET_HORIZONTAL2]=0;
@@ -278,7 +278,7 @@ void TakeBullet_Control_Center(void)
 				
 				
 				
-				if(valve_fdbstate[VALVE_BULLET_CLAMP]==0&&abs(BulletRotate_Data.fdbP-BULLETROTATE_WAITING)<40)	//松开后且到准备位置，可以开始下一次
+				if(valve_fdbstate[VALVE_BULLET_CLAMP]==0&&abs(BulletRotate_Data[BULLETROTATE_RIGHT].fdbP-BULLETROTATE_WAITING)<40)	//松开后且到准备位置，可以开始下一次
 				{
 					TakeBulletState=BULLET_ACQUIRE2;	//下一次取弹
 					TakeBullet_AutoAimState=0;	//取到第一个块之后取消自动对位，好处是如果第一个块不成功就一直保持自动对位
@@ -289,8 +289,8 @@ void TakeBullet_Control_Center(void)
 			{
 				if(valve_fdbstate[VALVE_BULLET_HORIZONTAL1]==1)	//气缸平移
 				{
-					BulletRotate_Data.tarP=BULLETROTATE_ACQUIRE;
-					if(abs(BulletRotate_Data.fdbP-BULLETROTATE_ACQUIRE)<45)
+					BulletRotate_Data[BULLETROTATE_RIGHT].tarP=BULLETROTATE_ACQUIRE;
+					if(abs(BulletRotate_Data[BULLETROTATE_RIGHT].fdbP-BULLETROTATE_ACQUIRE)<45)
 					{
 						ViceControlData.valve[VALVE_BULLET_CLAMP]=1;
 						if(valve_fdbstate[VALVE_BULLET_CLAMP]==1)
@@ -305,8 +305,8 @@ void TakeBullet_Control_Center(void)
 			{
 //				static u32 time_record=0;
 				
-				BulletRotate_Data.tarP=BULLETROTATE_POUROUT;
-				if(abs(BulletRotate_Data.fdbP-BULLETROTATE_POUROUT)<50)
+				BulletRotate_Data[BULLETROTATE_RIGHT].tarP=BULLETROTATE_POUROUT;
+				if(abs(BulletRotate_Data[BULLETROTATE_RIGHT].fdbP-BULLETROTATE_POUROUT)<50)
 				{
 					if(time_record_pourout==0)
 					{
@@ -328,17 +328,17 @@ void TakeBullet_Control_Center(void)
 				
 				if(valve_fdbstate[VALVE_BULLET_CLAMP]==1)	//夹紧时放下，放下后回来
 				{
-					BulletRotate_Data.tarP=BULLETROTATE_THROWOUT;
+					BulletRotate_Data[BULLETROTATE_RIGHT].tarP=BULLETROTATE_THROWOUT;
 				}
 				
-				if(abs(BulletRotate_Data.fdbP-BULLETROTATE_THROWOUT)<40)	//放回原位
+				if(abs(BulletRotate_Data[BULLETROTATE_RIGHT].fdbP-BULLETROTATE_THROWOUT)<40)	//放回原位
 				{
 					ViceControlData.valve[VALVE_BULLET_CLAMP]=0;
 				}
 				
 				if(valve_fdbstate[VALVE_BULLET_CLAMP]==0)	//已经松开，开始回来
 				{
-					BulletRotate_Data.tarP=BULLETROTATE_WAITING;
+					BulletRotate_Data[BULLETROTATE_RIGHT].tarP=BULLETROTATE_WAITING;
 					
 	////////////				if((BulletRotate_Data.fdbP-BULLETROTATE_THROWOUT)>60)	//微微抬起后开始平移
 	////////////				{
@@ -348,7 +348,7 @@ void TakeBullet_Control_Center(void)
 	////////////				}
 				}
 				
-				if(valve_fdbstate[VALVE_BULLET_CLAMP]==0&&abs(BulletRotate_Data.fdbP-BULLETROTATE_WAITING)<40)	//松开后且到准备位置，可以开始下一次
+				if(valve_fdbstate[VALVE_BULLET_CLAMP]==0&&abs(BulletRotate_Data[BULLETROTATE_RIGHT].fdbP-BULLETROTATE_WAITING)<40)	//松开后且到准备位置，可以开始下一次
 				{
 					TakeBulletState=BULLET_WAITING;	//下一次取弹
 					AutoAimBulletData.take_count+=2;	//标记取弹数量+2
@@ -421,7 +421,7 @@ void TakeBullet_Control_Center(void)
 				
 			if(valve_fdbstate[VALVE_BULLET_HORIZONTAL1]==0&&valve_fdbstate[VALVE_BULLET_HORIZONTAL2]==0)
 			{
-				BulletRotate_Data.tarP=BULLETROTATE_OTHER;
+				BulletRotate_Data[BULLETROTATE_RIGHT].tarP=BULLETROTATE_OTHER;
 			}
 
 				
@@ -465,8 +465,8 @@ void TakeBullet_Control_Center(void)
 				
 				if(valve_fdbstate[VALVE_BULLET_CLAMP]==0)	//气缸松开
 				{
-					BulletRotate_Data.tarP=BULLETROTATE_WAITING;
-					if(abs(BulletRotate_Data.fdbP-BULLETROTATE_WAITING)<30)	//电机收回
+					BulletRotate_Data[BULLETROTATE_RIGHT].tarP=BULLETROTATE_WAITING;
+					if(abs(BulletRotate_Data[BULLETROTATE_RIGHT].fdbP-BULLETROTATE_WAITING)<30)	//电机收回
 					{
 						ViceControlData.valve[VALVE_BULLET_HORIZONTAL1]=1;
 						ViceControlData.valve[VALVE_BULLET_HORIZONTAL2]=0;
@@ -477,8 +477,8 @@ void TakeBullet_Control_Center(void)
 			}
 			case BULLET_ACQUIRE1:	//前伸、夹紧、抬起动作	称之为获得过程
 			{
-				BulletRotate_Data.tarP=BULLETROTATE_ACQUIRE;
-				if(abs(BulletRotate_Data.fdbP-BULLETROTATE_ACQUIRE)<45)
+				BulletRotate_Data[BULLETROTATE_RIGHT].tarP=BULLETROTATE_ACQUIRE;
+				if(abs(BulletRotate_Data[BULLETROTATE_RIGHT].fdbP-BULLETROTATE_ACQUIRE)<45)
 				{
 					ViceControlData.valve[VALVE_BULLET_CLAMP]=1;
 					if(valve_fdbstate[VALVE_BULLET_CLAMP]==1)
@@ -492,8 +492,8 @@ void TakeBullet_Control_Center(void)
 			{
 //				static u32 time_record=0;
 				
-				BulletRotate_Data.tarP=BULLETROTATE_POUROUT;
-				if(abs(BulletRotate_Data.fdbP-BULLETROTATE_POUROUT)<50)
+				BulletRotate_Data[BULLETROTATE_RIGHT].tarP=BULLETROTATE_POUROUT;
+				if(abs(BulletRotate_Data[BULLETROTATE_RIGHT].fdbP-BULLETROTATE_POUROUT)<50)
 				{
 					if(time_record_pourout==0)
 					{
@@ -514,19 +514,19 @@ void TakeBullet_Control_Center(void)
 				
 				if(valve_fdbstate[VALVE_BULLET_CLAMP]==1)	//夹紧时放下，放下后回来
 				{
-					BulletRotate_Data.tarP=BULLETROTATE_THROWOUT;
+					BulletRotate_Data[BULLETROTATE_RIGHT].tarP=BULLETROTATE_THROWOUT;
 				}
 				
-				if(abs(BulletRotate_Data.fdbP-BULLETROTATE_THROWOUT)<40)	//放回原位
+				if(abs(BulletRotate_Data[BULLETROTATE_RIGHT].fdbP-BULLETROTATE_THROWOUT)<40)	//放回原位
 				{
 					ViceControlData.valve[VALVE_BULLET_CLAMP]=0;
 				}
 				
 				if(valve_fdbstate[VALVE_BULLET_CLAMP]==0)	//已经松开，开始回来
 				{
-					BulletRotate_Data.tarP=BULLETROTATE_WAITING;
+					BulletRotate_Data[BULLETROTATE_RIGHT].tarP=BULLETROTATE_WAITING;
 					
-					if((BulletRotate_Data.fdbP-BULLETROTATE_THROWOUT)<-60)	//微微抬起后开始平移
+					if((BulletRotate_Data[BULLETROTATE_RIGHT].fdbP-BULLETROTATE_THROWOUT)<-60)	//微微抬起后开始平移
 					{
 						ViceControlData.valve[VALVE_BULLET_HORIZONTAL1]=1;
 						ViceControlData.valve[VALVE_BULLET_HORIZONTAL2]=0;
@@ -535,7 +535,7 @@ void TakeBullet_Control_Center(void)
 				
 				
 				
-				if(valve_fdbstate[VALVE_BULLET_CLAMP]==0&&abs(BulletRotate_Data.fdbP-BULLETROTATE_WAITING)<40)	//松开后且到准备位置，可以开始下一次
+				if(valve_fdbstate[VALVE_BULLET_CLAMP]==0&&abs(BulletRotate_Data[BULLETROTATE_RIGHT].fdbP-BULLETROTATE_WAITING)<40)	//松开后且到准备位置，可以开始下一次
 				{
 					TakeBulletState=BULLET_WAITING;	//下一次取弹
 					AutoAimBulletData.take_count+=1;	//标记取弹数量+1
@@ -608,7 +608,7 @@ void TakeBullet_Control_Center(void)
 				
 			if(valve_fdbstate[VALVE_BULLET_HORIZONTAL1]==0&&valve_fdbstate[VALVE_BULLET_HORIZONTAL2]==0)
 			{
-				BulletRotate_Data.tarP=BULLETROTATE_OTHER;
+				BulletRotate_Data[BULLETROTATE_RIGHT].tarP=BULLETROTATE_OTHER;
 			}
 
 				

@@ -125,7 +125,7 @@ void Work_State_Change(void)
 		}
 		case NORMAL_STATE:	//正常操作模式
 		{
-			if(RC_Ctl.rc.switch_left==RC_SWITCH_MIDDLE&&RC_Ctl.rc.switch_right==RC_SWITCH_MIDDLE)	//左中右中
+			if(RC_Ctl.rc.switch_left==RC_SWITCH_MIDDLE)	//左中右中		&&RC_Ctl.rc.switch_right==RC_SWITCH_MIDDLE
 			{
 				SetWorkState(STOP_STATE);
 			}
@@ -157,7 +157,7 @@ void Work_State_Change(void)
 			{
 				SetWorkState(NORMAL_STATE);
 			}
-			if(RC_Ctl.rc.switch_left==RC_SWITCH_MIDDLE&&RC_Ctl.rc.switch_right==RC_SWITCH_MIDDLE)	//左中
+			if(RC_Ctl.rc.switch_left==RC_SWITCH_MIDDLE)	//左中	&&RC_Ctl.rc.switch_right==RC_SWITCH_MIDDLE
 			{
 				SetWorkState(STOP_STATE);
 			}
@@ -165,7 +165,7 @@ void Work_State_Change(void)
 		}
 		case TAKEBULLET_STATE:	//取弹模式
 		{
-			if(RC_Ctl.rc.switch_left==RC_SWITCH_MIDDLE&&RC_Ctl.rc.switch_right==RC_SWITCH_MIDDLE)	//左中
+			if(RC_Ctl.rc.switch_left==RC_SWITCH_MIDDLE)	//左中	&&RC_Ctl.rc.switch_right==RC_SWITCH_MIDDLE
 			{
 				SetWorkState(STOP_STATE);
 			}
