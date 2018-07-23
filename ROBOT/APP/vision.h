@@ -13,6 +13,8 @@ void Tar_Relative_V_Mix(float yaw_angvel,s16 pix_x_v);	//目标速度融合
 float Gravity_Ballistic_Set(float* pitch_tarP,float dis_m);	//重力补偿坐标系中，向下为正
 void Tar_Move_Set(float* yaw_tarP,float dis_m,float tar_v);
 
+float Target_Range_Deal(s16 dis_dm,float armor_width);	//以分米为单位 正常是0.65f
+
 u8 Auto_Shoot_Aimfdb(void);	//瞄准状态
 u8 Auto_Shoot_AimAppraisal_Dynamic(float relative_v,s16 dis_dm,s16 pix_error);	//动态瞄准评估函数
 

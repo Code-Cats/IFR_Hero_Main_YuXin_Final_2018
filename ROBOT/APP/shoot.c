@@ -128,7 +128,7 @@ void RC_Control_Shoot(u8* fri_state)
 	swicth_Last_state=RC_Ctl.rc.switch_right;
 }
 
-
+extern s16 Auto_Shoot_Interval_Time;
 void PC_Control_Shoot(u8* fri_state)
 {
 	static u8 last_mouse_press_l=0;
@@ -142,7 +142,7 @@ void PC_Control_Shoot(u8* fri_state)
 	
 	if(Auto_Shoot_Aimfdb()==1&&Shoot_Heat_Limit(RobotHeatDataSimu42.heat,RobotHeatDataSimu42.maxheat)==1&&Shoot_Heat_Lost_Fre_Limit()==1&&*fri_state==1)	//自瞄自动打击
 	{
-		if(time_1ms_count-shoot_Data_Down.last_time>500)	//限制自瞄射击频率
+		if(time_1ms_count-shoot_Data_Down.last_time>Auto_Shoot_Interval_Time)	//限制自瞄射击频率
 		{
 			shoot_Data_Down.count--;
 			shoot_Data_Down.last_time=time_1ms_count;

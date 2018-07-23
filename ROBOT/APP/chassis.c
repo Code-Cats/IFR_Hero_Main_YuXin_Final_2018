@@ -756,6 +756,8 @@ s16 chassis_Vw_filter(s16 now_V)
 }
 
 
+#define POWER_LIMIT_K 0.8f/50.0f	//¼´ÄÜÁ¿²Û¿ÕÊ±0.2£¬50Ê±¿ªÊ¼ÏŞÖÆ
+#define POWER_LIMIT_B	0.21f
 u8 limit_power_statu=0;
 extern u8 SuperC_Output_Enable;	//µçÈİÊÇ·ñÄÜ·Åµç
 extern Error_check_t Error_Check;
@@ -771,25 +773,30 @@ float Limit_Power(float power,float powerbuffer)	//Ó¢ĞÛ120JÈÈÁ¿ÏŞÖÆ£¬Ö±½ÓÏŞÖÆ×ÜÊ
 ////		limit_k=limit_k<0.1f?0.1f:limit_k;
 //	}
 //	limit_k=0.9;	//È¡Ïû¹¦ÂÊÏŞÖÆ£¬ÆÁ±ÎºóÈ¡Ïû
-	if(SuperC_Output_Enable==0)//µçÈİ²»ÄÜ·Åµç
-	{
-		limit_power_statu=1;
-		limit_k=3.0f*powerbuffer/200.0f+0.08f;	//0.4
-		limit_k=limit_k>1?1:limit_k;
-		limit_k=limit_k<0.1f?0.1f:limit_k;
-	}
-	else	//µçÈİ¿ÉÒÔ·Åµç£¬·Å¿íÏŞÖÆ
-	{
-		limit_power_statu=2;
-		limit_k=3.0f*powerbuffer/125.0f+0.1f;//+0.16f;//+0.25f;	//30j¿ªÊ¼ÏŞÖÆ
-		limit_k=limit_k>1?1:limit_k;
-		limit_k=limit_k<0.1f?0.1f:limit_k;
-	}
+////////////	if(SuperC_Output_Enable==0)//µçÈİ²»ÄÜ·Åµç
+////////////	{
+////////////		limit_power_statu=1;
+////////////		limit_k=3.0f*powerbuffer/200.0f+0.08f;	//0.4
+////////////		limit_k=limit_k>1?1:limit_k;
+////////////		limit_k=limit_k<0.1f?0.1f:limit_k;
+////////////	}
+////////////	else	//µçÈİ¿ÉÒÔ·Åµç£¬·Å¿íÏŞÖÆ
+////////////	{
+////////////		limit_power_statu=2;
+////////////		limit_k=3.0f*powerbuffer/125.0f+0.1f;//+0.16f;//+0.25f;	//30j¿ªÊ¼ÏŞÖÆ
+////////////		limit_k=limit_k>1?1:limit_k;
+////////////		limit_k=limit_k<0.1f?0.1f:limit_k;
+////////////	}
+
+	
+	limit_k=POWER_LIMIT_K*powerbuffer+POWER_LIMIT_B;	//0.4
+	limit_k=limit_k>1?1:limit_k;
+	limit_k=limit_k<0.1f?0.1f:limit_k;
 	
 	if(Error_Check.statu[LOST_REFEREE]==1)	//²ÃÅĞlost
 	{
 		limit_power_statu=3;
-		limit_k=0.7;
+		limit_k=0.6;
 	}
 	
 	return limit_k;

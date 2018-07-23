@@ -317,30 +317,68 @@ u8 Auto_Shoot_AimAppraisal_Static(void)	//静态瞄准评估函数
 等效于预测函数的反解验证
 注：存在播弹延时
 *******************************/
+s16 test_autoshoot_error=0;	//理想情况下这个值应该反验为0
+s16 test_auto_shoot_pre_angel_raw=0;
+s16 test_auto_shoot_angel_error=0;
+
+s16 Auto_Shoot_Interval_Time=750;
 #define SHOOT_V_APPR	16	//用来校验的速度
 #define SHOOT_DELAY_MS 80	//以毫秒为单位
-#define CORRECTION_FACTOR 0.9f	//矫正函数修正	//以此可能会存在残差
+#define CORRECTION_FACTOR 5	//矫正函数修正	//以此可能会存在残差
 u8 Auto_Shoot_AimAppraisal_Dynamic(float relative_v,s16 dis_dm,s16 pix_error)	//动态瞄准评估函数
 {
 	u8 state=0;
 	static u8 count=0;
 	
-	int delay_to_tar=dis_dm*100/SHOOT_V_APPR+SHOOT_DELAY_MS;	//延时ms
+	int delay_to_tar=dis_dm*100/SHOOT_V_APPR+CORRECTION_FACTOR;	//延时ms
 	float	angel_error=atan(pix_error/1855.2f)*57.3f;	//以度为单位
-	float pre_angel_raw=delay_to_tar*relative_v/100;	//乘以以0.1度/s为单位的速度乘以ms处以100等于以度为单位
+	float pre_angel_raw=delay_to_tar*relative_v/10000;	//乘以以0.1度/s为单位的速度乘以ms处以100等于以度为单位
 	
-	pre_angel_raw*=CORRECTION_FACTOR;
+	if(dis_dm>20)
+	{
+		if(dis_dm>41)
+		{
+			Auto_Shoot_Interval_Time=(s16)(1000+abs(relative_v)*4+(dis_dm-40)*80);	//大于4M无预测
+		}
+		else
+		{
+			Auto_Shoot_Interval_Time=(s16)(600+abs(relative_v)*2+(dis_dm-20)*40);	//大于2M
+		}
+	}
+	else
+	{
+		if(abs(relative_v)<40)
+		{
+			Auto_Shoot_Interval_Time=300;
+		}
+		if(abs(relative_v)<60)
+		{
+			Auto_Shoot_Interval_Time=500;
+		}
+		else if(abs(relative_v)<130)
+		{
+			Auto_Shoot_Interval_Time=700;
+		}
+		else
+		{
+			Auto_Shoot_Interval_Time=(s16)(700+abs(relative_v)*2);
+		}
+	}
+//	pre_angel_raw*=CORRECTION_FACTOR;
 	
 	if(dis_dm>40)
 	{
 		dis_dm=40;
 	}
 	
-	if(abs(pre_angel_raw-angel_error)<2.2f-dis_dm*0.28f/10)	//以度为单位	//待加入大小装甲区分
+	test_auto_shoot_angel_error=(s16)(angel_error*10);
+	test_auto_shoot_pre_angel_raw=(s16)(pre_angel_raw*10);
+	test_autoshoot_error=(s16)((pre_angel_raw+angel_error)*10);
+	if(abs(pre_angel_raw+angel_error)<Target_Range_Deal(dis_dm,0.34f))	//以度为单位	//待加入大小装甲区分	1.6f-dis_dm*0.24f/10		0.65
 	{
 		count++;
 		if(count>50)	count=50;
-		if(count>1)	//连续两帧有效
+		if(count>2)	//连续三帧有效
 		{
 			if(abs(yunMotorData.pitch_tarP-yunMotorData.pitch_fdbP)<25&&Error_Check.statu[LOST_VISION]==0)	//未丢帧、Y方向正常
 			{
@@ -358,4 +396,11 @@ u8 Auto_Shoot_AimAppraisal_Dynamic(float relative_v,s16 dis_dm,s16 pix_error)	//
 	}
 	
 	return state;
+}
+
+
+float Target_Range_Deal(s16 dis_dm,float armor_width)	//以分米为单位 正常是0.65f
+{
+	float angle_range=abs(atan(armor_width/dis_dm))*18;	//本来应该是57.3
+	return angle_range;
 }

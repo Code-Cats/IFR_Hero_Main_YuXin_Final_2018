@@ -494,17 +494,22 @@
         <Ww>
           <count>27</count>
           <WinNumber>2</WinNumber>
-          <ItemText>test_tarP_set</ItemText>
+          <ItemText>PID_BulletRotate_Position[1]</ItemText>
         </Ww>
         <Ww>
           <count>28</count>
           <WinNumber>2</WinNumber>
-          <ItemText>teat_out</ItemText>
+          <ItemText>test_autoshoot_error,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>29</count>
           <WinNumber>2</WinNumber>
-          <ItemText>PID_BulletRotate_Position[1]</ItemText>
+          <ItemText>test_auto_shoot_pre_angel_raw,0x0A</ItemText>
+        </Ww>
+        <Ww>
+          <count>30</count>
+          <WinNumber>2</WinNumber>
+          <ItemText>test_auto_shoot_angel_error,0x0A</ItemText>
         </Ww>
       </WatchWindow2>
       <MemoryWindow1>
