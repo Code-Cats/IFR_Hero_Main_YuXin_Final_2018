@@ -1,7 +1,7 @@
 #include "auto_takebullet.h"
 #include "main.h"
 
-#define LIFT_DISTANCE_BULLET 700d
+#define LIFT_DISTANCE_BULLET 700
 
 TakeBulletState_e TakeBulletState=BULLET_OTHER;	//（自动）取弹状态位
 AutoAimBulletTypeDef AutoAimBulletData={0};
@@ -12,7 +12,7 @@ AutoAimBulletTypeDef AutoAimBulletData={0};
 #define BULLETROTATE_POUROUT	80//130//120	//倒弹位置
 #define BULLETROTATE_THROWOUT	970//960//-280//310	//抛出位置
 
-#define BULLETROTATE_POUROUT_DELAY	200	//300ms
+#define BULLETROTATE_POUROUT_DELAY	180	//200ms
 
 extern u32 time_1ms_count;
 extern KeyBoardTypeDef KeyBoardData[KEY_NUMS];
@@ -35,8 +35,8 @@ float pwm_r_t=STEER_UP_R_INIT;
 
 u8 valve_fdbstate[6]={0};	//记录是否伸出的反馈标志
 u8 servo_fdbstate[2]={0};
-const u32 valve_GOODdelay[6]={350,350,300,1000,1000,1000};	//0--1//待加入，延时参数
-const u32 valve_POORdelay[6]={350,350,100,1000,1000,1000};	//1--0//待加入，延时参数
+const u32 valve_GOODdelay[6]={370,370,300,1000,1000,1000};	//0--1//待加入，延时参数
+const u32 valve_POORdelay[6]={370,370,100,1000,1000,1000};	//1--0//待加入，延时参数
 const u32 servo_GOODdelay[2]={2500,800};	//延时参数	//第一段为2500是将子弹落下的延时也加进去了，因为舵机翻转和子弹下落必须是连在一体的
 const u32 servo_POORdelay[2]={500,500};	//延时参数
 
