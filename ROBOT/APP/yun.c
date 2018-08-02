@@ -176,7 +176,7 @@ void RC_Control_Yun(float * yaw_tarp,float * pitch_tarp)	//1000Hz
 	{
 		if(time_1ms_count%15==0)	//66.67hz
 		{
-			yunMotorData.yaw_tarP+=((RC_Ctl.rc.ch2-1024)*35.0/660.0);
+			yunMotorData.yaw_tarP+=((RC_Ctl.rc.ch2-1024)*27.0/660.0);	//35.0/660.0 图传延时过大 改小
 			yunMotorData.yaw_tarP=yunMotorData.yaw_tarP>1800?yunMotorData.yaw_tarP-3600:yunMotorData.yaw_tarP;	//过零点
 			yunMotorData.yaw_tarP=yunMotorData.yaw_tarP<-1800?yunMotorData.yaw_tarP+3600:yunMotorData.yaw_tarP;	//过零点
 		}
@@ -242,7 +242,7 @@ void PC_Control_Yun(float * yaw_tarp,float * pitch_tarp)	//1000Hz
 		
 		if(time_1ms_count%10==0)
 		{
-			yaw_tarp_float+=RC_Ctl.mouse.x*15.0f/40.0f;
+			yaw_tarp_float+=RC_Ctl.mouse.x*11.0f/40.0f;	//15.0f/40.0f,图传延时过大，改小
 			pitch_tarp_float-=RC_Ctl.mouse.y*2.0f/3.0f;	//2/4
 			
 			yaw_tarp_float=yaw_tarp_float>1800?yaw_tarp_float-3600:yaw_tarp_float;	//过零点

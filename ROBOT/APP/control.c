@@ -59,7 +59,7 @@ void Control_Task(void)	//2ms
 	BulletNum_Calculate();
 	if(time_1ms_count%10==0)
 	{
-		Heat_Simulating(testPowerHeatData.shooterHeat1,testGameRobotState.remainHP);	//本地端热量模拟
+		Heat_Simulating(testPowerHeatData.shooterHeat1,testGameRobotState.robotLevel);	//本地端热量模拟
 	}
 	
 	

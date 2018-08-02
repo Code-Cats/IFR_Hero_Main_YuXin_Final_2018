@@ -106,13 +106,13 @@ void Vision_Task(float* yaw_tarP,float* pitch_tarP)	//´¦ÀíÄ¿±ê½Ç¶È
 		*pitch_tarP=(float)yunMotorData.pitch_fdbP-Pixel_to_angle((s16)(VisionData.tar_y-VISION_TARY))*8192/360;
 		t_gravity_ballistic_set_angel=Gravity_Ballistic_Set(pitch_tarP,(float)(VisionData.armor_dis/10.0f));	//ÖØÁ¦²¹³¥
 		
-		if(GetWorkState()!=WAIST_STATE)
-		{
+//		if(GetWorkState()!=WAIST_STATE)
+//		{
 			if(VisionData.armor_dis<40)	//Ö»Ô¤²â4mÒÔÄÚ
 			{
 				Tar_Move_Set(yaw_tarP,(float)(VisionData.armor_dis/10.0f),VisionData.angle_x_v_filter);	//Ô¤²â ´ýµ÷½Ú
 			}
-		}
+//		}
 		
 		t_gravity_ballistic_set_angel_10=(s16)(t_gravity_ballistic_set_angel*10);
 		
@@ -131,6 +131,7 @@ float Gravity_Ballistic_Set(float* pitch_tarP,float dis_m)	//ÖØÁ¦²¹³¥×ø±êÏµÖÐ£¬Ï
 {
 	if(dis_m>4.6f)	dis_m=4.6f;
 	
+	dis_m+=0.15f;	//ÁÙÊ±¼ÓµÄ£¬ÒòÎª¾­³£´òµ½×°¼×ÏÂ·½
 //	static float tar_angle_rad_fliter=0;
 	float tar_angle_rad=(PITCH_GYRO_INIT-*pitch_tarP)*0.000767f;	//»¡¶ÈÖÆ¼ò»¯¼ÆËã2pi/8192//////////////////////////////////////////
 //	tar_angle_rad_fliter=0.9f*tar_angle_rad_fliter+0.1f*tar_angle_rad;
@@ -334,7 +335,7 @@ u8 Auto_Shoot_AimAppraisal_Dynamic(float relative_v,s16 dis_dm,s16 pix_error)	//
 	float	angel_error=atan(pix_error/1855.2f)*57.3f;	//ÒÔ¶ÈÎªµ¥Î»
 	float pre_angel_raw=delay_to_tar*relative_v/10000;	//³ËÒÔÒÔ0.1¶È/sÎªµ¥Î»µÄËÙ¶È³ËÒÔms´¦ÒÔ100µÈÓÚÒÔ¶ÈÎªµ¥Î»
 	
-	if(dis_dm>20)
+	if(dis_dm>32)
 	{
 		if(dis_dm>41)
 		{
@@ -345,7 +346,7 @@ u8 Auto_Shoot_AimAppraisal_Dynamic(float relative_v,s16 dis_dm,s16 pix_error)	//
 			Auto_Shoot_Interval_Time=(s16)(600+abs(relative_v)*2+(dis_dm-20)*40);	//´óÓÚ2M
 		}
 	}
-	else
+	else	//¼´3mÄÚ
 	{
 		if(abs(relative_v)<40)
 		{
@@ -374,13 +375,13 @@ u8 Auto_Shoot_AimAppraisal_Dynamic(float relative_v,s16 dis_dm,s16 pix_error)	//
 	test_auto_shoot_angel_error=(s16)(angel_error*10);
 	test_auto_shoot_pre_angel_raw=(s16)(pre_angel_raw*10);
 	test_autoshoot_error=(s16)((pre_angel_raw+angel_error)*10);
-	if(abs(pre_angel_raw+angel_error)<Target_Range_Deal(dis_dm,0.34f))	//ÒÔ¶ÈÎªµ¥Î»	//´ý¼ÓÈë´óÐ¡×°¼×Çø·Ö	1.6f-dis_dm*0.24f/10		0.65
+	if(abs(pre_angel_raw+angel_error)<Target_Range_Deal(dis_dm,0.35f))	//ÒÔ¶ÈÎªµ¥Î»	//´ý¼ÓÈë´óÐ¡×°¼×Çø·Ö	1.6f-dis_dm*0.24f/10		0.65
 	{
 		count++;
 		if(count>50)	count=50;
 		if(count>2)	//Á¬ÐøÈýÖ¡ÓÐÐ§
 		{
-			if(abs(yunMotorData.pitch_tarP-yunMotorData.pitch_fdbP)<25&&Error_Check.statu[LOST_VISION]==0)	//Î´¶ªÖ¡¡¢Y·½ÏòÕý³£
+			if(abs(yunMotorData.pitch_tarP-yunMotorData.pitch_fdbP)<23&&Error_Check.statu[LOST_VISION]==0)	//Î´¶ªÖ¡¡¢Y·½ÏòÕý³£
 			{
 				if(abs(VisionData.angle_x_v_filter)<410&&dis_dm<=46)	//¾àÀëÐ¡ÓÚ5m2£¬ËÙ¶ÈÐ¡ÓÚ41
 				{
@@ -401,6 +402,6 @@ u8 Auto_Shoot_AimAppraisal_Dynamic(float relative_v,s16 dis_dm,s16 pix_error)	//
 
 float Target_Range_Deal(s16 dis_dm,float armor_width)	//ÒÔ·ÖÃ×Îªµ¥Î» Õý³£ÊÇ0.65f
 {
-	float angle_range=abs(atan(armor_width/dis_dm))*18;	//±¾À´Ó¦¸ÃÊÇ57.3
+	float angle_range=abs(atan(armor_width/dis_dm))*25;	//±¾À´Ó¦¸ÃÊÇ57.3
 	return angle_range;
 }

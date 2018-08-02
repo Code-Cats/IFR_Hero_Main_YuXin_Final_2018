@@ -33,7 +33,8 @@ u8 Chassis_Follow_Statu=1;	//µ×ÅÌ¸úËæ±êÖ¾Î»£¬ÉèÁ¢´Ë±êÖ¾Î»Ô­ÒòÊÇ·½±ãµÄÔÚ´«¸ĞÆ÷Ê§Ğ
 float yaw_follow_error=0;	//»¡¶ÈÖÆ±ØĞë¸¡µã	//ÕâÀïÔÚÔÆÌ¨ÄÇÀïÅ¤Ñü²¿·Ö»áÓÃµ½
 /*************************************************************/
 
-
+	s16 test_yaw_follow_error=0;
+	u8 test_turn_flag=0;
 #define WAIST_RANGE 800//721¸Ä780//750
 #define K_SPEED 10
 s32 t_Vw_PID=0;
@@ -115,7 +116,9 @@ void Chassis_Control_External_Solution(void)	//ÍÓÂİÒÇÕı³£µÄµ×ÅÌ½â¾ö·½°¸
 			case 0:
 			{
 				YAW_INIT=yaw_init_def-WAIST_RANGE;
-				if(abs(YAW_INIT-yunMotorData.yaw_fdbP)<58)	//ÓÅ»¯-´óÓÚÒ»¸ö0¸½½ü ¸ºÖµ¾Í¿ÉÒÔ
+				test_yaw_follow_error=YAW_INIT-yunMotorData.yaw_fdbP;/////////////////////////////////////////
+				test_turn_flag=0;///////////////////////////////////////
+				if((YAW_INIT-yunMotorData.yaw_fdbP)>-85)	//ÓÅ»¯-´óÓÚÒ»¸ö0¸½½ü ¸ºÖµ¾Í¿ÉÒÔ
 				{
 					turn_flag=1;
 				}
@@ -124,7 +127,9 @@ void Chassis_Control_External_Solution(void)	//ÍÓÂİÒÇÕı³£µÄµ×ÅÌ½â¾ö·½°¸
 			case 1:
 			{
 				YAW_INIT=yaw_init_def+WAIST_RANGE;
-				if(abs(YAW_INIT-yunMotorData.yaw_fdbP)<58)	//ÓÅ»¯-Ğ¡ÓÚÒ»¸ö0¸½½üµÄÕıÖµ
+				test_yaw_follow_error=YAW_INIT-yunMotorData.yaw_fdbP;//////////////////////////////////////////
+				test_turn_flag=0;//////////////////////////////////
+				if((YAW_INIT-yunMotorData.yaw_fdbP)<85)	//ÓÅ»¯-Ğ¡ÓÚÒ»¸ö0¸½½üµÄÕıÖµ
 				{
 					turn_flag=0;
 				}
@@ -132,7 +137,7 @@ void Chassis_Control_External_Solution(void)	//ÍÓÂİÒÇÕı³£µÄµ×ÅÌ½â¾ö·½°¸
 			}
 		}
 		
-		PID_Chassis_Follow.k_p=CHASSIS_FOLLOW_PID_P/1.3f;
+		PID_Chassis_Follow.k_p=CHASSIS_FOLLOW_PID_P/1.27f;
 	}
 	else
 	{

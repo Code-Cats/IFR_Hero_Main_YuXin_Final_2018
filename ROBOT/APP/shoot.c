@@ -258,7 +258,7 @@ void Friction_Adjust_DependOn_fdbV(u16* friction_shoot,float bullet_fdbV)	//·ÅÔÚ
 	}
 	
 	if(*friction_shoot<1600)	*friction_shoot=1600;
-	if(*friction_shoot>1680)	*friction_shoot=1680;
+	if(*friction_shoot>1700)	*friction_shoot=1700;
 }
 
 

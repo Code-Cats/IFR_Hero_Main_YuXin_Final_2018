@@ -10,7 +10,7 @@ AutoAimBulletTypeDef AutoAimBulletData={0};
 #define BULLETROTATE_WAITING	476//455//-750//650	//等待（对位）时位置
 #define BULLETROTATE_ACQUIRE	1050//1050//1030	//取弹位置
 #define BULLETROTATE_POUROUT	80//130//120	//倒弹位置
-#define BULLETROTATE_THROWOUT	970//960//-280//310	//抛出位置
+#define BULLETROTATE_THROWOUT	960//970//960//-280//310	//抛出位置
 
 #define BULLETROTATE_POUROUT_DELAY	180	//200ms
 
@@ -36,7 +36,7 @@ float pwm_r_t=STEER_UP_R_INIT;
 u8 valve_fdbstate[6]={0};	//记录是否伸出的反馈标志
 u8 servo_fdbstate[2]={0};
 const u32 valve_GOODdelay[6]={370,370,300,1000,1000,1000};	//0--1//待加入，延时参数
-const u32 valve_POORdelay[6]={370,370,70,1000,1000,1000};	//1--0//待加入，延时参数
+const u32 valve_POORdelay[6]={370,370,90,1000,1000,1000};	//1--0//待加入，延时参数
 const u32 servo_GOODdelay[2]={2500,800};	//延时参数	//第一段为2500是将子弹落下的延时也加进去了，因为舵机翻转和子弹下落必须是连在一体的
 const u32 servo_POORdelay[2]={500,500};	//延时参数
 
@@ -744,7 +744,7 @@ void TakeBullet_Control_Center(void)
 }
 
 
-#define AUTOAIM_SPEENX	7	//向前压力
+#define AUTOAIM_SPEENX	15	//向前压力
 #define AUTOAIM_VOIDSPEEDY	150//130//110	//自动取块空时对位速度	//以向右为正方向
 #define AUTOAIM_EXISTSPEEDY	120//75//55	//自动取块有障碍时速度
 u8 AutoAimBullet_Task(s16* chassis_vx,s16* chassis_vy)	//自动对位任务

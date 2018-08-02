@@ -354,6 +354,11 @@
           <WinNumber>1</WinNumber>
           <ItemText>BulletRotate_Cali_Statu</ItemText>
         </Ww>
+        <Ww>
+          <count>30</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>FRICTION_SHOOT,0x0A</ItemText>
+        </Ww>
       </WatchWindow1>
       <WatchWindow2>
         <Ww>
@@ -510,6 +515,16 @@
           <count>30</count>
           <WinNumber>2</WinNumber>
           <ItemText>test_auto_shoot_angel_error,0x0A</ItemText>
+        </Ww>
+        <Ww>
+          <count>31</count>
+          <WinNumber>2</WinNumber>
+          <ItemText>test_yaw_follow_error,0x0A</ItemText>
+        </Ww>
+        <Ww>
+          <count>32</count>
+          <WinNumber>2</WinNumber>
+          <ItemText>test_turn_flag,0x0A</ItemText>
         </Ww>
       </WatchWindow2>
       <MemoryWindow1>
