@@ -90,10 +90,10 @@ void CAN2_Shoot_Bullet_SendMsg(int16_t motor_201,int16_t motor_202,int16_t motor
     tx_message.RTR = CAN_RTR_Data;   //数据帧
     tx_message.DLC = 0x08;           //帧长度为8
     
-    tx_message.Data[0] = (char)(motor_201>>8);
-    tx_message.Data[1] = (char)motor_201;
-    tx_message.Data[2] = (char)(motor_202>>8);
-    tx_message.Data[3] = (char)motor_202;
+    tx_message.Data[0] = 0;//(char)(motor_201>>8);
+    tx_message.Data[1] = 0;//(char)motor_201;
+    tx_message.Data[2] = 0;//(char)(motor_202>>8);
+    tx_message.Data[3] = 0;//(char)motor_202;
     tx_message.Data[4] = (char)(motor_203>>8);
     tx_message.Data[5] = (char)motor_203;
     tx_message.Data[6] = (char)(motor_204>>8);

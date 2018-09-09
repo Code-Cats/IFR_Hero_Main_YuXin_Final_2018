@@ -284,7 +284,7 @@ void Work_Execute(void)	//工作执行2018.7.1
 		}
 		case CALI_STATE:	//标定模式
 		{
-			if(BulletRotate_Cali()==1&&Imu_Cali_State()==1)	//改为闭环标定	//BulletRotate_OffSetInit()==1
+			if(Imu_Cali_State()==1)	//改为闭环标定	//BulletRotate_OffSetInit()==1		//BulletRotate_Cali()==1&& 临时取消夹子一系列功能，用于招新发传单 2018.9.9
 			{
 				SetWorkState(NORMAL_STATE);
 			}
